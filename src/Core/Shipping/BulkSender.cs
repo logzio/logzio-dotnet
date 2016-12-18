@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Logzio.DotNet.Core.Shipping
 {
@@ -16,10 +17,21 @@ namespace Logzio.DotNet.Core.Shipping
 		private const string HttpsUrlTemplate = "https://" + LogzioHost + ":8071/?token={0}&type={1}";
 
 		private readonly BulkSenderOptions _options;
+		private readonly JsonSerializer _jsonSerializer;
 
 		public BulkSender(BulkSenderOptions options)
 		{
 			_options = options;
+			_jsonSerializer = new JsonSerializer { ContractResolver = new CamelCasePropertyNamesContractResolver() };
+		}
+
+		public string Serialize(object obj)
+		{
+			using (var sb = new StringWriter())
+			{
+				_jsonSerializer.Serialize(sb, obj);
+				return sb.ToString();
+			}
 		}
 
 		public void Send(ICollection<LogEvent> logz, int attempt = 0)
@@ -29,7 +41,9 @@ namespace Logzio.DotNet.Core.Shipping
 			{
 				using (var client = new WebClient())
 				{
-					client.UploadString(url, JsonConvert.SerializeObject(logz.Select(x => x.LogData)));
+					var serializedLogLines = logz.Select(x => Serialize(x.LogData)).ToArray();
+					var body = String.Join(Environment.NewLine, serializedLogLines);
+					client.UploadString(url, body);
 				}
 			}
 			catch (Exception ex)
@@ -37,13 +51,13 @@ namespace Logzio.DotNet.Core.Shipping
 				Trace.WriteLine("Logzio.DotNet ERROR: " + ex);
 
 				if (attempt < _options.RetriesMaxAttempts - 1)
-					Task.Delay(_options.RetriesInterval).ContinueWith((task) => Send(logz, attempt + 1));
+					Task.Delay(_options.RetriesInterval).ContinueWith(task => Send(logz, attempt + 1));
 			}
 		}
 
 		public void SendAsync(ICollection<LogEvent> logz)
 		{
-			Task.Run(() => Send(logz, 0));
+			Task.Run(() => Send(logz));
 		}
 	}
 }

@@ -1,10 +1,12 @@
+using System.Collections.Generic;
+
 namespace Logzio.DotNet.Core.Shipping
 {
 	public class LogEvent
 	{
-		public object LogData { get; set; }
+		public Dictionary<string,string> LogData { get; set; }
 
-		public LogEvent(object logData)
+		public LogEvent(Dictionary<string,string> logData)
 		{
 			LogData = logData;
 		}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using log4net.Appender;
 using log4net.Core;
 using Logzio.DotNet.Core.Shipping;
@@ -16,16 +17,16 @@ namespace Logzio.DotNet.Log4net
 
 		protected override void Append(LoggingEvent loggingEvent)
 		{
-			_shipper.Log(new LogEvent(new
+			_shipper.Log(new LogEvent(new Dictionary<string,string>
 			{
-				loggingEvent.TimeStamp,
-				Logger = loggingEvent.LoggerName,
-				loggingEvent.Domain,
-				loggingEvent.Level,
-				Thread = loggingEvent.ThreadName,
-				Message = loggingEvent.RenderedMessage,
-				Exception = loggingEvent.GetExceptionString(),
-				User = loggingEvent.UserName
+				{"@timestamp", loggingEvent.TimeStamp.ToString("o")},
+				{"logger", loggingEvent.LoggerName },
+				{"domain", loggingEvent.Domain },
+				{"level", loggingEvent.Level.DisplayName },
+				{"thread", loggingEvent.ThreadName },
+				{"message", loggingEvent.RenderedMessage },
+				{"exception", loggingEvent.GetExceptionString() },
+				{"user", loggingEvent.UserName }
 			}));
 		}
 
@@ -44,16 +45,6 @@ namespace Logzio.DotNet.Log4net
 			_shipper.SendOptions.IsSecured = value;
 		}
 
-		public void AddRetriesMaxAttempts(int value)
-		{
-			_shipper.SendOptions.RetriesMaxAttempts = value;
-		}
-
-		public void AddRetriesInterval(TimeSpan value)
-		{
-			_shipper.SendOptions.RetriesInterval = value;
-		}
-
 		public void AddBufferSize(int bufferSize)
 		{
 			_shipper.Options.BufferSize = bufferSize;
@@ -64,9 +55,14 @@ namespace Logzio.DotNet.Log4net
 			_shipper.Options.BufferTimeLimit = value;
 		}
 
-		public void AddAddConnectionTimeout(TimeSpan value)
+		public void AddRetriesMaxAttempts(int value)
 		{
-			_shipper.SendOptions.Timeout = value;
+			_shipper.SendOptions.RetriesMaxAttempts = value;
+		}
+
+		public void AddRetriesInterval(TimeSpan value)
+		{
+			_shipper.SendOptions.RetriesInterval = value;
 		}
 	}
 }
