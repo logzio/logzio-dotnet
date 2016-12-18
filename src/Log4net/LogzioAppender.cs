@@ -17,7 +17,7 @@ namespace Logzio.DotNet.Log4net
 
 		protected override void Append(LoggingEvent loggingEvent)
 		{
-			_shipper.Log(new LogEvent(new Dictionary<string,string>
+			var values = new Dictionary<string,string>
 			{
 				{"@timestamp", loggingEvent.TimeStamp.ToString("o")},
 				{"logger", loggingEvent.LoggerName },
@@ -27,7 +27,14 @@ namespace Logzio.DotNet.Log4net
 				{"message", loggingEvent.RenderedMessage },
 				{"exception", loggingEvent.GetExceptionString() },
 				{"user", loggingEvent.UserName }
-			}));
+			};
+			ExtendValues(loggingEvent, values);
+			_shipper.Log(new LogEvent(values));
+		}
+
+		protected virtual void ExtendValues(LoggingEvent loggingEvent, Dictionary<string, string> values)
+		{
+			
 		}
 
 		public void AddToken(string value)
