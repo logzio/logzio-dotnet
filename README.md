@@ -5,9 +5,9 @@ This library offers a solution for .NET loggers, log4net and NLog.
 
 - [log4net](#log4net)
 	- [Configuration](#configuration)
-		    - [XML](#xml)
-			- [Code](#code)
-			- [Custom Fields](#custom_fields)
+		- [XML](#xml)
+		- [Code](#code)
+		- [Custom Fields](#custom_fields)
 	- [Extensibility](#extensibility)
 - [NLog](#nlog)
 

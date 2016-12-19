@@ -29,5 +29,9 @@ echo Merging DLLs...
 copy log4net\Logzio.DotNet.Log4net.nuspec log4net\package\Logzio.DotNet.Log4net.nuspec
 %nuget% pack log4net\package\Logzio.DotNet.Log4net.nuspec -OutputDirectory log4net
 
+
+:nuget setApiKey Your-API-Key
+:nuget push YourPackage.nupkg -Source https://www.nuget.org/api/v2/package
+
 echo Done
 pause
