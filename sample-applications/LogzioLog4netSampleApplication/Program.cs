@@ -12,8 +12,8 @@ namespace LogzioLog4netSampleApplication
 			XmlConfigurator.Configure();
 
 			var logger = LogManager.GetLogger("GreetingsLogger");
-			logger.Info("Hello to you");
-			Thread.Sleep(TimeSpan.FromSeconds(10));
+			logger.Info("Hmm.");
+			Thread.Sleep(TimeSpan.FromSeconds(30));
 		}
 	}
 }
