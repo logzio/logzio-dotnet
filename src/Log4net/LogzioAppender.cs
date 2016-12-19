@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using log4net;
 using log4net.Appender;
 using log4net.Core;
 using Logzio.DotNet.Core.Shipping;
@@ -9,6 +10,7 @@ namespace Logzio.DotNet.Log4net
 	public class LogzioAppender : AppenderSkeleton
 	{
 		private readonly Shipper _shipper = new Shipper();
+		private readonly List<LogzioAppenderCustomField> _customFields = new List<LogzioAppenderCustomField>();
 
 		public LogzioAppender()
 		{
@@ -28,6 +30,12 @@ namespace Logzio.DotNet.Log4net
 				{"exception", loggingEvent.GetExceptionString() },
 				{"user", loggingEvent.UserName }
 			};
+
+			foreach (var customField in _customFields)
+			{
+				values[customField.Key] = customField.Value;
+			}
+
 			ExtendValues(loggingEvent, values);
 			
 			_shipper.Log(new LogzioLoggingEvent(values));
@@ -71,6 +79,11 @@ namespace Logzio.DotNet.Log4net
 		public void AddRetriesInterval(TimeSpan value)
 		{
 			_shipper.SendOptions.RetriesInterval = value;
+		}
+
+		public void AddCustomField(LogzioAppenderCustomField customField)
+		{
+			_customFields.Add(customField);			
 		}
 	}
 }
