@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
+using Logzio.DotNet.Core.WebClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -12,9 +12,7 @@ namespace Logzio.DotNet.Core.Shipping
 {
 	public interface IBulkSender
 	{
-		string Serialize(object obj);
-		void Send(ICollection<LogzioLoggingEvent> logz, int attempt = 0);
-		void SendAsync(ICollection<LogzioLoggingEvent> logz);
+		Task SendAsync(ICollection<LogzioLoggingEvent> logz);
 	}
 
 	public class BulkSender : IBulkSender
@@ -22,6 +20,8 @@ namespace Logzio.DotNet.Core.Shipping
 		private const string LogzioHost = "listener.logz.io";
 		private const string HttpUrlTemplate = "http://" + LogzioHost + ":8070/?token={0}&type={1}";
 		private const string HttpsUrlTemplate = "https://" + LogzioHost + ":8071/?token={0}&type={1}";
+
+		public IWebClientFactory WebClientFactory = new WebClientFactory();
 
 		private readonly BulkSenderOptions _options;
 		private readonly JsonSerializer _jsonSerializer;
@@ -32,21 +32,17 @@ namespace Logzio.DotNet.Core.Shipping
 			_jsonSerializer = new JsonSerializer { ContractResolver = new CamelCasePropertyNamesContractResolver() };
 		}
 
-		public string Serialize(object obj)
+		public Task SendAsync(ICollection<LogzioLoggingEvent> logz)
 		{
-			using (var sb = new StringWriter())
-			{
-				_jsonSerializer.Serialize(sb, obj);
-				return sb.ToString();
-			}
+			return Task.Run(() => Send(logz));
 		}
 
-		public void Send(ICollection<LogzioLoggingEvent> logz, int attempt = 0)
+		private void Send(ICollection<LogzioLoggingEvent> logz, int attempt = 0)
 		{
 			var url = string.Format(_options.IsSecured ? HttpsUrlTemplate : HttpUrlTemplate, _options.Token, _options.Type);
 			try
 			{
-				using (var client = new WebClient())
+				using (var client = WebClientFactory.GetWebClient())
 				{
 					var serializedLogLines = logz.Select(x => Serialize(x.LogData)).ToArray();
 					var body = String.Join(Environment.NewLine, serializedLogLines);
@@ -62,9 +58,13 @@ namespace Logzio.DotNet.Core.Shipping
 			}
 		}
 
-		public void SendAsync(ICollection<LogzioLoggingEvent> logz)
+		private string Serialize(object obj)
 		{
-			Task.Run(() => Send(logz));
+			using (var sb = new StringWriter())
+			{
+				_jsonSerializer.Serialize(sb, obj);
+				return sb.ToString();
+			}
 		}
 	}
 }
