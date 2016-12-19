@@ -4,30 +4,33 @@ using System.Threading.Tasks;
 
 namespace Logzio.DotNet.Core.Shipping
 {
-	public class Shipper
+	public interface IShipper
 	{
-		private readonly BulkSender _bulkSender;
+		ShipperOptions Options { get; set; }
+		BulkSenderOptions SendOptions { get; set; }
+		void Log(LogzioLoggingEvent logzioLoggingEvent);
+	}
 
-		public ShipperOptions Options { get; set; }
-		public BulkSenderOptions SendOptions { get; set; }
+	public class Shipper : IShipper
+	{
+		public IBulkSender BulkSender { get; set; }
 
-		private readonly ConcurrentQueue<LogzioLoggingEvent> _queue;
-		private readonly object _fullBufferlocker;
-		private readonly object _timedOutBufferlocker;
+		public ShipperOptions Options { get; set; } = new ShipperOptions();
+		public BulkSenderOptions SendOptions { get; set; } = new BulkSenderOptions();
+
+		private readonly ConcurrentQueue<LogzioLoggingEvent> _queue = new ConcurrentQueue<LogzioLoggingEvent>();
+		private readonly object _fullBufferlocker = new object();
+		private readonly object _timedOutBufferlocker = new object();
 		private Task _delayTask;
 
 		public Shipper()
 		{
-			Options = new ShipperOptions();
-			SendOptions = new BulkSenderOptions();
-			_bulkSender = new BulkSender(SendOptions);
-			_queue = new ConcurrentQueue<LogzioLoggingEvent>();
-			_fullBufferlocker = new object();
-			_timedOutBufferlocker = new object();
+			BulkSender = new BulkSender(SendOptions);
 		}
 
 		public void Log(LogzioLoggingEvent logzioLoggingEvent)
 		{
+			// ReSharper disable once InconsistentlySynchronizedField
 			_queue.Enqueue(logzioLoggingEvent);
 
 			SendLogsIfBufferIsFull();
@@ -75,7 +78,7 @@ namespace Logzio.DotNet.Core.Shipping
 				logz.Add(log);
 			}
 
-			_bulkSender.SendAsync(logz);
+			BulkSender.SendAsync(logz);
 		}
 	}
 }

@@ -10,7 +10,14 @@ using Newtonsoft.Json.Serialization;
 
 namespace Logzio.DotNet.Core.Shipping
 {
-	public class BulkSender
+	public interface IBulkSender
+	{
+		string Serialize(object obj);
+		void Send(ICollection<LogzioLoggingEvent> logz, int attempt = 0);
+		void SendAsync(ICollection<LogzioLoggingEvent> logz);
+	}
+
+	public class BulkSender : IBulkSender
 	{
 		private const string LogzioHost = "listener.logz.io";
 		private const string HttpUrlTemplate = "http://" + LogzioHost + ":8070/?token={0}&type={1}";
