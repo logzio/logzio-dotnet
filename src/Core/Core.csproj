@@ -47,7 +47,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shipping\BulkSender.cs" />
     <Compile Include="Shipping\BulkSenderOptions.cs" />
-    <Compile Include="Shipping\LogEvent.cs" />
+    <Compile Include="Shipping\LogzioLoggingEvent.cs" />
     <Compile Include="Shipping\Shipper.cs" />
     <Compile Include="Shipping\ShipperOptions.cs" />
   </ItemGroup>

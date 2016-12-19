@@ -34,7 +34,7 @@ namespace Logzio.DotNet.Core.Shipping
 			}
 		}
 
-		public void Send(ICollection<LogEvent> logz, int attempt = 0)
+		public void Send(ICollection<LogzioLoggingEvent> logz, int attempt = 0)
 		{
 			var url = string.Format(_options.IsSecured ? HttpsUrlTemplate : HttpUrlTemplate, _options.Token, _options.Type);
 			try
@@ -55,7 +55,7 @@ namespace Logzio.DotNet.Core.Shipping
 			}
 		}
 
-		public void SendAsync(ICollection<LogEvent> logz)
+		public void SendAsync(ICollection<LogzioLoggingEvent> logz)
 		{
 			Task.Run(() => Send(logz));
 		}

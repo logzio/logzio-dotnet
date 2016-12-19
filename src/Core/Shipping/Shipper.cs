@@ -11,7 +11,7 @@ namespace Logzio.DotNet.Core.Shipping
 		public ShipperOptions Options { get; set; }
 		public BulkSenderOptions SendOptions { get; set; }
 
-		private readonly ConcurrentQueue<LogEvent> _queue;
+		private readonly ConcurrentQueue<LogzioLoggingEvent> _queue;
 		private readonly object _fullBufferlocker;
 		private readonly object _timedOutBufferlocker;
 		private Task _delayTask;
@@ -21,14 +21,14 @@ namespace Logzio.DotNet.Core.Shipping
 			Options = new ShipperOptions();
 			SendOptions = new BulkSenderOptions();
 			_bulkSender = new BulkSender(SendOptions);
-			_queue = new ConcurrentQueue<LogEvent>();
+			_queue = new ConcurrentQueue<LogzioLoggingEvent>();
 			_fullBufferlocker = new object();
 			_timedOutBufferlocker = new object();
 		}
 
-		public void Log(LogEvent logEvent)
+		public void Log(LogzioLoggingEvent logzioLoggingEvent)
 		{
-			_queue.Enqueue(logEvent);
+			_queue.Enqueue(logzioLoggingEvent);
 
 			SendLogsIfBufferIsFull();
 			if (_delayTask == null || _delayTask.IsCompleted)
@@ -65,10 +65,10 @@ namespace Logzio.DotNet.Core.Shipping
 
 		private void SendLogs()
 		{
-			var logz = new List<LogEvent>();
+			var logz = new List<LogzioLoggingEvent>();
 			for (var i = 0; i < Options.BufferSize; i++)
 			{
-				LogEvent log;
+				LogzioLoggingEvent log;
 				if (!_queue.TryDequeue(out log))
 					break;
 

@@ -2,11 +2,11 @@ using System.Collections.Generic;
 
 namespace Logzio.DotNet.Core.Shipping
 {
-	public class LogEvent
+	public class LogzioLoggingEvent
 	{
 		public Dictionary<string,string> LogData { get; set; }
 
-		public LogEvent(Dictionary<string,string> logData)
+		public LogzioLoggingEvent(Dictionary<string,string> logData)
 		{
 			LogData = logData;
 		}

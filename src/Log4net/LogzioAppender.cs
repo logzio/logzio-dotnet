@@ -29,7 +29,8 @@ namespace Logzio.DotNet.Log4net
 				{"user", loggingEvent.UserName }
 			};
 			ExtendValues(loggingEvent, values);
-			_shipper.Log(new LogEvent(values));
+			
+			_shipper.Log(new LogzioLoggingEvent(values));
 		}
 
 		protected virtual void ExtendValues(LoggingEvent loggingEvent, Dictionary<string, string> values)
