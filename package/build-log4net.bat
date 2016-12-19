@@ -3,7 +3,6 @@ echo Clearing previous files...
 rmdir log4net\out /S /Q
 rmdir log4net\package /S /Q
 del log4net\*.nupkg
-pause 
 
 echo Making directory tree...
 mkdir log4net

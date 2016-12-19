@@ -12,5 +12,8 @@
     <summary>A log4net appender to send logs to the logz.io app</summary>
 	<description>This log4net appender will send logs, in bulks, to the logz.io bulk HTTP service. Configurations are available, see the github readme for details.</description>    
     <tags>logging log logzio</tags>
+	<dependencies>
+      <dependency id="Newtonsoft.Json" version="9.0" />
+    </dependencies>
   </metadata>
 </package>
