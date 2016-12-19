@@ -38,7 +38,7 @@ namespace Logzio.DotNet.Log4net
 
 			ExtendValues(loggingEvent, values);
 			
-			Shipper.Log(new LogzioLoggingEvent(values));
+			Shipper.Ship(new LogzioLoggingEvent(values));
 		}
 
 		protected virtual void ExtendValues(LoggingEvent loggingEvent, Dictionary<string, string> values)

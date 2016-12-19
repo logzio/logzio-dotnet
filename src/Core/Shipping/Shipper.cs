@@ -8,7 +8,7 @@ namespace Logzio.DotNet.Core.Shipping
 	{
 		ShipperOptions Options { get; set; }
 		BulkSenderOptions SendOptions { get; set; }
-		void Log(LogzioLoggingEvent logzioLoggingEvent);
+		void Ship(LogzioLoggingEvent logzioLoggingEvent);
 	}
 
 	public class Shipper : IShipper
@@ -28,7 +28,7 @@ namespace Logzio.DotNet.Core.Shipping
 			BulkSender = new BulkSender(SendOptions);
 		}
 
-		public void Log(LogzioLoggingEvent logzioLoggingEvent)
+		public void Ship(LogzioLoggingEvent logzioLoggingEvent)
 		{
 			// ReSharper disable once InconsistentlySynchronizedField
 			_queue.Enqueue(logzioLoggingEvent);
