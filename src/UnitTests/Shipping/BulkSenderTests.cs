@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
 using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.Core.WebClient;
 using NSubstitute;

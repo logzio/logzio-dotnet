@@ -1,4 +1,6 @@
-﻿using log4net;
+﻿using System;
+using System.Threading;
+using log4net;
 using log4net.Repository.Hierarchy;
 using Logzio.DotNet.Log4net;
 using NUnit.Framework;
@@ -9,14 +11,17 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
 	public class Log4netSanityTests
 	{
 		[Test]
-		public void Sanity()
+		public void  Sanity()
 		{
 			var hierarchy = (Hierarchy)LogManager.GetRepository();
-			hierarchy.Root.AddAppender(new LogzioAppender());
+			var logzioAppender = new LogzioAppender();
+			logzioAppender.AddToken("DKJiomZjbFyVvssJDmUAWeEOSNnDARWz");
+			hierarchy.Root.AddAppender(logzioAppender);
 			hierarchy.Configured = true;
-			
 			var logger = LogManager.GetLogger(typeof (Log4netSanityTests));
+
 			logger.Info("Just a random log line");
+			Thread.Sleep(TimeSpan.FromDays(1));
 		}
 	}
 }
