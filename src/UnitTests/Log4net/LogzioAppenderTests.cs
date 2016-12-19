@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using log4net.Core;
+﻿using log4net.Core;
 using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.Log4net;
 using NSubstitute;
@@ -23,7 +22,7 @@ namespace Logzio.DotNet.UnitTests.Log4net
 		}
 
 		[Test]
-		public void Append_WhenAppending_CallsShipperWithCorrectValues()
+		public void Append_Appending_CallsShipperWithCorrectValues()
 		{
 			_target.DoAppend(GetLoggingEventWithSomeData());
 
@@ -31,7 +30,7 @@ namespace Logzio.DotNet.UnitTests.Log4net
 		}
 
 		[Test]
-		public void Append_WhenAppendingWithCustomFields_CallsShipperWithCorrectValues()
+		public void Append_AppendingWithCustomFields_CallsShipperWithCorrectValues()
 		{
 			_target.AddCustomField(new LogzioAppenderCustomField { Key = "DatKey", Value = "DatVal"});
 			_target.DoAppend(GetLoggingEventWithSomeData());
