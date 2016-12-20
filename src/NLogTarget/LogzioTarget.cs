@@ -64,6 +64,12 @@ namespace Logzio.DotNet.NLog
 			}
 		}
 
+		protected override void CloseTarget()
+		{
+			base.CloseTarget();
+			Shipper.Flush();
+		}
+
 		protected virtual void ExtendValues(LogEventInfo logEvent, Dictionary<string, string> values)
 		{
 

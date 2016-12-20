@@ -10,6 +10,7 @@ namespace Logzio.DotNet.Core.Shipping
 		ShipperOptions Options { get; set; }
 		BulkSenderOptions SendOptions { get; set; }
 		void Ship(LogzioLoggingEvent logzioLoggingEvent);
+		void Flush();
 	}
 
 	public class Shipper : IShipper
@@ -42,6 +43,27 @@ namespace Logzio.DotNet.Core.Shipping
 				_delayTask = Task.Delay(Options.BufferTimeLimit).ContinueWith(task => SendLogsIfBufferTimedOut());
 		}
 
+		public void Flush()
+		{
+			if (Options.Debug)
+				InternalLogger.Log("Flushing remaining logz.");
+
+			if (_queue.IsEmpty)
+				return;
+
+			var logz = new List<LogzioLoggingEvent>();
+			while(!_queue.IsEmpty)
+			{
+				LogzioLoggingEvent log;
+				if (!_queue.TryDequeue(out log))
+					break;
+
+				logz.Add(log);
+			}
+
+			BulkSender.Send(logz);
+		}
+
 		private void SendLogsIfBufferIsFull()
 		{
 			if (_queue.Count < Options.BufferSize)
@@ -51,8 +73,9 @@ namespace Logzio.DotNet.Core.Shipping
 			{
 				if (_queue.Count < Options.BufferSize)
 					return;
-				
-				InternalLogger.Log("Buffer is full. Sending logs.");
+
+				if (Options.Debug)
+					InternalLogger.Log("Buffer is full. Sending logs.");
 				SendLogs();
 			}
 		}
@@ -67,7 +90,8 @@ namespace Logzio.DotNet.Core.Shipping
 				if (_queue.IsEmpty)
 					return;
 
-				InternalLogger.Log("Buffer is timed out. Sending logs.");
+				if (Options.Debug)
+					InternalLogger.Log("Buffer is timed out. Sending logs.");
 				SendLogs();
 			}
 		}

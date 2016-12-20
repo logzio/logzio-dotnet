@@ -19,6 +19,8 @@ namespace Logzio.DotNet.Log4net
 			Shipper.SendOptions.Type = "log4net";
 		}
 
+
+
 		protected override void Append(LoggingEvent loggingEvent)
 		{
 			try
@@ -54,6 +56,12 @@ namespace Logzio.DotNet.Log4net
 		protected virtual void ExtendValues(LoggingEvent loggingEvent, Dictionary<string, string> values)
 		{
 			
+		}
+
+		protected override void OnClose()
+		{
+			base.OnClose();
+			Shipper.Flush();
 		}
 
 		public void AddToken(string value)

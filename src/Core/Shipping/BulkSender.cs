@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +13,7 @@ namespace Logzio.DotNet.Core.Shipping
 	public interface IBulkSender
 	{
 		Task SendAsync(ICollection<LogzioLoggingEvent> logz);
+		void Send(ICollection<LogzioLoggingEvent> logz, int attempt = 0);
 	}
 
 	public class BulkSender : IBulkSender
@@ -39,7 +39,7 @@ namespace Logzio.DotNet.Core.Shipping
 			return Task.Run(() => Send(logz));
 		}
 
-		private void Send(ICollection<LogzioLoggingEvent> logz, int attempt = 0)
+		public void Send(ICollection<LogzioLoggingEvent> logz, int attempt = 0)
 		{
 			var url = string.Format(_options.IsSecured ? HttpsUrlTemplate : HttpUrlTemplate, _options.Token, _options.Type);
 			try
@@ -55,7 +55,8 @@ namespace Logzio.DotNet.Core.Shipping
 			}
 			catch (Exception ex)
 			{
-				InternalLogger.Log("Logzio.DotNet ERROR: " + ex);
+				if (_options.Debug)
+					InternalLogger.Log("Logzio.DotNet ERROR: " + ex);
 
 				if (attempt < _options.RetriesMaxAttempts - 1)
 					Task.Delay(_options.RetriesInterval).ContinueWith(task => Send(logz, attempt + 1));
