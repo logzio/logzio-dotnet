@@ -32,7 +32,7 @@ namespace Logzio.DotNet.NLog
 				{"logger", logEvent.LoggerName},
 				{"level", logEvent.Level.Name},
 				{"message", logEvent.FormattedMessage},
-				{"exception", logEvent.Exception.ToString()},
+				{"exception", logEvent.Exception?.ToString()},
 				{"sequenceId", logEvent.SequenceID.ToString() }
 			};
 
