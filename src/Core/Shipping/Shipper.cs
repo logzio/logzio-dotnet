@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Logzio.DotNet.Core.InternalLogger;
 
 namespace Logzio.DotNet.Core.Shipping
 {
@@ -14,6 +15,7 @@ namespace Logzio.DotNet.Core.Shipping
 	public class Shipper : IShipper
 	{
 		public IBulkSender BulkSender { get; set; }
+		public IInternalLogger InternalLogger = new InternalLogger.InternalLogger();
 
 		public ShipperOptions Options { get; set; } = new ShipperOptions();
 		public BulkSenderOptions SendOptions { get; set; } = new BulkSenderOptions();
@@ -32,6 +34,8 @@ namespace Logzio.DotNet.Core.Shipping
 		{
 			// ReSharper disable once InconsistentlySynchronizedField
 			_queue.Enqueue(logzioLoggingEvent);
+			if (Options.Debug)
+				InternalLogger.Log("Added log message. Queue size - [{0}]", _queue.Count);
 
 			SendLogsIfBufferIsFull();
 			if (_delayTask == null || _delayTask.IsCompleted)
@@ -47,7 +51,8 @@ namespace Logzio.DotNet.Core.Shipping
 			{
 				if (_queue.Count < Options.BufferSize)
 					return;
-
+				
+				InternalLogger.Log("Buffer is full. Sending logs.");
 				SendLogs();
 			}
 		}
@@ -62,6 +67,7 @@ namespace Logzio.DotNet.Core.Shipping
 				if (_queue.IsEmpty)
 					return;
 
+				InternalLogger.Log("Buffer is timed out. Sending logs.");
 				SendLogs();
 			}
 		}

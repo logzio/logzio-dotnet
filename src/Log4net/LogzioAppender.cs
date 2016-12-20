@@ -85,5 +85,11 @@ namespace Logzio.DotNet.Log4net
 		{
 			_customFields.Add(customField);			
 		}
+
+		public void AddDebug(bool value)
+		{
+			Shipper.Options.Debug = value;
+			Shipper.SendOptions.Debug = value;
+		}
 	}
 }

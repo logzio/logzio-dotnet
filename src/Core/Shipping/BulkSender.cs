@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.WebClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -22,6 +23,7 @@ namespace Logzio.DotNet.Core.Shipping
 		private const string HttpsUrlTemplate = "https://" + LogzioHost + ":8071/?token={0}&type={1}";
 
 		public IWebClientFactory WebClientFactory = new WebClientFactory();
+		public IInternalLogger InternalLogger = new InternalLogger.InternalLogger();
 
 		private readonly BulkSenderOptions _options;
 		private readonly JsonSerializer _jsonSerializer;
@@ -47,11 +49,13 @@ namespace Logzio.DotNet.Core.Shipping
 					var serializedLogLines = logz.Select(x => Serialize(x.LogData)).ToArray();
 					var body = String.Join(Environment.NewLine, serializedLogLines);
 					client.UploadString(url, body);
+					if (_options.Debug)
+						InternalLogger.Log("Sent bulk of [{0}] log messages to [{1}] successfully.", logz.Count, url);
 				}
 			}
 			catch (Exception ex)
 			{
-				Trace.WriteLine("Logzio.DotNet ERROR: " + ex);
+				InternalLogger.Log("Logzio.DotNet ERROR: " + ex);
 
 				if (attempt < _options.RetriesMaxAttempts - 1)
 					Task.Delay(_options.RetriesInterval).ContinueWith(task => Send(logz, attempt + 1));

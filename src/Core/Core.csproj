@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InternalLogger\InternalLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shipping\BulkSender.cs" />
     <Compile Include="Shipping\BulkSenderOptions.cs" />

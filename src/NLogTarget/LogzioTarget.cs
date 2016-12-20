@@ -24,6 +24,8 @@ namespace Logzio.DotNet.NLog
 		public TimeSpan BufferTimeout { get { return ShipperOptions.BufferTimeLimit; } set { ShipperOptions.BufferTimeLimit = value; } }
 		public int RetriesMaxAttempts { get { return SendOptions.RetriesMaxAttempts; } set { SendOptions.RetriesMaxAttempts= value; } }
 		public TimeSpan RetriesInterval { get { return SendOptions.RetriesInterval; } set { SendOptions.RetriesInterval = value; } }
+		public bool Debug { get { return SendOptions.Debug; } set { SendOptions.Debug = ShipperOptions.Debug = value; } }
+
 
 		protected override void Write(LogEventInfo logEvent)
 		{
