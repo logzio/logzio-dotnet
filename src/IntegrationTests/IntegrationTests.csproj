@@ -34,6 +34,10 @@
       <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.4.0\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
@@ -49,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Log4net\Log4netSanityTests.cs" />
+    <Compile Include="NLog\NLogSanityTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +63,10 @@
     <ProjectReference Include="..\Log4net\Log4netShipper.csproj">
       <Project>{21AA4336-7888-4D92-83DC-ECA624C10E33}</Project>
       <Name>Log4netShipper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NLogTarget\NLogTarget.csproj">
+      <Project>{74371DFF-55AF-4712-93FE-CE76F6BCDC69}</Project>
+      <Name>NLogTarget</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
