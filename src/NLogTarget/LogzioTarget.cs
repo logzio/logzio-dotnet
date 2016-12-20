@@ -8,6 +8,7 @@ using NLog.Targets;
 
 namespace Logzio.DotNet.NLog
 {
+	[Target("Logzio")]
 	public class LogzioTarget : Target
 	{
 		public IShipper Shipper { get; set; } = new Shipper();
