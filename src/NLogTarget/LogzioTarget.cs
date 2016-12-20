@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Logzio.DotNet.Core.Shipping;
 using NLog;
 using NLog.Config;
@@ -31,8 +32,14 @@ namespace Logzio.DotNet.NLog
 				{"logger", logEvent.LoggerName},
 				{"level", logEvent.Level.Name},
 				{"message", logEvent.FormattedMessage},
-				{"exception", logEvent.Exception.ToString()}
+				{"exception", logEvent.Exception.ToString()},
+				{"sequenceId", logEvent.SequenceID.ToString() }
 			};
+
+			foreach (var pair in logEvent.Properties.Where(pair => pair.Key != null))
+			{
+				values[pair.Key.ToString()] = pair.Value?.ToString();
+			}
 
 			ExtendValues(logEvent, values);
 
