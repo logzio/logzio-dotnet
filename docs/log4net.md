@@ -42,6 +42,8 @@ If you configure your logging in an XML file, simply add a reference to the Logz
     		<retriesMaxAttempts>3</retriesMaxAttempts>
     		<!-- Time to wait between retries, in a hh:mm:ss.fff format -->
 			<retriesInterval>00:00:02</retriesInterval>
+			<!-- Enable the appender's internal debug logger (sent to the console output and trace log) -->
+			<debug>false</debug>
     	</appender>
     
     	<root>
