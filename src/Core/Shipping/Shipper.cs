@@ -1,5 +1,7 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Logzio.DotNet.Core.InternalLogger;
 
@@ -22,6 +24,7 @@ namespace Logzio.DotNet.Core.Shipping
 		public BulkSenderOptions SendOptions { get; set; } = new BulkSenderOptions();
 
 		private readonly ConcurrentQueue<LogzioLoggingEvent> _queue = new ConcurrentQueue<LogzioLoggingEvent>();
+		private readonly ConcurrentDictionary<Task, byte> _tasks = new ConcurrentDictionary<Task, byte>();
 		private readonly object _fullBufferlocker = new object();
 		private readonly object _timedOutBufferlocker = new object();
 		private Task _delayTask;
@@ -51,17 +54,24 @@ namespace Logzio.DotNet.Core.Shipping
 			if (_queue.IsEmpty)
 				return;
 
-			var logz = new List<LogzioLoggingEvent>();
 			while(!_queue.IsEmpty)
 			{
-				LogzioLoggingEvent log;
-				if (!_queue.TryDequeue(out log))
-					break;
+				var logz = new List<LogzioLoggingEvent>();
 
-				logz.Add(log);
+				for (int i = 0; i < Options.BufferSize; i++)
+				{
+
+					LogzioLoggingEvent log;
+					if (!_queue.TryDequeue(out log))
+						break;
+
+					logz.Add(log);
+				}
+
+				BulkSender.Send(logz);
 			}
 
-			BulkSender.Send(logz);
+			Task.WaitAll(_tasks.Keys.ToArray());
 		}
 
 		private void SendLogsIfBufferIsFull()
@@ -108,7 +118,10 @@ namespace Logzio.DotNet.Core.Shipping
 				logz.Add(log);
 			}
 
-			BulkSender.SendAsync(logz);
+			var task = BulkSender.SendAsync(logz);
+			_tasks[task] = 0;
+			byte b;
+			task.ContinueWith((x) => _tasks.TryRemove(task, out b));
 		}
 	}
 }

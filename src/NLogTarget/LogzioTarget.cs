@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
 using NLog;
@@ -35,33 +36,36 @@ namespace Logzio.DotNet.NLog
 
 		protected override void Write(LogEventInfo logEvent)
 		{
-			try
+			Task.Run(() =>
 			{
-				var values = new Dictionary<string, string>
+				try
 				{
-					{"@timestamp", logEvent.TimeStamp.ToString("o")},
-					{"logger", logEvent.LoggerName},
-					{"level", logEvent.Level.Name},
-					{"message", logEvent.FormattedMessage},
-					{"exception", logEvent.Exception?.ToString()},
-					{"sequenceId", logEvent.SequenceID.ToString()}
-				};
+					var values = new Dictionary<string, string>
+					{
+						{"@timestamp", logEvent.TimeStamp.ToString("o")},
+						{"logger", logEvent.LoggerName},
+						{"level", logEvent.Level.Name},
+						{"message", logEvent.FormattedMessage},
+						{"exception", logEvent.Exception?.ToString()},
+						{"sequenceId", logEvent.SequenceID.ToString()}
+					};
 
-				foreach (var pair in logEvent.Properties.Where(pair => pair.Key != null))
-				{
-					values[pair.Key.ToString()] = pair.Value?.ToString();
+					foreach (var pair in logEvent.Properties.Where(pair => pair.Key != null))
+					{
+						values[pair.Key.ToString()] = pair.Value?.ToString();
+					}
+
+					ExtendValues(logEvent, values);
+
+					Shipper.Ship(new LogzioLoggingEvent(values));
 				}
+				catch (Exception ex)
+				{
+					if (Debug)
+						InternalLogger.Log("Couldn't handle log message: " + ex);
 
-				ExtendValues(logEvent, values);
-
-				Shipper.Ship(new LogzioLoggingEvent(values));
-			}
-			catch (Exception ex)
-			{
-				if (Debug)
-					InternalLogger.Log("Couldn't handle log message: " + ex);
-					
-			}
+				}
+			});
 		}
 
 		protected override void CloseTarget()
