@@ -18,7 +18,6 @@ namespace Logzio.DotNet.IntegrationTests.NLog
 				Token = "DKJiomZjbFyVvssJDmUAWeEOSNnDARWz",
 				Debug = true,
 				BufferSize = 1,
-				Name = "Logzio"
 			};
 			config.AddTarget("Logzio", logzioTarget);
 			config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio", "*");

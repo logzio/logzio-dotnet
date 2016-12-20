@@ -1,4 +1,4 @@
-# Logz.io log4net Shipper
+# Logz.io log4net Appender
 
 - [Configuration](#configuration)
 	- [XML](#xml)
