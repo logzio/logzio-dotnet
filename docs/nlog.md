@@ -29,7 +29,7 @@ If you configure your logging in an XML file, you need to register the assembly 
 				token="DKJiomZjbFyVvssJDmUAWeEOSNnDARWz" 
 				type="nlog"
 				isSecured="true"
-				bufferSize="30"
+				bufferSize="100"
 				bufferTimeout="00:00:05"
 				retriesMaxAttempts="3"
 				retriesInterval="00:00:02"

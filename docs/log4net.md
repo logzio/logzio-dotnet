@@ -35,7 +35,7 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 			<!-- Whether or not to send the logs through HTTPS -->
     		<isSecured>true</isSecured>
 			<!-- The maximum number of log lines to send in each bulk -->
-    		<bufferSize>30</bufferSize>
+    		<bufferSize>100</bufferSize>
 			<!-- The maximum time to wait for more log lines, in a hh:mm:ss.fff format -->
     		<bufferTimeout>00:00:05</bufferTimeout>
 			<!-- If connection to Logz.io API fails, how many times to retry -->

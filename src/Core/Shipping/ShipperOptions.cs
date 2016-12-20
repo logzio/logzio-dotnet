@@ -6,7 +6,7 @@ namespace Logzio.DotNet.Core.Shipping
 	{
 		public ShipperOptions()
 		{
-			BufferSize = 30;
+			BufferSize = 100;
 			BufferTimeLimit = TimeSpan.FromSeconds(5);
 		}
 
