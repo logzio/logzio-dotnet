@@ -14,7 +14,7 @@ namespace Logzio.DotNet.NLog
 	public class LogzioTarget : Target
 	{
 		public IShipper Shipper { get; set; } = new Shipper();
-		public IInternalLogger InternalLogger = new InternalLogger();
+		public IInternalLogger InternalLogger { get; set; } = new InternalLogger();
 		public ShipperOptions ShipperOptions => Shipper.Options;
 		public BulkSenderOptions SendOptions => Shipper.SendOptions;
 
@@ -23,9 +23,9 @@ namespace Logzio.DotNet.NLog
 
 		public string Type { get { return SendOptions.Type; } set { SendOptions.Type = value; } }
 		public bool IsSecured { get { return SendOptions.IsSecured; } set { SendOptions.IsSecured = value; } }
-		public int BufferSize { get { return ShipperOptions.BufferSize; } set { ShipperOptions.BufferSize= value; } }
+		public int BufferSize { get { return ShipperOptions.BufferSize; } set { ShipperOptions.BufferSize = value; } }
 		public TimeSpan BufferTimeout { get { return ShipperOptions.BufferTimeLimit; } set { ShipperOptions.BufferTimeLimit = value; } }
-		public int RetriesMaxAttempts { get { return SendOptions.RetriesMaxAttempts; } set { SendOptions.RetriesMaxAttempts= value; } }
+		public int RetriesMaxAttempts { get { return SendOptions.RetriesMaxAttempts; } set { SendOptions.RetriesMaxAttempts = value; } }
 		public TimeSpan RetriesInterval { get { return SendOptions.RetriesInterval; } set { SendOptions.RetriesInterval = value; } }
 		public bool Debug { get { return SendOptions.Debug; } set { SendOptions.Debug = ShipperOptions.Debug = value; } }
 
@@ -36,36 +36,42 @@ namespace Logzio.DotNet.NLog
 
 		protected override void Write(LogEventInfo logEvent)
 		{
-			Task.Run(() =>
+			Task.Run(() => { WriteImpl(logEvent); });
+		}
+
+		private void WriteImpl(LogEventInfo logEvent)
+		{
+			try
 			{
-				try
+				var values = new Dictionary<string, string>
 				{
-					var values = new Dictionary<string, string>
-					{
-						{"@timestamp", logEvent.TimeStamp.ToString("o")},
-						{"logger", logEvent.LoggerName},
-						{"level", logEvent.Level.Name},
-						{"message", logEvent.FormattedMessage},
-						{"exception", logEvent.Exception?.ToString()},
-						{"sequenceId", logEvent.SequenceID.ToString()}
-					};
+					{"@timestamp", logEvent.TimeStamp.ToString("o")},
+					{"logger", logEvent.LoggerName},
+					{"level", logEvent.Level.Name},
+					{"message", logEvent.FormattedMessage},
+					{"exception", logEvent.Exception?.ToString()},
+					{"sequenceId", logEvent.SequenceID.ToString()}
+				};
 
-					foreach (var pair in logEvent.Properties.Where(pair => pair.Key != null))
-					{
-						values[pair.Key.ToString()] = pair.Value?.ToString();
-					}
-
-					ExtendValues(logEvent, values);
-
-					Shipper.Ship(new LogzioLoggingEvent(values));
-				}
-				catch (Exception ex)
+				foreach (var pair in logEvent.Properties.Where(pair => pair.Key != null))
 				{
-					if (Debug)
-						InternalLogger.Log("Couldn't handle log message: " + ex);
-
+					values[pair.Key.ToString()] = pair.Value?.ToString();
 				}
-			});
+		
+				foreach (var pair in LogManager.Configuration.Variables.Where(pair => pair.Key != null))
+				{
+					values[pair.Key] = pair.Value?.OriginalText;
+				}
+
+				ExtendValues(logEvent, values);
+
+				Shipper.Ship(new LogzioLoggingEvent(values));
+			}
+			catch (Exception ex)
+			{
+				if (Debug)
+					InternalLogger.Log("Couldn't handle log message: " + ex);
+			}
 		}
 
 		protected override void CloseTarget()

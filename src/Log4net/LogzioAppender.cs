@@ -20,41 +20,41 @@ namespace Logzio.DotNet.Log4net
 			Shipper.SendOptions.Type = "log4net";
 		}
 
-
-
 		protected override void Append(LoggingEvent loggingEvent)
 		{
-			Task.Run(() =>
+			Task.Run(() => { WriteImpl(loggingEvent); });
+		}
+
+		private void WriteImpl(LoggingEvent loggingEvent)
+		{
+			try
 			{
-				try
+				var values = new Dictionary<string, string>
 				{
-					var values = new Dictionary<string, string>
-					{
-						{"@timestamp", loggingEvent.TimeStamp.ToString("o")},
-						{"logger", loggingEvent.LoggerName},
-						{"domain", loggingEvent.Domain},
-						{"level", loggingEvent.Level.DisplayName},
-						{"thread", loggingEvent.ThreadName},
-						{"message", loggingEvent.RenderedMessage},
-						{"exception", loggingEvent.GetExceptionString()},
-						{"user", loggingEvent.UserName},
-					};
+					{"@timestamp", loggingEvent.TimeStamp.ToString("o")},
+					{"logger", loggingEvent.LoggerName},
+					{"domain", loggingEvent.Domain},
+					{"level", loggingEvent.Level.DisplayName},
+					{"thread", loggingEvent.ThreadName},
+					{"message", loggingEvent.RenderedMessage},
+					{"exception", loggingEvent.GetExceptionString()},
+					{"user", loggingEvent.UserName},
+				};
 
-					foreach (var customField in _customFields)
-					{
-						values[customField.Key] = customField.Value;
-					}
-
-					ExtendValues(loggingEvent, values);
-
-					Shipper.Ship(new LogzioLoggingEvent(values));
-				}
-				catch (Exception ex)
+				foreach (var customField in _customFields)
 				{
-					if (Shipper.Options.Debug)
-						InternalLogger.Log("Couldn't handle log message: " + ex);
+					values[customField.Key] = customField.Value;
 				}
-			});
+
+				ExtendValues(loggingEvent, values);
+
+				Shipper.Ship(new LogzioLoggingEvent(values));
+			}
+			catch (Exception ex)
+			{
+				if (Shipper.Options.Debug)
+					InternalLogger.Log("Couldn't handle log message: " + ex);
+			}
 		}
 
 		protected virtual void ExtendValues(LoggingEvent loggingEvent, Dictionary<string, string> values)
