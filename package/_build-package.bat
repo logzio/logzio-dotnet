@@ -18,7 +18,7 @@ mkdir %framework%\package\lib\net46
 set msbuild="C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
 set ilmerge=..\src\packages\ILMerge.2.14.1208\tools\ILMerge.exe
 set nuget=..\src\packages\NuGet.CommandLine.3.4.3\tools\NuGet.exe
-
+set szip="C:\Program Files\7-Zip\7z.exe"
 
 echo Building project...
 %msbuild% ..\src\%project%\%project%.csproj /p:OutDir=..\..\package\%framework%\out\46;Configuration=Release;TargetFrameworkVersion=4.6 /t:Rebuild
@@ -28,12 +28,15 @@ echo Merging DLLs...
 %ilmerge% /out:%framework%\package\lib\net45\Logzio.DotNet.%dllsuffix%.dll %framework%\out\45\Logzio.DotNet.%dllsuffix%.dll %framework%\out\45\Logzio.DotNet.Core.dll 
 %ilmerge% /out:%framework%\package\lib\net46\Logzio.DotNet.%dllsuffix%.dll %framework%\out\46\Logzio.DotNet.%dllsuffix%.dll %framework%\out\46\Logzio.DotNet.Core.dll 
 
-
+echo Creating nuget package...
 copy %framework%\Logzio.DotNet.%dllsuffix%.nuspec %framework%\package\Logzio.DotNet.%dllsuffix%.nuspec
 %nuget% pack %framework%\package\Logzio.DotNet.%dllsuffix%.nuspec -OutputDirectory %framework%
 
 
 :nuget setApiKey Your-API-Key
 :nuget push YourPackage.nupkg -Source https://www.nuget.org/api/v2/package
+
+echo Creating release zip...
+%szip% a -r %framework%\Logzio.DotNet.%dllsuffix%.zip .\%framework%\package\lib\*
 
 echo Done
