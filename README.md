@@ -9,5 +9,6 @@ This repository contains the [Logz.io](http://www.logz.io) shippers for .NET fra
 - Async, non-blocking and non-throwing logging to [Logz.io](http://www.logz.io)
 - Logs are uploaded in bulks of 100 messages (configurable) or a timeout of 5 seconds (configurable)
 - Up to 3 retries (configurable) 2 seconds apart (configurable) in case the upload fails, for whatever reason
-- Enable debug mode to see debug messages or errors in the console or trace log
+- On console applications, logs are flushed before the app exists
+- Enable debug mode to see debug messages and errors in the console output and trace log
 - Provided with sample applications and configuration examples
