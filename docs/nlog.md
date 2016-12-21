@@ -3,6 +3,7 @@
 - [Configuration](#configuration)
 	- [XML](#xml)
 	- [Code](#code)
+- [Variables](#variables)
 - [Extensibility](#extensibility)
 
 
@@ -53,6 +54,16 @@ To add the Logz.io target via code, add the following lines:
 	LogManager.Configuration = config;
 ```
 
+##Variables
+
+Any variables defined in the NLog configuration will be forwarded to Logzio. For example:
+
+```xml
+	<nlog>
+		<variable key="site" value="New Zealand" />
+		<variable key="rings" value="one" />
+	</nlog>
+```
 
 ##Extensibility 
 
