@@ -73,7 +73,7 @@
       <Project>{83260D70-F07C-4D06-B60F-FE0EE633CF77}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Log4net\Log4netShipper.csproj">
+    <ProjectReference Include="..\Log4netShipper\Log4netShipper.csproj">
       <Project>{21AA4336-7888-4D92-83DC-ECA624C10E33}</Project>
       <Name>Log4netShipper</Name>
     </ProjectReference>

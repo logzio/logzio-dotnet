@@ -62,13 +62,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Log4net\Log4netShipper.csproj">
+    <ProjectReference Include="..\Log4netShipper\Log4netShipper.csproj">
       <Project>{21AA4336-7888-4D92-83DC-ECA624C10E33}</Project>
       <Name>Log4netShipper</Name>
     </ProjectReference>
-    <ProjectReference Include="..\NLogTarget\NLogTarget.csproj">
+    <ProjectReference Include="..\NLogShipper\NLogShipper.csproj">
       <Project>{74371DFF-55AF-4712-93FE-CE76F6BCDC69}</Project>
-      <Name>NLogTarget</Name>
+      <Name>NLogShipper</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

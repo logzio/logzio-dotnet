@@ -18,8 +18,8 @@ set nuget=..\src\packages\NuGet.CommandLine.3.4.3\tools\NuGet.exe
 
 
 echo Building project...
-%msbuild% ..\src\Log4net\Log4netShipper.csproj /p:OutDir=..\..\package\log4net\out\46;Configuration=Release;TargetFrameworkVersion=4.6 /t:Rebuild
-%msbuild% ..\src\Log4net\Log4netShipper.csproj /p:OutDir=..\..\package\log4net\out\45;Configuration=Release;TargetFrameworkVersion=4.5 /t:Rebuild
+%msbuild% ..\src\Log4netShipper\Log4netShipper.csproj /p:OutDir=..\..\package\log4net\out\46;Configuration=Release;TargetFrameworkVersion=4.6 /t:Rebuild
+%msbuild% ..\src\Log4netShipper\Log4netShipper.csproj /p:OutDir=..\..\package\log4net\out\45;Configuration=Release;TargetFrameworkVersion=4.5 /t:Rebuild
 
 echo Merging DLLs...
 %ilmerge% /out:log4net\package\lib\net45\Logzio.DotNet.Log4net.dll log4net\out\45\Logzio.DotNet.Log4net.dll log4net\out\45\Logzio.DotNet.Core.dll 

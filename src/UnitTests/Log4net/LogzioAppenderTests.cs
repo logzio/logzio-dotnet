@@ -25,7 +25,7 @@ namespace Logzio.DotNet.UnitTests.Log4net
 		public void Append_Appending_CallsShipperWithCorrectValues()
 		{
 			_target.DoAppend(GetLoggingEventWithSomeData());
-
+			_target.Close();
 			_shipper.Received().Ship(Arg.Is<LogzioLoggingEvent>(x => x.LogData["domain"] == "Such domain"));
 		}
 
@@ -34,6 +34,7 @@ namespace Logzio.DotNet.UnitTests.Log4net
 		{
 			_target.AddCustomField(new LogzioAppenderCustomField { Key = "DatKey", Value = "DatVal"});
 			_target.DoAppend(GetLoggingEventWithSomeData());
+			_target.Close();
 
 			_shipper.Received().Ship(Arg.Is<LogzioLoggingEvent>(x => x.LogData["DatKey"] == "DatVal"));
 		}
