@@ -26,9 +26,9 @@ If you configure your logging in an XML file, you need to register the assembly 
 		<targets>
 			<!-- parameters are shown here with their default values. 
 				Other than the token, all of the fields are optional and can be safely omitted. -->
-			<target name="logzio" xsi:type="Logzio" 
+			<target name="logzio" type="Logzio" 
 				token="DKJiomZjbFyVvssJDmUAWeEOSNnDARWz" 
-				type="nlog"
+				logzioType="nlog"
 				isSecured="true"
 				bufferSize="100"
 				bufferTimeout="00:00:05"

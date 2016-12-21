@@ -21,7 +21,7 @@ namespace Logzio.DotNet.NLog
 		[RequiredParameter]
 		public string Token { get { return SendOptions.Token; } set { SendOptions.Token = value; } }
 
-		public string Type { get { return SendOptions.Type; } set { SendOptions.Type = value; } }
+		public string LogzioType { get { return SendOptions.Type; } set { SendOptions.Type = value; } }
 		public bool IsSecured { get { return SendOptions.IsSecured; } set { SendOptions.IsSecured = value; } }
 		public int BufferSize { get { return ShipperOptions.BufferSize; } set { ShipperOptions.BufferSize = value; } }
 		public TimeSpan BufferTimeout { get { return ShipperOptions.BufferTimeLimit; } set { ShipperOptions.BufferTimeLimit = value; } }
@@ -31,7 +31,7 @@ namespace Logzio.DotNet.NLog
 
 		public LogzioTarget()
 		{
-			Type = "nlog";
+			LogzioType = "nlog";
 		}
 
 		protected override void Write(LogEventInfo logEvent)
