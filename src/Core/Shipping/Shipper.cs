@@ -51,16 +51,14 @@ namespace Logzio.DotNet.Core.Shipping
 			if (Options.Debug)
 				InternalLogger.Log("Flushing remaining logz.");
 
-			if (_queue.IsEmpty)
-				return;
-
-			while(!_queue.IsEmpty)
+			while (!_queue.IsEmpty)
 			{
 				var logz = new List<LogzioLoggingEvent>();
 
+				
+
 				for (int i = 0; i < Options.BufferSize; i++)
 				{
-
 					LogzioLoggingEvent log;
 					if (!_queue.TryDequeue(out log))
 						break;
