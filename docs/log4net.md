@@ -32,8 +32,8 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 			<!-- The type field will be added to each log message, making it 
 			easier for you to differ between different types of logs. -->
     		<type>log4net</type>
-			<!-- Whether or not to send the logs through HTTPS -->
-    		<isSecured>true</isSecured>
+			<!-- The URL of the Lgz.io listener -->
+    		<listenerUrl>https://listener.logz.io:8071</listenerUrl>
 			<!-- The maximum number of log lines to send in each bulk -->
     		<bufferSize>100</bufferSize>
 			<!-- The maximum time to wait for more log lines, in a hh:mm:ss.fff format -->

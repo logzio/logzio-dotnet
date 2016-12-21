@@ -37,8 +37,9 @@
       <HintPath>packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Logzio.DotNet.Log4net">
-      <HintPath>..\..\src\Log4net\bin\Debug\Logzio.DotNet.Log4net.dll</HintPath>
+    <Reference Include="Logzio.DotNet.Log4net, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\src\Log4netShipper\bin\Debug\Logzio.DotNet.Log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

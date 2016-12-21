@@ -18,9 +18,7 @@ namespace Logzio.DotNet.Core.Shipping
 
 	public class BulkSender : IBulkSender
 	{
-		private const string LogzioHost = "listener.logz.io";
-		private const string HttpUrlTemplate = "http://" + LogzioHost + ":8070/?token={0}&type={1}";
-		private const string HttpsUrlTemplate = "https://" + LogzioHost + ":8071/?token={0}&type={1}";
+		private const string UrlTemplate = "{0}/?token={1}&type={2}";
 
 		public IWebClientFactory WebClientFactory = new WebClientFactory();
 		public IInternalLogger InternalLogger = new InternalLogger.InternalLogger();
@@ -41,7 +39,7 @@ namespace Logzio.DotNet.Core.Shipping
 
 		public void Send(ICollection<LogzioLoggingEvent> logz, int attempt = 0)
 		{
-			var url = string.Format(_options.IsSecured ? HttpsUrlTemplate : HttpUrlTemplate, _options.Token, _options.Type);
+			var url = string.Format(UrlTemplate, _options.ListenerUrl, _options.Token, _options.Type);
 			try
 			{
 				using (var client = WebClientFactory.GetWebClient())

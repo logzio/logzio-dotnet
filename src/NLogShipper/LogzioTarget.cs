@@ -22,7 +22,7 @@ namespace Logzio.DotNet.NLog
 		public string Token { get { return SendOptions.Token; } set { SendOptions.Token = value; } }
 
 		public string LogzioType { get { return SendOptions.Type; } set { SendOptions.Type = value; } }
-		public bool IsSecured { get { return SendOptions.IsSecured; } set { SendOptions.IsSecured = value; } }
+		public string ListenerUrl { get { return SendOptions.ListenerUrl; } set { SendOptions.ListenerUrl = value?.TrimEnd('/'); } }
 		public int BufferSize { get { return ShipperOptions.BufferSize; } set { ShipperOptions.BufferSize = value; } }
 		public TimeSpan BufferTimeout { get { return ShipperOptions.BufferTimeLimit; } set { ShipperOptions.BufferTimeLimit = value; } }
 		public int RetriesMaxAttempts { get { return SendOptions.RetriesMaxAttempts; } set { SendOptions.RetriesMaxAttempts = value; } }

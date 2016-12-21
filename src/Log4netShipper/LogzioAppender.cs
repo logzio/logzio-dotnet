@@ -78,9 +78,9 @@ namespace Logzio.DotNet.Log4net
 			Shipper.SendOptions.Type = value;
 		}
 
-		public void AddIsSecured(bool value)
+		public void AddListenerUrl(string value)
 		{
-			Shipper.SendOptions.IsSecured = value;
+			Shipper.SendOptions.ListenerUrl = value?.TrimEnd('/');
 		}
 
 		public void AddBufferSize(int bufferSize)

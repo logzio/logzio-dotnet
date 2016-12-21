@@ -29,7 +29,7 @@ If you configure your logging in an XML file, you need to register the assembly 
 			<target name="logzio" type="Logzio" 
 				token="DKJiomZjbFyVvssJDmUAWeEOSNnDARWz" 
 				logzioType="nlog"
-				isSecured="true"
+				listenerUrl="https://listener.logz.io:8071"
 				bufferSize="100"
 				bufferTimeout="00:00:05"
 				retriesMaxAttempts="3"
