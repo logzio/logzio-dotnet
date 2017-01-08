@@ -1,3 +1,5 @@
+![Travis Build Status](https://travis-ci.org/logzio/logzio-dotnet.svg?branch=master) ([*Travis CI*](https://travis-ci.org/logzio/logzio-dotnet))
+
 # logzio-dotnet
 
 This repository contains the [Logz.io](http://www.logz.io) shippers for .NET frameworks, currently including [log4net](https://logging.apache.org/log4net/) and [NLog](http://nlog-project.org/).
