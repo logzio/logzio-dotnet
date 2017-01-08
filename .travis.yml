@@ -7,3 +7,5 @@ install:
 script:
   - xbuild /p:Configuration=Release logzio-dotnet.sln
   - mono ./testrunner/NUnit.ConsoleRunner.3.5.0/tools/nunit3-console.exe ./UnitTests/bin/Release/Logzio.DotNet.UnitTests.dll
+notifications:
+  slack: logzio:bLRWDmRpTJI4vTdAEDSpZ9Sp
