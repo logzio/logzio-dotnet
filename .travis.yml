@@ -1,8 +1,9 @@
 language: csharp
 solution: src/logzio-dotnet.sln
 install:
-  - nuget restore src/logzio-dotnet.sln
-  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+  - cd src
+  - nuget restore logzio-dotnet.sln
+  - nuget install NUnit.Console -Version 3.5.0  -OutputDirectory testrunner
 script:
-  - xbuild /p:Configuration=Release src/logzio-dotnet.sln
-  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./src/UnitTests/bin/Release/Logzio.DotNet.UnitTests.dll
+  - xbuild /p:Configuration=Release logzio-dotnet.sln
+  - mono ./testrunner/NUnit.ConsoleRunner.3.5.0/tools/nunit3-console.exe ./UnitTests/bin/Release/Logzio.DotNet.UnitTests.dll
