@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using log4net;
 using log4net.Appender;
 using log4net.Core;
 using Logzio.DotNet.Core.InternalLogger;
@@ -13,13 +13,9 @@ namespace Logzio.DotNet.Log4net
 	public class LogzioAppender : AppenderSkeleton
 	{
 		private static readonly string ProcessId = Process.GetCurrentProcess().Id.ToString();
-		private static readonly string MachineName = Environment.MachineName;
 
 		public IShipper Shipper { get; set; } = new Shipper();
 		public IInternalLogger InternalLogger { get; set; } = new InternalLogger();
-
-		public string GlobalContextKeys { get; set; }
-		public string GlobalContextKeysField { get; set; }
 
 		private readonly List<LogzioAppenderCustomField> _customFields = new List<LogzioAppenderCustomField>();
 
@@ -47,8 +43,7 @@ namespace Logzio.DotNet.Log4net
 					{"message", loggingEvent.RenderedMessage},
 					{"exception", loggingEvent.GetExceptionString()},
 					{"user", loggingEvent.UserName},
-					{"processId", ProcessId},
-					{"machineName", MachineName},
+					{"processId", ProcessId}
 				};
 
 				foreach (var customField in _customFields)
@@ -56,11 +51,18 @@ namespace Logzio.DotNet.Log4net
 					values[customField.Key] = customField.Value;
 				}
 
-				AddGlobalPropertiesFields(GlobalContextKeys, values);
-				if (!string.IsNullOrEmpty(GlobalContextKeysField))
+				var properties = loggingEvent.GetProperties();
+				foreach (DictionaryEntry property in properties)
 				{
-					var fieldNames = GlobalContext.Properties["fieldNames"] as string;
-					AddGlobalPropertiesFields(fieldNames, values);
+					var value = property.Value?.ToString();
+					if (string.IsNullOrWhiteSpace(value))
+						continue;
+
+					var key = property.Key.ToString();
+					key = key.Replace(":", "");
+					key = key.Replace(".", "");
+					key = key.Replace("log4net", "");
+					values["property" + key] = value;
 				}
 
 				ExtendValues(loggingEvent, values);
@@ -129,30 +131,6 @@ namespace Logzio.DotNet.Log4net
 		{
 			Shipper.Options.Debug = value;
 			Shipper.SendOptions.Debug = value;
-		}
-
-		private void AddGlobalPropertiesFields(string fieldNames, Dictionary<string, string> values)
-		{
-			if (!string.IsNullOrEmpty(fieldNames))
-			{
-				var fields = fieldNames.Split(';');
-				foreach (var field in fields)
-				{
-					AddGlobalPropertiesFieldValue(values, field);
-				}
-			}
-		}
-
-		private static void AddGlobalPropertiesFieldValue(Dictionary<string, string> values, string field)
-		{
-			if (!string.IsNullOrEmpty(field))
-			{
-				var value = GlobalContext.Properties[field];
-				if (value != null)
-				{
-					values[field] = value.ToString();
-				}
-			}
 		}
 	}
 }
