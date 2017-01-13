@@ -42,7 +42,8 @@ namespace Logzio.DotNet.Log4net
 					{"thread", loggingEvent.ThreadName},
 					{"message", loggingEvent.RenderedMessage},
 					{"exception", loggingEvent.GetExceptionString()},
-					{"user", loggingEvent.UserName},
+					// log4net already adds this 'username' property which is added to values bellow
+					//{"user", loggingEvent.UserName},
 					{"processId", ProcessId}
 				};
 
