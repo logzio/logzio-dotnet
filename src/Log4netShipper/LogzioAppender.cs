@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using log4net.Appender;
 using log4net.Core;
@@ -10,6 +12,8 @@ namespace Logzio.DotNet.Log4net
 {
 	public class LogzioAppender : AppenderSkeleton
 	{
+		private static readonly string ProcessId = Process.GetCurrentProcess().Id.ToString();
+
 		public IShipper Shipper { get; set; } = new Shipper();
 		public IInternalLogger InternalLogger { get; set; } = new InternalLogger();
 
@@ -38,12 +42,28 @@ namespace Logzio.DotNet.Log4net
 					{"thread", loggingEvent.ThreadName},
 					{"message", loggingEvent.RenderedMessage},
 					{"exception", loggingEvent.GetExceptionString()},
-					{"user", loggingEvent.UserName},
+					// log4net already adds this 'username' property which is added to values bellow
+					//{"user", loggingEvent.UserName},
+					{"processId", ProcessId}
 				};
 
 				foreach (var customField in _customFields)
 				{
 					values[customField.Key] = customField.Value;
+				}
+
+				var properties = loggingEvent.GetProperties();
+				foreach (DictionaryEntry property in properties)
+				{
+					var value = property.Value?.ToString();
+					if (string.IsNullOrWhiteSpace(value))
+						continue;
+
+					var key = property.Key.ToString();
+					key = key.Replace(":", "");
+					key = key.Replace(".", "");
+					key = key.Replace("log4net", "");
+					values["property" + key] = value;
 				}
 
 				ExtendValues(loggingEvent, values);
