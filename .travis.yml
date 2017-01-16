@@ -1,5 +1,9 @@
 language: csharp
 solution: src/logzio-dotnet.sln
+cache:
+  directories:
+    - $TRAVIS_BUILD_DIR/src/packages
+    - $TRAVIS_BUILD_DIR/src/testrunner
 install:
   - cd src
   - nuget restore logzio-dotnet.sln
