@@ -55,9 +55,9 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             stopwatch.Stop();
             Console.WriteLine("Total time: " + stopwatch.Elapsed);
 
-            stopwatch.Elapsed.Should().BeLessOrEqualTo(TimeSpan.FromMilliseconds(40));
+            stopwatch.Elapsed.Should().BeLessOrEqualTo(TimeSpan.FromMilliseconds(100));
 
-            Thread.Sleep(logsAmount); //Make sure the logs are added to the queue before we flush everything
+            Thread.Sleep(logsAmount * 2); //Make sure the logs are added to the queue before we flush everything
 
             LogManager.Shutdown();
 
