@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.Core.WebClient;
 using NSubstitute;
@@ -16,9 +17,8 @@ namespace Logzio.DotNet.UnitTests.Shipping
 		[SetUp]
 		public void SetUp()
 		{
-			_target = new BulkSender(new BulkSenderOptions()) {
-				WebClientFactory = _webClientFactory = Substitute.For<IWebClientFactory>()
-			};
+		    _webClientFactory = Substitute.For<IWebClientFactory>();
+		    _target = new BulkSender(_webClientFactory, Substitute.For<IInternalLogger>());
 			_webClient = Substitute.For<IWebClient>();
 			_webClientFactory.GetWebClient().Returns(x => _webClient);
 		}
@@ -26,7 +26,7 @@ namespace Logzio.DotNet.UnitTests.Shipping
 		[Test]
 		public void SendAsync_Logs_LogsAreSent()
 		{
-			_target.SendAsync(new[] {GetLoggingEventWithSomeData(), GetLoggingEventWithSomeData()}).Wait();
+			_target.SendAsync(new[] {GetLoggingEventWithSomeData(), GetLoggingEventWithSomeData()}, new BulkSenderOptions()).Wait();
 
 			_webClientFactory.Received().GetWebClient();
 			_webClient.Received().UploadString(Arg.Any<string>(), Arg.Any<string>());
@@ -34,7 +34,7 @@ namespace Logzio.DotNet.UnitTests.Shipping
 
 		private LogzioLoggingEvent GetLoggingEventWithSomeData()
 		{
-			return new LogzioLoggingEvent(new Dictionary<string, string> {
+			return new LogzioLoggingEvent(new Dictionary<string, object> {
 				{"message", "hey" },
 				{"@timestamp", "2016-01-01T01:01:01Z" },
 			});

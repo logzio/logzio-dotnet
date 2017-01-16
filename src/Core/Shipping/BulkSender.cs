@@ -12,52 +12,52 @@ namespace Logzio.DotNet.Core.Shipping
 {
 	public interface IBulkSender
 	{
-		Task SendAsync(ICollection<LogzioLoggingEvent> logz);
-		void Send(ICollection<LogzioLoggingEvent> logz, int attempt = 0);
+		Task SendAsync(ICollection<LogzioLoggingEvent> logz, BulkSenderOptions options);
+		void Send(ICollection<LogzioLoggingEvent> logz, BulkSenderOptions options, int attempt = 0);
 	}
 
 	public class BulkSender : IBulkSender
 	{
 		private const string UrlTemplate = "{0}/?token={1}&type={2}";
 
-		public IWebClientFactory WebClientFactory = new WebClientFactory();
-		public IInternalLogger InternalLogger = new InternalLogger.InternalLogger();
+		private readonly IWebClientFactory _webClientFactory;
+		private readonly IInternalLogger _internalLogger;
 
-		private readonly BulkSenderOptions _options;
 		private readonly JsonSerializer _jsonSerializer;
 
-		public BulkSender(BulkSenderOptions options)
+		public BulkSender(IWebClientFactory webClientFactory, IInternalLogger internalLogger)
 		{
-			_options = options;
-			_jsonSerializer = new JsonSerializer { ContractResolver = new CamelCasePropertyNamesContractResolver() };
+		    _webClientFactory = webClientFactory;
+		    _internalLogger = internalLogger;
+		    _jsonSerializer = new JsonSerializer { ContractResolver = new CamelCasePropertyNamesContractResolver() };
 		}
 
-		public Task SendAsync(ICollection<LogzioLoggingEvent> logz)
+		public Task SendAsync(ICollection<LogzioLoggingEvent> logz, BulkSenderOptions options)
 		{
-			return Task.Run(() => Send(logz));
+			return Task.Run(() => Send(logz, options));
 		}
 
-		public void Send(ICollection<LogzioLoggingEvent> logz, int attempt = 0)
+		public void Send(ICollection<LogzioLoggingEvent> logz, BulkSenderOptions options, int attempt = 0)
 		{
-			var url = string.Format(UrlTemplate, _options.ListenerUrl, _options.Token, _options.Type);
+			var url = string.Format(UrlTemplate, options.ListenerUrl, options.Token, options.Type);
 			try
 			{
-				using (var client = WebClientFactory.GetWebClient())
+				using (var client = _webClientFactory.GetWebClient())
 				{
 					var serializedLogLines = logz.Select(x => Serialize(x.LogData)).ToArray();
 					var body = String.Join(Environment.NewLine, serializedLogLines);
 					client.UploadString(url, body);
-					if (_options.Debug)
-						InternalLogger.Log("Sent bulk of [{0}] log messages to [{1}] successfully.", logz.Count, url);
+					if (options.Debug)
+						_internalLogger.Log("Sent bulk of [{0}] log messages to [{1}] successfully.", logz.Count, url);
 				}
 			}
 			catch (Exception ex)
 			{
-				if (_options.Debug)
-					InternalLogger.Log("Logzio.DotNet ERROR: " + ex);
+				if (options.Debug)
+					_internalLogger.Log("Logzio.DotNet ERROR: " + ex);
 
-				if (attempt < _options.RetriesMaxAttempts - 1)
-					Task.Delay(_options.RetriesInterval).ContinueWith(task => Send(logz, attempt + 1));
+				if (attempt < options.RetriesMaxAttempts - 1)
+					Task.Delay(options.RetriesInterval).ContinueWith(task => Send(logz, options, attempt + 1));
 			}
 		}
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,19 +8,14 @@ namespace Logzio.DotNet.Core.Shipping
 {
 	public interface IShipper
 	{
-		ShipperOptions Options { get; set; }
-		BulkSenderOptions SendOptions { get; set; }
-		void Ship(LogzioLoggingEvent logzioLoggingEvent);
-		void Flush();
+		void Ship(LogzioLoggingEvent logzioLoggingEvent, ShipperOptions options);
+		void Flush(ShipperOptions options);
 	}
 
 	public class Shipper : IShipper
 	{
-		public IBulkSender BulkSender { get; set; }
-		public IInternalLogger InternalLogger = new InternalLogger.InternalLogger();
-
-		public ShipperOptions Options { get; set; } = new ShipperOptions();
-		public BulkSenderOptions SendOptions { get; set; } = new BulkSenderOptions();
+	    private readonly IBulkSender _bulkSender;
+	    private readonly IInternalLogger _internalLogger;
 
 		private readonly ConcurrentQueue<LogzioLoggingEvent> _queue = new ConcurrentQueue<LogzioLoggingEvent>();
 		private readonly ConcurrentDictionary<Task, byte> _tasks = new ConcurrentDictionary<Task, byte>();
@@ -29,27 +23,28 @@ namespace Logzio.DotNet.Core.Shipping
 		private readonly object _timedOutBufferlocker = new object();
 		private Task _delayTask;
 
-		public Shipper()
+		public Shipper(IBulkSender bulkSender, IInternalLogger internalLogger)
 		{
-			BulkSender = new BulkSender(SendOptions);
+		    _bulkSender = bulkSender;
+		    _internalLogger = internalLogger;
 		}
 
-		public void Ship(LogzioLoggingEvent logzioLoggingEvent)
+		public void Ship(LogzioLoggingEvent logzioLoggingEvent, ShipperOptions options)
 		{
 			// ReSharper disable once InconsistentlySynchronizedField
 			_queue.Enqueue(logzioLoggingEvent);
-			if (Options.Debug)
-				InternalLogger.Log("Added log message. Queue size - [{0}]", _queue.Count);
+			if (options.Debug)
+				_internalLogger.Log("Added log message. Queue size - [{0}]", _queue.Count);
 
-			SendLogsIfBufferIsFull();
+			SendLogsIfBufferIsFull(options);
 			if (_delayTask == null || _delayTask.IsCompleted)
-				_delayTask = Task.Delay(Options.BufferTimeLimit).ContinueWith(task => SendLogsIfBufferTimedOut());
+				_delayTask = Task.Delay(options.BufferTimeLimit).ContinueWith(task => SendLogsIfBufferTimedOut(options));
 		}
 
-		public void Flush()
+		public void Flush(ShipperOptions options)
 		{
-			if (Options.Debug)
-				InternalLogger.Log("Flushing remaining logz.");
+			if (options.Debug)
+				_internalLogger.Log("Flushing remaining logz.");
 
 			while (!_queue.IsEmpty)
 			{
@@ -57,7 +52,7 @@ namespace Logzio.DotNet.Core.Shipping
 
 				
 
-				for (int i = 0; i < Options.BufferSize; i++)
+				for (int i = 0; i < options.BufferSize; i++)
 				{
 					LogzioLoggingEvent log;
 					if (!_queue.TryDequeue(out log))
@@ -66,29 +61,29 @@ namespace Logzio.DotNet.Core.Shipping
 					logz.Add(log);
 				}
 
-				BulkSender.Send(logz);
+				_bulkSender.Send(logz, options.BulkSenderOptions);
 			}
 
 			Task.WaitAll(_tasks.Keys.ToArray());
 		}
 
-		private void SendLogsIfBufferIsFull()
+		private void SendLogsIfBufferIsFull(ShipperOptions options)
 		{
-			if (_queue.Count < Options.BufferSize)
+			if (_queue.Count < options.BufferSize)
 				return;
 
 			lock (_fullBufferlocker)
 			{
-				if (_queue.Count < Options.BufferSize)
+				if (_queue.Count < options.BufferSize)
 					return;
 
-				if (Options.Debug)
-					InternalLogger.Log("Buffer is full. Sending logs.");
-				SendLogs();
+				if (options.Debug)
+					_internalLogger.Log("Buffer is full. Sending logs.");
+				SendLogs(options);
 			}
 		}
 
-		private void SendLogsIfBufferTimedOut()
+		private void SendLogsIfBufferTimedOut(ShipperOptions options)
 		{
 			if (_queue.IsEmpty)
 				return;
@@ -98,16 +93,16 @@ namespace Logzio.DotNet.Core.Shipping
 				if (_queue.IsEmpty)
 					return;
 
-				if (Options.Debug)
-					InternalLogger.Log("Buffer is timed out. Sending logs.");
-				SendLogs();
+				if (options.Debug)
+					_internalLogger.Log("Buffer is timed out. Sending logs.");
+				SendLogs(options);
 			}
 		}
 
-		private void SendLogs()
+		private void SendLogs(ShipperOptions options)
 		{
 			var logz = new List<LogzioLoggingEvent>();
-			for (var i = 0; i < Options.BufferSize; i++)
+			for (var i = 0; i < options.BufferSize; i++)
 			{
 				LogzioLoggingEvent log;
 				if (!_queue.TryDequeue(out log))
@@ -116,7 +111,7 @@ namespace Logzio.DotNet.Core.Shipping
 				logz.Add(log);
 			}
 
-			var task = BulkSender.SendAsync(logz);
+			var task = _bulkSender.SendAsync(logz, options.BulkSenderOptions);
 			_tasks[task] = 0;
 			byte b;
 			task.ContinueWith((x) => _tasks.TryRemove(task, out b));

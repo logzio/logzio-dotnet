@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using FluentAssertions;
+using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
 using NSubstitute;
 using NUnit.Framework;
@@ -18,39 +19,35 @@ namespace Logzio.DotNet.UnitTests.Shipping
 		[SetUp]
 		public void SetUp()
 		{
-			_target = new Shipper { BulkSender = _bulkSender = Substitute.For<IBulkSender>() };
+		    _bulkSender = Substitute.For<IBulkSender>();
+		    _target = new Shipper(_bulkSender, Substitute.For<IInternalLogger>());
 		}
 
 		[Test]
 		public void Ship_BufferSetTo1_LogSent()
 		{
-			_target.Options.BufferSize = 1;
-			_target.Ship(GetLoggingEventWithSomeData());
+			_target.Ship(GetLoggingEventWithSomeData(), new ShipperOptions { BufferSize =  1 });
 
-			_bulkSender.Received().SendAsync(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 1));
+			_bulkSender.Received().SendAsync(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 1), Arg.Any<BulkSenderOptions>());
 		}
 
 		[Test]
 		public void Ship_BufferLimitReached_OnlySetAmountSent()
 		{
-			_target.Options.BufferSize = 10;
-
 			for (var i = 0; i < 12; i++)
 			{
-				_target.Ship(GetLoggingEventWithSomeData());
+				_target.Ship(GetLoggingEventWithSomeData(), new ShipperOptions { BufferSize = 10 });
 			}
 
-			_bulkSender.Received().SendAsync(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 10));
+			_bulkSender.Received().SendAsync(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 10), Arg.Any<BulkSenderOptions>());
 		}
 
 		[Test]
 		public void Ship_BufferLimitReachedMultipleTimes_OnlySetAmountSentInBulks()
 		{
-			_target.Options.BufferSize = 10;
-
 			for (var i = 0; i < 40; i++)
 			{
-				_target.Ship(GetLoggingEventWithSomeData());
+				_target.Ship(GetLoggingEventWithSomeData(), new ShipperOptions { BufferSize = 10 });
 			}
 
 			var calls = _bulkSender.ReceivedCalls().ToList();
@@ -64,31 +61,32 @@ namespace Logzio.DotNet.UnitTests.Shipping
 		[Test]
 		public void Ship_BufferLimitNotReached_NothingWasSent()
 		{
-			_target.Options.BufferSize = 2;
+			_target.Ship(GetLoggingEventWithSomeData(), new ShipperOptions { BufferSize =  2});
 
-			_target.Ship(GetLoggingEventWithSomeData());
-
-			_bulkSender.DidNotReceiveWithAnyArgs().SendAsync(Arg.Any<ICollection<LogzioLoggingEvent>>());
+			_bulkSender.DidNotReceiveWithAnyArgs().SendAsync(Arg.Any<ICollection<LogzioLoggingEvent>>(), Arg.Any<BulkSenderOptions>());
 		}
 
 		[Test]
 		public void Ship_BufferTimeoutReached_LogWasSent()
 		{
-			_target.Options.BufferSize = 10;
-			_target.Options.BufferTimeLimit = TimeSpan.FromMilliseconds(20);
+		    var options = new ShipperOptions
+		    {
+		        BufferSize = 10,
+		        BufferTimeLimit = TimeSpan.FromMilliseconds(20)
+		    };
 
-			_target.Ship(GetLoggingEventWithSomeData());
-			_target.Ship(GetLoggingEventWithSomeData());
+			_target.Ship(GetLoggingEventWithSomeData(), options);
+			_target.Ship(GetLoggingEventWithSomeData(), options);
 
-			_bulkSender.DidNotReceiveWithAnyArgs().SendAsync(Arg.Any<ICollection<LogzioLoggingEvent>>());
+			_bulkSender.DidNotReceiveWithAnyArgs().SendAsync(Arg.Any<ICollection<LogzioLoggingEvent>>(), Arg.Any<BulkSenderOptions>());
 
 			Thread.Sleep(TimeSpan.FromMilliseconds(30));
-			_bulkSender.Received().SendAsync(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 2));
+			_bulkSender.Received().SendAsync(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 2), Arg.Any<BulkSenderOptions>());
 		}
 
 		private LogzioLoggingEvent GetLoggingEventWithSomeData()
 		{
-			return new LogzioLoggingEvent(new Dictionary<string, string> {
+			return new LogzioLoggingEvent(new Dictionary<string, object> {
 				{"message", "hey" },
 				{"@timestamp", "2016-01-01T01:01:01Z" },
 			});

@@ -1,6 +1,6 @@
 ﻿using System.Threading;
-using System.Threading.Tasks;
 using log4net.Core;
+using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.Log4net;
 using NSubstitute;
@@ -17,10 +17,8 @@ namespace Logzio.DotNet.UnitTests.Log4net
 		[SetUp]
 		public void Setup()
 		{
-			_target = new LogzioAppender
-			{
-				Shipper = _shipper = Substitute.For<IShipper>()
-			};
+		    _shipper = Substitute.For<IShipper>();
+			_target = new LogzioAppender(_shipper, Substitute.For<IInternalLogger>());
 		}
 
 		[Test]
@@ -29,7 +27,8 @@ namespace Logzio.DotNet.UnitTests.Log4net
 			_target.DoAppend(GetLoggingEventWithSomeData());
 			_target.Close();
 		    SleepJustABit();
-		    _shipper.Received().Ship(Arg.Is<LogzioLoggingEvent>(x => x.LogData["domain"] == "Such domain"));
+		    _shipper.Received().Ship(Arg.Is<LogzioLoggingEvent>(x => (string) x.LogData["domain"] == "Such domain"),
+		        Arg.Any<ShipperOptions>());
 		}
 
 		[Test]
@@ -39,7 +38,7 @@ namespace Logzio.DotNet.UnitTests.Log4net
 			_target.DoAppend(GetLoggingEventWithSomeData());
 			_target.Close();
 		    SleepJustABit();
-			_shipper.Received().Ship(Arg.Is<LogzioLoggingEvent>(x => x.LogData["DatKey"] == "DatVal"));
+			_shipper.Received().Ship(Arg.Is<LogzioLoggingEvent>(x => (string) x.LogData["DatKey"] == "DatVal"), Arg.Any<ShipperOptions>());
 		}
 
 		private LoggingEvent GetLoggingEventWithSomeData()
