@@ -32,7 +32,45 @@ namespace Logzio.DotNet.UnitTests.Shipping
 			_webClient.Received().UploadString(Arg.Any<string>(), Arg.Any<string>());
 		}
 
-		private LogzioLoggingEvent GetLoggingEventWithSomeData()
+	    [Test]
+	    public void Send_Logs_LogsAreFormatted()
+	    {
+	        _target.Send(new[] { GetLoggingEventWithSomeData(), GetLoggingEventWithSomeData(), GetLoggingEventWithSomeData() },
+	            new BulkSenderOptions());
+
+	        _webClient.Received()
+	            .UploadString(Arg.Any<string>(), Arg.Is<string>(x => x.Contains("\"message\":\"hey\"")));
+	    }
+
+	    [Test]
+	    public void Send_LogWithNumericField_LogsAreFormatted()
+	    {
+	        var log = GetLoggingEventWithSomeData();
+	        log.LogData["id"] = 300;
+
+	        _target.Send(new[] { log }, new BulkSenderOptions());
+
+	        _webClient.Received()
+	            .UploadString(Arg.Any<string>(), Arg.Is<string>(x => x.Contains("\"id\":300")));
+	    }
+
+	    [Test]
+	    public void Send_LogWithObjectField_LogsAreFormatted()
+	    {
+	        var log = GetLoggingEventWithSomeData();
+	        log.LogData["dummy"] = new DummyLogObject
+	        {
+	            SomeId = 42,
+	            SomeString = "The Answer"
+	        };
+
+	        _target.Send(new[] { log }, new BulkSenderOptions());
+
+	        _webClient.Received()
+	            .UploadString(Arg.Any<string>(), Arg.Is<string>(x => x.Contains("\"dummy\":{\"someId\":42,\"someString\":\"The Answer\"}")));
+	    }
+
+	    private LogzioLoggingEvent GetLoggingEventWithSomeData()
 		{
 			return new LogzioLoggingEvent(new Dictionary<string, object> {
 				{"message", "hey" },
@@ -40,4 +78,10 @@ namespace Logzio.DotNet.UnitTests.Shipping
 			});
 		}
 	}
+
+    public class DummyLogObject
+    {
+        public int SomeId { get; set; }
+        public string SomeString { get; set; }
+    }
 }
