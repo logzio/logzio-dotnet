@@ -65,7 +65,7 @@ namespace Logzio.DotNet.NLog
 
 				foreach (var pair in logEvent.Properties.Where(pair => pair.Key != null))
 				{
-					values[pair.Key.ToString()] = pair.Value?.ToString();
+					values[pair.Key.ToString()] = pair.Value;
 				}
 		
 				foreach (var pair in LogManager.Configuration.Variables.Where(pair => pair.Key != null))

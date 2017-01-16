@@ -64,8 +64,8 @@ namespace Logzio.DotNet.Log4net
                 var properties = loggingEvent.GetProperties();
                 foreach (DictionaryEntry property in properties)
                 {
-                    var value = property.Value?.ToString();
-                    if (string.IsNullOrWhiteSpace(value))
+                    var value = property.Value;
+                    if (value == null || ReferenceEquals(value, ""))
                         continue;
 
                     var key = property.Key.ToString();
