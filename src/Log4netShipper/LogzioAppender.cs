@@ -20,8 +20,9 @@ namespace Logzio.DotNet.Log4net
 
         private readonly ShipperOptions _shipperOptions = new ShipperOptions {BulkSenderOptions = {Type = "log4net"}};
         private readonly List<LogzioAppenderCustomField> _customFields = new List<LogzioAppenderCustomField>();
+	    private Task _lastTask;
 
-        public LogzioAppender()
+	    public LogzioAppender()
         {
             var bootstraper = new Bootstraper();
             bootstraper.Bootstrap();
@@ -37,7 +38,7 @@ namespace Logzio.DotNet.Log4net
 
         protected override void Append(LoggingEvent loggingEvent)
         {
-            Task.Run(() => { WriteImpl(loggingEvent); });
+            _lastTask = Task.Run(() => { WriteImpl(loggingEvent); });
         }
 
         private void WriteImpl(LoggingEvent loggingEvent)
@@ -92,6 +93,7 @@ namespace Logzio.DotNet.Log4net
         protected override void OnClose()
         {
 			base.OnClose();
+	        _lastTask?.Wait();
 			//Shipper can be null if there was an error in the ctor, we don't
 			//want to create another exception in the closing
             _shipper?.Flush(_shipperOptions);

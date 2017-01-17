@@ -18,6 +18,7 @@ namespace Logzio.DotNet.NLog
 	    private readonly IInternalLogger _internalLogger;
 
 	    private readonly ShipperOptions _shipperOptions = new ShipperOptions { BulkSenderOptions = { Type = "nlog" }};
+		private Task _lastTask;
 
 	    [RequiredParameter]
 		public string Token { get { return _shipperOptions.BulkSenderOptions.Token; } set { _shipperOptions.BulkSenderOptions.Token = value; } }
@@ -44,9 +45,9 @@ namespace Logzio.DotNet.NLog
 	        _internalLogger = internalLogger;
 	    }
 
-	    protected override void Write(LogEventInfo logEvent)
+		protected override void Write(LogEventInfo logEvent)
 		{
-			Task.Run(() => { WriteImpl(logEvent); });
+			_lastTask = Task.Run(() => { WriteImpl(logEvent); });
 		}
 
 		private void WriteImpl(LogEventInfo logEvent)
@@ -87,6 +88,7 @@ namespace Logzio.DotNet.NLog
 		protected override void CloseTarget()
 		{
 			base.CloseTarget();
+			_lastTask?.Wait();
 			//Shipper can be null if there was an error in the ctor, we don't
 			//want to create another exception in the closing
 			_shipper?.Flush(_shipperOptions);
