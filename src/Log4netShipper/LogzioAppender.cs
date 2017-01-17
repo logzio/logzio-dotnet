@@ -91,8 +91,10 @@ namespace Logzio.DotNet.Log4net
 
         protected override void OnClose()
         {
-            base.OnClose();
-            _shipper.Flush(_shipperOptions);
+			base.OnClose();
+			//Shipper can be null if there was an error in the ctor, we don't
+			//want to create another exception in the closing
+            _shipper?.Flush(_shipperOptions);
         }
 
         public void AddToken(string value)

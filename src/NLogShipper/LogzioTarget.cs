@@ -87,7 +87,9 @@ namespace Logzio.DotNet.NLog
 		protected override void CloseTarget()
 		{
 			base.CloseTarget();
-			_shipper.Flush(_shipperOptions);
+			//Shipper can be null if there was an error in the ctor, we don't
+			//want to create another exception in the closing
+			_shipper?.Flush(_shipperOptions);
 		}
 
 		protected virtual void ExtendValues(LogEventInfo logEvent, Dictionary<string, object> values)
