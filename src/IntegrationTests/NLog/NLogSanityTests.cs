@@ -1,5 +1,7 @@
 ﻿using System.Threading;
 using FluentAssertions;
+using Logzio.DotNet.Core.Bootstrap;
+using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.IntegrationTests.Listener;
 using Logzio.DotNet.NLog;
 using NLog;
@@ -46,6 +48,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             logger.Info("Hello");
             Thread.Sleep(100);
 
+            new Bootstraper().Resolve<IShipper>().WaitForSendLogsTask();
             LogManager.Shutdown();
 
             _dummy.Requests.Should().HaveCount(1);

@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.Threading;
 using FluentAssertions;
+using Logzio.DotNet.Core.Bootstrap;
+using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.IntegrationTests.Listener;
 using Logzio.DotNet.NLog;
 using NLog;
@@ -59,6 +61,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
 
             Thread.Sleep(logsAmount * 2); //Make sure the logs are added to the queue before we flush everything
 
+            new Bootstraper().Resolve<IShipper>().WaitForSendLogsTask();
             LogManager.Shutdown();
 
             _dummy.Requests.Count.ShouldBeEquivalentTo(Math.Ceiling((decimal) (logsAmount / 100)));

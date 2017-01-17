@@ -64,11 +64,16 @@
     <Compile Include="NLog\NLogPerfTests.cs" />
     <Compile Include="NLog\NLogSanityTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shipper\ShipperThreadHandlingTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{83260D70-F07C-4D06-B60F-FE0EE633CF77}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Log4netShipper\Log4netShipper.csproj">
       <Project>{21AA4336-7888-4D92-83DC-ECA624C10E33}</Project>
       <Name>Log4netShipper</Name>

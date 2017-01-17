@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Text;
 
 namespace Logzio.DotNet.IntegrationTests.Listener
 {
@@ -48,6 +47,7 @@ namespace Logzio.DotNet.IntegrationTests.Listener
         {
             _isActive = false;
             _httpListener.Close();
+            _httpListener.Abort();
         }
     }
 }

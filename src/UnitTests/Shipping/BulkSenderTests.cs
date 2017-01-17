@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FluentAssertions;
 using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.Core.WebClient;
@@ -68,6 +69,14 @@ namespace Logzio.DotNet.UnitTests.Shipping
 
 	        _webClient.Received()
 	            .UploadString(Arg.Any<string>(), Arg.Is<string>(x => x.Contains("\"dummy\":{\"someId\":42,\"someString\":\"The Answer\"}")));
+	    }
+
+	    [Test]
+	    public void Send_EmptyLogsList_ShouldntSendAnything()
+	    {
+	        _target.Send(new List<LogzioLoggingEvent>(), new BulkSenderOptions());
+
+	        _webClient.ReceivedCalls().Should().BeEmpty();
 	    }
 
 	    private LogzioLoggingEvent GetLoggingEventWithSomeData()

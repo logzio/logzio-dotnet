@@ -27,8 +27,9 @@ namespace Logzio.DotNet.UnitTests.Shipping
 		public void Ship_BufferSetTo1_LogSent()
 		{
 			_target.Ship(GetLoggingEventWithSomeData(), new ShipperOptions { BufferSize =  1 });
+		    _target.WaitForSendLogsTask();
 
-			_bulkSender.Received().SendAsync(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 1), Arg.Any<BulkSenderOptions>());
+		    _bulkSender.Received().Send(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 1), Arg.Any<BulkSenderOptions>());
 		}
 
 		[Test]
@@ -38,8 +39,9 @@ namespace Logzio.DotNet.UnitTests.Shipping
 			{
 				_target.Ship(GetLoggingEventWithSomeData(), new ShipperOptions { BufferSize = 10 });
 			}
+		    _target.WaitForSendLogsTask();
 
-			_bulkSender.Received().SendAsync(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 10), Arg.Any<BulkSenderOptions>());
+		    _bulkSender.Received().Send(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 10), Arg.Any<BulkSenderOptions>());
 		}
 
 		[Test]
@@ -49,6 +51,7 @@ namespace Logzio.DotNet.UnitTests.Shipping
 			{
 				_target.Ship(GetLoggingEventWithSomeData(), new ShipperOptions { BufferSize = 10 });
 			}
+            _target.WaitForSendLogsTask();
 
 			var calls = _bulkSender.ReceivedCalls().ToList();
 			calls.Count.ShouldBeEquivalentTo(4);
@@ -62,8 +65,9 @@ namespace Logzio.DotNet.UnitTests.Shipping
 		public void Ship_BufferLimitNotReached_NothingWasSent()
 		{
 			_target.Ship(GetLoggingEventWithSomeData(), new ShipperOptions { BufferSize =  2});
+		    _target.WaitForSendLogsTask();
 
-			_bulkSender.DidNotReceiveWithAnyArgs().SendAsync(Arg.Any<ICollection<LogzioLoggingEvent>>(), Arg.Any<BulkSenderOptions>());
+		    _bulkSender.DidNotReceiveWithAnyArgs().Send(Arg.Any<ICollection<LogzioLoggingEvent>>(), Arg.Any<BulkSenderOptions>());
 		}
 
 		[Test]
@@ -77,12 +81,33 @@ namespace Logzio.DotNet.UnitTests.Shipping
 
 			_target.Ship(GetLoggingEventWithSomeData(), options);
 			_target.Ship(GetLoggingEventWithSomeData(), options);
+		    _target.WaitForSendLogsTask();
 
-			_bulkSender.DidNotReceiveWithAnyArgs().SendAsync(Arg.Any<ICollection<LogzioLoggingEvent>>(), Arg.Any<BulkSenderOptions>());
+		    _bulkSender.DidNotReceiveWithAnyArgs().Send(Arg.Any<ICollection<LogzioLoggingEvent>>(), Arg.Any<BulkSenderOptions>());
 
 			Thread.Sleep(TimeSpan.FromMilliseconds(30));
-			_bulkSender.Received().SendAsync(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 2), Arg.Any<BulkSenderOptions>());
+			_bulkSender.Received().Send(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 2), Arg.Any<BulkSenderOptions>());
 		}
+
+	    [Test]
+	    public void Flush_FlushingTwice_DoesntSendEmpty()
+	    {
+	        var options = new ShipperOptions
+	        {
+	            BufferSize = 1
+	        };
+
+	        var count = 5;
+	        for (var i = 0; i < count; i++)
+	        {
+	            _target.Ship(GetLoggingEventWithSomeData(), options);
+	        }
+            _target.Flush(options);
+            _target.Flush(options);
+	        _target.WaitForSendLogsTask();
+
+	        _bulkSender.ReceivedCalls().Should().HaveCount(count);
+	    }
 
 		private LogzioLoggingEvent GetLoggingEventWithSomeData()
 		{

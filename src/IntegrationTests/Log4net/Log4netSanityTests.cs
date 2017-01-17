@@ -3,6 +3,8 @@ using System.Threading;
 using FluentAssertions;
 using log4net;
 using log4net.Repository.Hierarchy;
+using Logzio.DotNet.Core.Bootstrap;
+using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.IntegrationTests.Listener;
 using Logzio.DotNet.Log4net;
 using NUnit.Framework;
@@ -40,6 +42,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
 
             logger.Info("Just a random log line");
             Thread.Sleep(200);
+            new Bootstraper().Resolve<IShipper>().WaitForSendLogsTask();
             logzioAppender.Close();
             LogManager.Shutdown();
 

@@ -10,6 +10,7 @@ namespace Logzio.DotNet.Core.Shipping
 	{
 		void Ship(LogzioLoggingEvent logzioLoggingEvent, ShipperOptions options);
 		void Flush(ShipperOptions options);
+	    void WaitForSendLogsTask();
 	}
 
 	public class Shipper : IShipper
@@ -18,12 +19,14 @@ namespace Logzio.DotNet.Core.Shipping
 	    private readonly IInternalLogger _internalLogger;
 
 		private readonly ConcurrentQueue<LogzioLoggingEvent> _queue = new ConcurrentQueue<LogzioLoggingEvent>();
-		private readonly ConcurrentDictionary<Task, byte> _tasks = new ConcurrentDictionary<Task, byte>();
-		private readonly object _fullBufferlocker = new object();
-		private readonly object _timedOutBufferlocker = new object();
+		private readonly object _fullBufferLocker = new object();
+		private readonly object _timedOutBufferLocker = new object();
+	    private readonly object _sendLogsLocker = new object();
 		private Task _delayTask;
+	    private Task _sendLogsTask;
+	    private bool _timeoutReached;
 
-		public Shipper(IBulkSender bulkSender, IInternalLogger internalLogger)
+	    public Shipper(IBulkSender bulkSender, IInternalLogger internalLogger)
 		{
 		    _bulkSender = bulkSender;
 		    _internalLogger = internalLogger;
@@ -46,25 +49,8 @@ namespace Logzio.DotNet.Core.Shipping
 			if (options.Debug)
 				_internalLogger.Log("Flushing remaining logz.");
 
-			while (!_queue.IsEmpty)
-			{
-				var logz = new List<LogzioLoggingEvent>();
-
-				
-
-				for (int i = 0; i < options.BufferSize; i++)
-				{
-					LogzioLoggingEvent log;
-					if (!_queue.TryDequeue(out log))
-						break;
-
-					logz.Add(log);
-				}
-
-				_bulkSender.Send(logz, options.BulkSenderOptions);
-			}
-
-			Task.WaitAll(_tasks.Keys.ToArray());
+		    SendLogs(options, true);
+		    WaitForSendLogsTask();
 		}
 
 		private void SendLogsIfBufferIsFull(ShipperOptions options)
@@ -72,13 +58,14 @@ namespace Logzio.DotNet.Core.Shipping
 			if (_queue.Count < options.BufferSize)
 				return;
 
-			lock (_fullBufferlocker)
+			lock (_fullBufferLocker)
 			{
 				if (_queue.Count < options.BufferSize)
 					return;
 
 				if (options.Debug)
 					_internalLogger.Log("Buffer is full. Sending logs.");
+
 				SendLogs(options);
 			}
 		}
@@ -88,33 +75,57 @@ namespace Logzio.DotNet.Core.Shipping
 			if (_queue.IsEmpty)
 				return;
 
-			lock (_timedOutBufferlocker)
+			lock (_timedOutBufferLocker)
 			{
 				if (_queue.IsEmpty)
 					return;
 
 				if (options.Debug)
 					_internalLogger.Log("Buffer is timed out. Sending logs.");
-				SendLogs(options);
+
+			    _timeoutReached = true;
+			    SendLogs(options);
 			}
 		}
 
-		private void SendLogs(ShipperOptions options)
+		private void SendLogs(ShipperOptions options, bool flush = false)
 		{
-			var logz = new List<LogzioLoggingEvent>();
-			for (var i = 0; i < options.BufferSize; i++)
-			{
-				LogzioLoggingEvent log;
-				if (!_queue.TryDequeue(out log))
-					break;
+		    lock (_sendLogsLocker)
+		    {
+		        if (_sendLogsTask != null && !_sendLogsTask.IsCompleted)
+		            return;
 
-				logz.Add(log);
-			}
+		        _sendLogsTask = Task.Run(() =>
+		        {
+		            do
+		            {
+		                _timeoutReached = false;
+		                var logz = new List<LogzioLoggingEvent>();
+		                for (var i = 0; i < options.BufferSize; i++)
+		                {
+		                    LogzioLoggingEvent log;
+		                    if (!_queue.TryDequeue(out log))
+		                        break;
 
-			var task = _bulkSender.SendAsync(logz, options.BulkSenderOptions);
-			_tasks[task] = 0;
-			byte b;
-			task.ContinueWith((x) => _tasks.TryRemove(task, out b));
+		                    logz.Add(log);
+		                }
+		                if (options.Debug)
+		                    _internalLogger.Log("Sending [{0}] logs ([{1}] in queue)...", logz.Count, _queue.Count);
+
+		                if (logz.Count > 0)
+		                    _bulkSender.Send(logz, options.BulkSenderOptions);
+
+		                if (options.Debug)
+		                    _internalLogger.Log("Sent logs. [{0}] in queue.", _queue.Count);
+
+		            } while (_queue.Count >= options.BufferSize || ((_timeoutReached || flush) && !_queue.IsEmpty));
+		        });
+		    }
 		}
+
+	    public void WaitForSendLogsTask()
+	    {
+	        _sendLogsTask?.Wait();
+	    }
 	}
 }

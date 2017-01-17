@@ -4,6 +4,8 @@ using System.Threading;
 using FluentAssertions;
 using log4net;
 using log4net.Repository.Hierarchy;
+using Logzio.DotNet.Core.Bootstrap;
+using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.IntegrationTests.Listener;
 using Logzio.DotNet.Log4net;
 using NUnit.Framework;
@@ -33,6 +35,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
         {
             var bufferSize = 100;
             var logzioAppender = SetupAppender(bufferSize);
+            logzioAppender.AddDebug(true);
             var logger = LogManager.GetLogger(typeof (Log4netSanityTests));
 
             var stopwatch = Stopwatch.StartNew();
@@ -48,6 +51,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
             stopwatch.Elapsed.Should().BeLessOrEqualTo(TimeSpan.FromMilliseconds(100));
 
             Thread.Sleep(logsAmount); //Make sure the logs are added to the queue before we flush everything
+            new Bootstraper().Resolve<IShipper>().WaitForSendLogsTask();
 
             logzioAppender.Close();
             LogManager.Shutdown();

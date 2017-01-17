@@ -39,6 +39,9 @@ namespace Logzio.DotNet.Core.Shipping
 
 		public void Send(ICollection<LogzioLoggingEvent> logz, BulkSenderOptions options, int attempt = 0)
 		{
+		    if (logz == null || logz.Count == 0)
+		        return;
+
 			var url = string.Format(UrlTemplate, options.ListenerUrl, options.Token, options.Type);
 			try
 			{
