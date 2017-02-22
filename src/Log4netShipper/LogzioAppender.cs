@@ -53,7 +53,7 @@ namespace Logzio.DotNet.Log4net
                     {"level", loggingEvent.Level.DisplayName},
                     {"thread", loggingEvent.ThreadName},
                     {"message", loggingEvent.RenderedMessage},
-                    {"exception", loggingEvent.GetExceptionString()},
+                    {"exception.Log4Net", loggingEvent.GetExceptionString()},
                     {"processId", ProcessId}
                 };
 
