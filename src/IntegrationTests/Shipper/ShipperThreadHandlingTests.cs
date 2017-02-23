@@ -43,7 +43,7 @@ namespace Logzio.DotNet.IntegrationTests.Shipper
             
             _shipper.Ship(GetLogging(), options);
             _shipper.Flush(options);
-            Thread.Sleep(TimeSpan.FromSeconds(2));
+
             _shipper.Ship(GetLogging(), options);
             _shipper.Flush(options);
 

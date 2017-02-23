@@ -46,7 +46,6 @@ namespace Logzio.DotNet.IntegrationTests.NLog
 
             var logger = LogManager.GetCurrentClassLogger();
             logger.Info("Hello");
-            Thread.Sleep(100);
 
             new Bootstraper().Resolve<IShipper>().WaitForSendLogsTask();
             LogManager.Shutdown();

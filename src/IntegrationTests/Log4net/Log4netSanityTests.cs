@@ -41,7 +41,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
             var logger = LogManager.GetLogger(typeof (Log4netSanityTests));
 
             logger.Info("Just a random log line");
-            Thread.Sleep(200);
+
             new Bootstraper().Resolve<IShipper>().WaitForSendLogsTask();
             logzioAppender.Close();
             LogManager.Shutdown();

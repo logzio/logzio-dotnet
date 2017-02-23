@@ -85,7 +85,7 @@ namespace Logzio.DotNet.UnitTests.Shipping
 
 		    _bulkSender.DidNotReceiveWithAnyArgs().Send(Arg.Any<ICollection<LogzioLoggingEvent>>(), Arg.Any<BulkSenderOptions>());
 
-			Thread.Sleep(TimeSpan.FromMilliseconds(30));
+			Thread.Sleep(TimeSpan.FromMilliseconds(30)); //wait for the actual timeout
 			_bulkSender.Received().Send(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 2), Arg.Any<BulkSenderOptions>());
 		}
 

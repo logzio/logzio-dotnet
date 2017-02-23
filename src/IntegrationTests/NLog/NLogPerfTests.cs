@@ -59,8 +59,6 @@ namespace Logzio.DotNet.IntegrationTests.NLog
 
             stopwatch.Elapsed.Should().BeLessOrEqualTo(TimeSpan.FromMilliseconds(100));
 
-            Thread.Sleep(logsAmount * 2); //Make sure the logs are added to the queue before we flush everything
-
             new Bootstraper().Resolve<IShipper>().WaitForSendLogsTask();
             LogManager.Shutdown();
 

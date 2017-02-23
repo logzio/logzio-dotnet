@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using log4net.Core;
+﻿using log4net.Core;
 using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.Log4net;
@@ -26,7 +25,6 @@ namespace Logzio.DotNet.UnitTests.Log4net
 		{
 			_target.DoAppend(GetLoggingEventWithSomeData());
 			_target.Close();
-		    SleepJustABit();
 		    _shipper.Received().Ship(Arg.Is<LogzioLoggingEvent>(x => (string) x.LogData["domain"] == "Such domain"),
 		        Arg.Any<ShipperOptions>());
 		}
@@ -37,7 +35,6 @@ namespace Logzio.DotNet.UnitTests.Log4net
 			_target.AddCustomField(new LogzioAppenderCustomField { Key = "DatKey", Value = "DatVal"});
 			_target.DoAppend(GetLoggingEventWithSomeData());
 			_target.Close();
-		    SleepJustABit();
 			_shipper.Received().Ship(Arg.Is<LogzioLoggingEvent>(x => (string) x.LogData["DatKey"] == "DatVal"), Arg.Any<ShipperOptions>());
 		}
 
@@ -50,10 +47,5 @@ namespace Logzio.DotNet.UnitTests.Log4net
 				Message = "That's a message alright"
 			});
 		}
-
-	    private void SleepJustABit()
-	    {
-	        Thread.Sleep(50);
-	    }
 	}
 }
