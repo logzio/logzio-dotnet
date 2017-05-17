@@ -60,8 +60,8 @@ Any variables defined in the NLog configuration will be forwarded to Logzio. For
 
 ```xml
 	<nlog>
-		<variable key="site" value="New Zealand" />
-		<variable key="rings" value="one" />
+		<variable name="site" value="New Zealand" />
+		<variable name="rings" value="one" />
 	</nlog>
 ```
 
