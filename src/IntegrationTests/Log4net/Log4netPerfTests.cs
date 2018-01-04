@@ -54,7 +54,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
             logzioAppender.Close();
             LogManager.Shutdown();
 
-            _dummy.Requests.Count.ShouldBeSameAs(Math.Ceiling((decimal)(logsAmount / bufferSize)));
+            _dummy.Requests.Count.ShouldBe(logsAmount / bufferSize);
         }
 
         private static LogzioAppender SetupAppender(int bufferSize)

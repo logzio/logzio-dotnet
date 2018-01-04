@@ -26,10 +26,10 @@ namespace Logzio.DotNet.IntegrationTests.Listener
 
         private void OnContext(IAsyncResult ar)
         {
-            var context = _httpListener.EndGetContext(ar);
-
             if (!_isActive)
                 return;
+
+            var context = _httpListener.EndGetContext(ar);
 
             _httpListener.BeginGetContext(OnContext, null);
 
