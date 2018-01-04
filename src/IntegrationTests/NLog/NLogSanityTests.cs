@@ -1,12 +1,11 @@
-﻿using System.Threading;
-using FluentAssertions;
-using Logzio.DotNet.Core.Bootstrap;
+﻿using Logzio.DotNet.Core.Bootstrap;
 using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.IntegrationTests.Listener;
 using Logzio.DotNet.NLog;
 using NLog;
 using NLog.Config;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Logzio.DotNet.IntegrationTests.NLog
 {
@@ -28,7 +27,6 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             _dummy.Stop();
         }
 
-
         [Test]
         public void Sanity()
         {
@@ -40,7 +38,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
                 ListenerUrl = LogzioListenerDummy.DefaultUrl
             };
             config.AddTarget("Logzio", logzioTarget);
-            config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio", "*");
+            config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio");
 
             LogManager.Configuration = config;
 
@@ -50,9 +48,8 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             new Bootstraper().Resolve<IShipper>().WaitForSendLogsTask();
             LogManager.Shutdown();
 
-            _dummy.Requests.Should().HaveCount(1);
-            _dummy.Requests[0].Should().Match("*Hello*");
+            _dummy.Requests.Count.ShouldBe(1);
+            _dummy.Requests[0].ShouldMatch("*Hello*");
         }
-		 
     }
 }

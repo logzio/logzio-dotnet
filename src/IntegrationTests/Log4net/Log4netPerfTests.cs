@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
-using FluentAssertions;
 using log4net;
 using log4net.Repository.Hierarchy;
 using Logzio.DotNet.Core.Bootstrap;
@@ -9,6 +7,7 @@ using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.IntegrationTests.Listener;
 using Logzio.DotNet.Log4net;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Logzio.DotNet.IntegrationTests.Log4net
 {
@@ -33,14 +32,14 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
         [Test]
         public void MeasurePerfForLog4net()
         {
-            var bufferSize = 100;
+            const int bufferSize = 100;
             var logzioAppender = SetupAppender(bufferSize);
             logzioAppender.AddDebug(true);
-            var logger = LogManager.GetLogger(typeof (Log4netSanityTests));
+            var logger = LogManager.GetLogger(typeof(Log4netSanityTests));
 
             var stopwatch = Stopwatch.StartNew();
 
-            var logsAmount = 1000;
+            const int logsAmount = 1000;
             for (var i = 0; i < logsAmount; i++)
             {
                 logger.Info("A Fish");
@@ -48,19 +47,19 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
 
             stopwatch.Stop();
             Console.WriteLine("Total time: " + stopwatch.Elapsed);
-            stopwatch.Elapsed.Should().BeLessOrEqualTo(TimeSpan.FromMilliseconds(100));
+            stopwatch.Elapsed.ShouldBeLessThanOrEqualTo(TimeSpan.FromMilliseconds(100));
 
             new Bootstraper().Resolve<IShipper>().WaitForSendLogsTask();
 
             logzioAppender.Close();
             LogManager.Shutdown();
 
-            _dummy.Requests.Count.ShouldBeEquivalentTo(Math.Ceiling((decimal) (logsAmount / bufferSize)));
+            _dummy.Requests.Count.ShouldBeSameAs(Math.Ceiling((decimal)(logsAmount / bufferSize)));
         }
 
         private static LogzioAppender SetupAppender(int bufferSize)
         {
-            var hierarchy = (Hierarchy) LogManager.GetRepository();
+            var hierarchy = (Hierarchy)LogManager.GetRepository("");
             var logzioAppender = new LogzioAppender();
             logzioAppender.AddToken("DKJiomZjbFyVvssJDmUAWeEOSNnDARWz");
             logzioAppender.AddListenerUrl(LogzioListenerDummy.DefaultUrl);

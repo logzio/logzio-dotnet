@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
-using FluentAssertions;
 using Logzio.DotNet.Core.Bootstrap;
 using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.IntegrationTests.Listener;
@@ -9,6 +7,7 @@ using Logzio.DotNet.NLog;
 using NLog;
 using NLog.Config;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Logzio.DotNet.IntegrationTests.NLog
 {
@@ -41,14 +40,14 @@ namespace Logzio.DotNet.IntegrationTests.NLog
                 ListenerUrl = LogzioListenerDummy.DefaultUrl
             };
             config.AddTarget("Logzio", logzioTarget);
-            config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio", "*");
+            config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio");
             LogManager.Configuration = config;
 
             var logger = LogManager.GetCurrentClassLogger();
 
             var stopwatch = Stopwatch.StartNew();
 
-            var logsAmount = 1000;
+            const int logsAmount = 1000;
             for (var i = 0; i < logsAmount; i++)
             {
                 logger.Info("A Bird");
@@ -57,12 +56,12 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             stopwatch.Stop();
             Console.WriteLine("Total time: " + stopwatch.Elapsed);
 
-            stopwatch.Elapsed.Should().BeLessOrEqualTo(TimeSpan.FromMilliseconds(100));
+            stopwatch.Elapsed.ShouldBeLessThanOrEqualTo(TimeSpan.FromMilliseconds(100));
 
             new Bootstraper().Resolve<IShipper>().WaitForSendLogsTask();
             LogManager.Shutdown();
 
-            _dummy.Requests.Count.ShouldBeEquivalentTo(Math.Ceiling((decimal) (logsAmount / 100)));
+            _dummy.Requests.Count.ShouldBeSameAs(Math.Ceiling((decimal)(logsAmount / 100)));
         }
     }
 }
