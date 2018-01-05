@@ -49,7 +49,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             LogManager.Shutdown();
 
             _dummy.Requests.Count.ShouldBe(1);
-            _dummy.Requests[0].ShouldMatch("*Hello*");
+            _dummy.Requests[0].ShouldContain("Hello");
         }
     }
 }

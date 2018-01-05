@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection;
 using log4net;
 using log4net.Repository.Hierarchy;
 using Logzio.DotNet.Core.Bootstrap;
@@ -59,7 +60,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
 
         private static LogzioAppender SetupAppender(int bufferSize)
         {
-            var hierarchy = (Hierarchy)LogManager.GetRepository("");
+            var hierarchy = (Hierarchy)LogManager.GetRepository(Assembly.GetCallingAssembly());
             var logzioAppender = new LogzioAppender();
             logzioAppender.AddToken("DKJiomZjbFyVvssJDmUAWeEOSNnDARWz");
             logzioAppender.AddListenerUrl(LogzioListenerDummy.DefaultUrl);

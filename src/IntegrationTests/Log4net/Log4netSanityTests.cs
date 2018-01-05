@@ -1,4 +1,5 @@
-﻿using log4net;
+﻿using System.Reflection;
+using log4net;
 using log4net.Repository.Hierarchy;
 using Logzio.DotNet.Core.Bootstrap;
 using Logzio.DotNet.Core.Shipping;
@@ -30,7 +31,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
         [Test]
         public void Sanity()
         {
-            var hierarchy = (Hierarchy)LogManager.GetRepository("");
+            var hierarchy = (Hierarchy)LogManager.GetRepository(Assembly.GetCallingAssembly());
             var logzioAppender = new LogzioAppender();
             logzioAppender.AddToken("DKJiomZjbFyVvssJDmUAWeEOSNnDARWz");
             logzioAppender.AddListenerUrl(LogzioListenerDummy.DefaultUrl);
@@ -45,7 +46,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
             LogManager.Shutdown();
 
             _dummy.Requests.Count.ShouldBe(1);
-            _dummy.Requests[0].ShouldMatch("*Just a random log line*");
+            _dummy.Requests[0].ShouldContain("Just a random log line");
         }
     }
 }
