@@ -9,10 +9,9 @@ cache:
 install:
   - cd src
   - dotnet restore logzio-dotnet.sln
-  - dotnet install NUnit.Console -Version 3.5.0  -OutputDirectory testrunner
 script:
   - dotnet build logzio-dotnet.sln /p:Configuration=Release
-  - dotnet test ./UnitTests/bin/Release/Logzio.DotNet.UnitTests.dll
-  - dotnet test ./IntegrationTests/bin/Release/Logzio.DotNet.IntegrationTests.dll
+  - dotnet test ./UnitTests/UnitTests.csproj
+  - dotnet test ./IntegrationTests/IntegrationTests.csproj
 notifications:
   slack: logzio:bLRWDmRpTJI4vTdAEDSpZ9Sp
