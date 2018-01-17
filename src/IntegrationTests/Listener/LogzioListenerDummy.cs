@@ -48,6 +48,7 @@ namespace Logzio.DotNet.IntegrationTests.Listener
             _isActive = false;
             _httpListener.Close();
             _httpListener.Abort();
+            Thread.Sleep(TimeSpan.FromMilliseconds(100)); // temporary for travis debbug
         }
     }
 }
