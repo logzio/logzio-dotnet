@@ -7,12 +7,13 @@ using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
 using NLog;
 using NLog.Config;
+using NLog.Layouts;
 using NLog.Targets;
 
 namespace Logzio.DotNet.NLog
 {
 	[Target("Logzio")]
-	public class LogzioTarget : Target
+	public class LogzioTarget : TargetWithLayout
 	{
 	    private readonly IShipper _shipper;
 	    private readonly IInternalLogger _internalLogger;
@@ -59,7 +60,7 @@ namespace Logzio.DotNet.NLog
 					{"@timestamp", logEvent.TimeStamp.ToString("o")},
 					{"logger", logEvent.LoggerName},
 					{"level", logEvent.Level.Name},
-					{"message", logEvent.FormattedMessage},
+					{"message", GetFormattedMessage(logEvent)},
 					{"exception", logEvent.Exception?.ToString()},
 					{"sequenceId", logEvent.SequenceID.ToString()}
 				};
@@ -83,6 +84,16 @@ namespace Logzio.DotNet.NLog
 				if (Debug)
 					_internalLogger.Log("Couldn't handle log message: " + ex);
 			}
+		}
+
+		private string GetFormattedMessage(LogEventInfo logEvent)
+		{
+			return IsDefaultLayout(Layout) ? logEvent.FormattedMessage : (Layout.Render(logEvent) ?? "").Trim();
+		}
+
+		private static bool IsDefaultLayout(Layout layout)
+		{
+			return layout == null || layout.ToString() == "'${longdate}|${level:uppercase=true}|${logger}|${message}'";
 		}
 
 		protected override void CloseTarget()
