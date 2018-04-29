@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Logzio.DotNet.Log4net</id>
-    <version>0.20</version>
+    <version>0.3.0</version>
     <title>Logzio.DotNet.Log4net</title>
     <authors>Logz.io</authors>
     <owners>Maor Rosenfeld</owners>

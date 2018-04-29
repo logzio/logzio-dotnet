@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using FluentAssertions;
+﻿using System.Collections.Generic;
 using Logzio.DotNet.Core.Bootstrap;
 using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.IntegrationTests.Listener;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Logzio.DotNet.IntegrationTests.Shipper
 {
@@ -40,14 +38,14 @@ namespace Logzio.DotNet.IntegrationTests.Shipper
                 BufferSize = 1,
                 BulkSenderOptions = { ListenerUrl = LogzioListenerDummy.DefaultUrl }
             };
-            
-            _shipper.Ship(GetLogging(), options);
-            _shipper.Flush(options);
 
             _shipper.Ship(GetLogging(), options);
             _shipper.Flush(options);
 
-            _dummy.Requests.Should().HaveCount(2);
+            _shipper.Ship(GetLogging(), options);
+            _shipper.Flush(options);
+
+            _dummy.Requests.Count.ShouldBe(2);
         }
 
         private static LogzioLoggingEvent GetLogging()

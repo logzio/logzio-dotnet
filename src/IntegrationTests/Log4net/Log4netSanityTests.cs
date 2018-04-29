@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading;
-using FluentAssertions;
+﻿using System.Reflection;
 using log4net;
 using log4net.Repository.Hierarchy;
 using Logzio.DotNet.Core.Bootstrap;
@@ -8,6 +6,7 @@ using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.IntegrationTests.Listener;
 using Logzio.DotNet.Log4net;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Logzio.DotNet.IntegrationTests.Log4net
 {
@@ -30,15 +29,15 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
         }
 
         [Test]
-        public void  Sanity()
+        public void Sanity()
         {
-            var hierarchy = (Hierarchy)LogManager.GetRepository();
+            var hierarchy = (Hierarchy)LogManager.GetRepository(Assembly.GetCallingAssembly());
             var logzioAppender = new LogzioAppender();
             logzioAppender.AddToken("DKJiomZjbFyVvssJDmUAWeEOSNnDARWz");
             logzioAppender.AddListenerUrl(LogzioListenerDummy.DefaultUrl);
             hierarchy.Root.AddAppender(logzioAppender);
             hierarchy.Configured = true;
-            var logger = LogManager.GetLogger(typeof (Log4netSanityTests));
+            var logger = LogManager.GetLogger(typeof(Log4netSanityTests));
 
             logger.Info("Just a random log line");
 
@@ -46,8 +45,8 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
             logzioAppender.Close();
             LogManager.Shutdown();
 
-            _dummy.Requests.Should().HaveCount(1);
-            _dummy.Requests[0].Should().Match("*Just a random log line*");
+            _dummy.Requests.Count.ShouldBe(1);
+            _dummy.Requests[0].ShouldContain("Just a random log line");
         }
     }
 }

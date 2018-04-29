@@ -1,16 +1,17 @@
 language: csharp
 solution: src/logzio-dotnet.sln
+mono: none
+dotnet: 2.0.0
 cache:
   directories:
     - $TRAVIS_BUILD_DIR/src/packages
     - $TRAVIS_BUILD_DIR/src/testrunner
 install:
   - cd src
-  - nuget restore logzio-dotnet.sln
-  - nuget install NUnit.Console -Version 3.5.0  -OutputDirectory testrunner
+  - dotnet restore logzio-dotnet.sln
 script:
-  - xbuild /p:Configuration=Release logzio-dotnet.sln
-  - mono ./testrunner/NUnit.ConsoleRunner.3.5.0/tools/nunit3-console.exe ./UnitTests/bin/Release/Logzio.DotNet.UnitTests.dll
-  - mono ./testrunner/NUnit.ConsoleRunner.3.5.0/tools/nunit3-console.exe ./IntegrationTests/bin/Release/Logzio.DotNet.IntegrationTests.dll
+  - dotnet build logzio-dotnet.sln /p:Configuration=Release
+  - dotnet test ./UnitTests/UnitTests.csproj
+  - dotnet test ./IntegrationTests/IntegrationTests.csproj
 notifications:
   slack: logzio:bLRWDmRpTJI4vTdAEDSpZ9Sp
