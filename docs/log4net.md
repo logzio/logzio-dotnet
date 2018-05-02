@@ -13,7 +13,7 @@ Install the log4net appender from the Package Manager Console:
 
 If you prefer to install the library manually, download the latest version from the releases page.
 
-##Configuration
+## Configuration
 ### XML
 If you configure your logging in an XML file, simply add a reference to the Logz.io appender.
 
