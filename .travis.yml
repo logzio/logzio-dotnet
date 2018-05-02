@@ -13,5 +13,3 @@ script:
   - dotnet build logzio-dotnet.sln /p:Configuration=Release
   - dotnet test ./UnitTests/UnitTests.csproj
   - dotnet test ./IntegrationTests/IntegrationTests.csproj
-notifications:
-  slack: logzio:bLRWDmRpTJI4vTdAEDSpZ9Sp
