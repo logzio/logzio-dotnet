@@ -36,7 +36,7 @@ namespace Logzio.Community.IntegrationTests.NLog
 
             var logzioTarget = new LogzioTarget
             {
-                Token = "DKJiomZjbFyVvssJDmUAWeEOSNnDARWz",
+                Token = "iWnDeXJFJtuEPPcgWRDpkCdkBksbrUAO",
                 ListenerUrl = LogzioListenerDummy.DefaultUrl
             };
             config.AddTarget("Logzio", logzioTarget);
