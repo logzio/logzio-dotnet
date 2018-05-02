@@ -52,7 +52,7 @@ If you configure your logging in an XML file, simply add a reference to the Logz
     	</root>
     </log4net>
 ```
-###Code
+### Code
 To add the Logz.io appender via code, add the following lines:
 
 ```C#
@@ -63,7 +63,7 @@ To add the Logz.io appender via code, add the following lines:
 	hierarchy.Configured = true;
 ```
 
-##Custom Fields
+## Custom Fields
 
 You can add static keys and values to be added to all log messages. For example:
 
@@ -81,7 +81,7 @@ You can add static keys and values to be added to all log messages. For example:
     	</appender>
 ```
 
-##Extensibility 
+## Extensibility 
 
 If you want to change some of the fields or add some of your own, inherit the appender and override the `ExtendValues` method:
 
