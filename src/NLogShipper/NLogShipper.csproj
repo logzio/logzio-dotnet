@@ -10,6 +10,8 @@
 		<PackageProjectUrl>https://github.com/yellowblood/logzio-dotnet</PackageProjectUrl>
 		<Description>This NLog target will send logs, in bulks, to the logz.io bulk HTTP service. Configurations are available, see the github readme for details.</Description>
 		<PackageTags>logging log logzio NLog</PackageTags>
+		<AssemblyName>Logzio.Community.NLog</AssemblyName>
+		<RootNamespace>Logzio.Community.NLog</RootNamespace>
 	</PropertyGroup>
   <ItemGroup>
     <PackageReference Include="newtonsoft.json" Version="10.0.3" />

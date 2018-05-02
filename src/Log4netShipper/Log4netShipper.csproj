@@ -10,6 +10,8 @@
     <PackageProjectUrl>https://github.com/yellowblood/logzio-dotnet</PackageProjectUrl>
     <Description>This log4net appender will send logs, in bulks, to the logz.io bulk HTTP service. Configurations are available, see the github readme for details.</Description>
     <PackageTags>logging log logzio log4net</PackageTags>
+    <AssemblyName>Logzio.Community.Log4Net</AssemblyName>
+    <RootNamespace>Logzio.Community.Log4Net</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.8" />

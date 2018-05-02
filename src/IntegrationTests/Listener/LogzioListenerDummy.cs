@@ -4,7 +4,7 @@ using System.IO;
 using System.Net;
 using System.Threading;
 
-namespace Logzio.DotNet.IntegrationTests.Listener
+namespace Logzio.Community.IntegrationTests.Listener
 {
     public class LogzioListenerDummy
     {

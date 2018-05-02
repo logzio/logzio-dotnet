@@ -1,6 +1,4 @@
-﻿using TinyIoC;
-
-namespace Logzio.DotNet.Core.Bootstrap
+﻿namespace Logzio.Community.Core.Bootstrap
 {
     public interface IBootstraper
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Logzio.DotNet.Core.InternalLogger
+namespace Logzio.Community.Core.InternalLogger
 {
 	public interface IInternalLogger
 	{

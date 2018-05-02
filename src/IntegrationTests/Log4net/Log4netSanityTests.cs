@@ -1,17 +1,17 @@
 ﻿using System.Reflection;
 using log4net;
 using log4net.Repository.Hierarchy;
-using Logzio.DotNet.Core.Bootstrap;
-using Logzio.DotNet.Core.Shipping;
-using Logzio.DotNet.IntegrationTests.Listener;
-using Logzio.DotNet.Log4net;
+using Logzio.Community.Core.Bootstrap;
+using Logzio.Community.Core.Shipping;
+using Logzio.Community.IntegrationTests.Listener;
+using Logzio.Community.Log4Net;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Logzio.DotNet.IntegrationTests.Log4net
+namespace Logzio.Community.IntegrationTests.Log4net
 {
     [TestFixture]
-    public class Log4netSanityTests
+    public class Log4NetSanityTests
     {
         private LogzioListenerDummy _dummy;
 
@@ -37,7 +37,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
             logzioAppender.AddListenerUrl(LogzioListenerDummy.DefaultUrl);
             hierarchy.Root.AddAppender(logzioAppender);
             hierarchy.Configured = true;
-            var logger = LogManager.GetLogger(typeof(Log4netSanityTests));
+            var logger = LogManager.GetLogger(typeof(Log4NetSanityTests));
 
             logger.Info("Just a random log line");
 

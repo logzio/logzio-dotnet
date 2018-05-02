@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+    <AssemblyName>Logzio.Community.UnitTests</AssemblyName>
+    <RootNamespace>Logzio.Community.UnitTests</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
@@ -10,6 +12,7 @@
     <PackageReference Include="Shouldly" Version="3.0.0-beta0003" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Log4netShipper\Log4netShipper.csproj" />
   </ItemGroup>
 </Project>

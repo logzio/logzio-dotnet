@@ -1,6 +1,6 @@
 using System;
 
-namespace Logzio.DotNet.Core.Shipping
+namespace Logzio.Community.Core.Shipping
 {
 	public class BulkSenderOptions
 	{

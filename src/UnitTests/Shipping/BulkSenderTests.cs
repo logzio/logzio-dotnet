@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using Logzio.DotNet.Core.InternalLogger;
-using Logzio.DotNet.Core.Shipping;
-using Logzio.DotNet.Core.WebClient;
+using Logzio.Community.Core.InternalLogger;
+using Logzio.Community.Core.Shipping;
+using Logzio.Community.Core.WebClient;
 using NSubstitute;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Logzio.DotNet.UnitTests.Shipping
+namespace Logzio.Community.UnitTests.Shipping
 {
     [TestFixture]
     public class BulkSenderTests

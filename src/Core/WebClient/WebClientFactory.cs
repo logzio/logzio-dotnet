@@ -1,4 +1,4 @@
-﻿namespace Logzio.DotNet.Core.WebClient
+﻿namespace Logzio.Community.Core.WebClient
 {
 	public interface IWebClientFactory
 	{

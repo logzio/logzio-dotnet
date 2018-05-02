@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Logzio.DotNet.Core.Shipping
+namespace Logzio.Community.Core.Shipping
 {
 	public class LogzioLoggingEvent
 	{

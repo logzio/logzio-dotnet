@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using Logzio.DotNet.Core.Bootstrap;
-using Logzio.DotNet.Core.Shipping;
-using Logzio.DotNet.IntegrationTests.Listener;
+using Logzio.Community.Core.Bootstrap;
+using Logzio.Community.Core.Shipping;
+using Logzio.Community.IntegrationTests.Listener;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Logzio.DotNet.IntegrationTests.Shipper
+namespace Logzio.Community.IntegrationTests.Shipper
 {
     [TestFixture]
     public class ShipperThreadHandlingTests

@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Logzio.DotNet.Core.InternalLogger;
-using Logzio.DotNet.Core.Shipping;
+using Logzio.Community.Core.InternalLogger;
+using Logzio.Community.Core.Shipping;
 using NSubstitute;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Logzio.DotNet.UnitTests.Shipping
+namespace Logzio.Community.UnitTests.Shipping
 {
     [TestFixture]
     public class ShipperTests

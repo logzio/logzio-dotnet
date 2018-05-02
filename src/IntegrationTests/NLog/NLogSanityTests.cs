@@ -1,13 +1,13 @@
-﻿using Logzio.DotNet.Core.Bootstrap;
-using Logzio.DotNet.Core.Shipping;
-using Logzio.DotNet.IntegrationTests.Listener;
-using Logzio.DotNet.NLog;
+﻿using Logzio.Community.Core.Bootstrap;
+using Logzio.Community.Core.Shipping;
+using Logzio.Community.IntegrationTests.Listener;
+using Logzio.Community.NLog;
 using NLog;
 using NLog.Config;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Logzio.DotNet.IntegrationTests.NLog
+namespace Logzio.Community.IntegrationTests.NLog
 {
     [TestFixture]
     public class NLogSanityTests
