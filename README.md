@@ -1,4 +1,4 @@
-[![Travis Build Status](https://travis-ci.org/logzio/logzio-dotnet.svg?branch=master)](https://travis-ci.org/logzio/logzio-dotnet)
+[![Travis Build Status](https://travis-ci.org/yellowblood/logzio-dotnet.svg?branch=master)](https://travis-ci.org/yellowblood/logzio-dotnet)
 
 # logzio-dotnet
 
