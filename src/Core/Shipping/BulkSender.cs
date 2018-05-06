@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Logzio.DotNet.Core.InternalLogger;
-using Logzio.DotNet.Core.WebClient;
+using Logzio.Community.Core.InternalLogger;
+using Logzio.Community.Core.WebClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Logzio.DotNet.Core.Shipping
+namespace Logzio.Community.Core.Shipping
 {
 	public interface IBulkSender
 	{

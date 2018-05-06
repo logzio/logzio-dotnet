@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Threading;
 
-namespace Logzio.DotNet.IntegrationTests.Listener
+namespace Logzio.Community.IntegrationTests.Listener
 {
     public class LogzioListenerDummy
     {
@@ -26,10 +27,10 @@ namespace Logzio.DotNet.IntegrationTests.Listener
 
         private void OnContext(IAsyncResult ar)
         {
-            var context = _httpListener.EndGetContext(ar);
-
             if (!_isActive)
                 return;
+
+            var context = _httpListener.EndGetContext(ar);
 
             _httpListener.BeginGetContext(OnContext, null);
 
@@ -48,6 +49,11 @@ namespace Logzio.DotNet.IntegrationTests.Listener
             _isActive = false;
             _httpListener.Close();
             _httpListener.Abort();
+
+            // TODO: remove sleep ater bug is fixed (milestone of dotnet 2.1.0)
+            // Disposing Socket then rebinding fails with SocketError.AddressAlreadyInUse on Unix
+            // https://github.com/dotnet/corefx/issues/25016     
+            Thread.Sleep(TimeSpan.FromMilliseconds(100)); 
         }
     }
 }

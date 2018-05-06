@@ -1,6 +1,8 @@
-[![Travis Build Status](https://travis-ci.org/logzio/logzio-dotnet.svg?branch=master)](https://travis-ci.org/logzio/logzio-dotnet)
+[![Travis Build Status](https://travis-ci.org/yellowblood/logzio-dotnet.svg?branch=master)](https://travis-ci.org/yellowblood/logzio-dotnet)
 
 # logzio-dotnet
+
+This is a fork of the official .NET log shippers of [Logz.io](http://www.logz.io).
 
 This repository contains the [Logz.io](http://www.logz.io) shippers for .NET frameworks, currently including [log4net](https://logging.apache.org/log4net/) and [NLog](http://nlog-project.org/).
 

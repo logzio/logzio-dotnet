@@ -5,15 +5,15 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using log4net.Appender;
 using log4net.Core;
-using Logzio.DotNet.Core.Bootstrap;
-using Logzio.DotNet.Core.InternalLogger;
-using Logzio.DotNet.Core.Shipping;
+using Logzio.Community.Core.Bootstrap;
+using Logzio.Community.Core.InternalLogger;
+using Logzio.Community.Core.Shipping;
 
-namespace Logzio.DotNet.Log4net
+namespace Logzio.Community.Log4Net
 {
     public class LogzioAppender : AppenderSkeleton
     {
-        private static readonly string ProcessId = Process.GetCurrentProcess().Id.ToString();
+        private static readonly int ProcessId = Process.GetCurrentProcess().Id;
 
         private readonly IShipper _shipper;
         private readonly IInternalLogger _internalLogger;

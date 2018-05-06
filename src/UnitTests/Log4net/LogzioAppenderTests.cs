@@ -1,11 +1,11 @@
 ﻿using log4net.Core;
-using Logzio.DotNet.Core.InternalLogger;
-using Logzio.DotNet.Core.Shipping;
-using Logzio.DotNet.Log4net;
+using Logzio.Community.Core.InternalLogger;
+using Logzio.Community.Core.Shipping;
+using Logzio.Community.Log4Net;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace Logzio.DotNet.UnitTests.Log4net
+namespace Logzio.Community.UnitTests.Log4net
 {
 	[TestFixture]
 	public class LogzioAppenderTests

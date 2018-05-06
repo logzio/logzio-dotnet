@@ -1,4 +1,4 @@
-﻿namespace Logzio.DotNet.Log4net
+﻿namespace Logzio.Community.Log4Net
 {
 	public class LogzioAppenderCustomField
 	{

@@ -1,10 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Logzio.DotNet.Core.InternalLogger;
+using Logzio.Community.Core.InternalLogger;
 
-namespace Logzio.DotNet.Core.Shipping
+namespace Logzio.Community.Core.Shipping
 {
 	public interface IShipper
 	{

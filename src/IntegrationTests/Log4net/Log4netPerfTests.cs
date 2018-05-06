@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
-using FluentAssertions;
+using System.Reflection;
 using log4net;
 using log4net.Repository.Hierarchy;
-using Logzio.DotNet.Core.Bootstrap;
-using Logzio.DotNet.Core.Shipping;
-using Logzio.DotNet.IntegrationTests.Listener;
-using Logzio.DotNet.Log4net;
+using Logzio.Community.Core.Bootstrap;
+using Logzio.Community.Core.Shipping;
+using Logzio.Community.IntegrationTests.Listener;
+using Logzio.Community.Log4Net;
 using NUnit.Framework;
+using Shouldly;
 
-namespace Logzio.DotNet.IntegrationTests.Log4net
+namespace Logzio.Community.IntegrationTests.Log4net
 {
     [TestFixture]
-    public class Log4netPerfTests
+    public class Log4NetPerfTests
     {
         private LogzioListenerDummy _dummy;
 
@@ -31,16 +31,16 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
         }
 
         [Test]
-        public void MeasurePerfForLog4net()
+        public void MeasurePerfForLog4Net()
         {
-            var bufferSize = 100;
+            const int bufferSize = 100;
             var logzioAppender = SetupAppender(bufferSize);
             logzioAppender.AddDebug(true);
-            var logger = LogManager.GetLogger(typeof (Log4netSanityTests));
+            var logger = LogManager.GetLogger(typeof(Log4NetSanityTests));
 
             var stopwatch = Stopwatch.StartNew();
 
-            var logsAmount = 1000;
+            const int logsAmount = 1000;
             for (var i = 0; i < logsAmount; i++)
             {
                 logger.Info("A Fish");
@@ -48,21 +48,21 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
 
             stopwatch.Stop();
             Console.WriteLine("Total time: " + stopwatch.Elapsed);
-            stopwatch.Elapsed.Should().BeLessOrEqualTo(TimeSpan.FromMilliseconds(100));
+            stopwatch.Elapsed.ShouldBeLessThanOrEqualTo(TimeSpan.FromMilliseconds(100));
 
             new Bootstraper().Resolve<IShipper>().WaitForSendLogsTask();
 
             logzioAppender.Close();
             LogManager.Shutdown();
 
-            _dummy.Requests.Count.ShouldBeEquivalentTo(Math.Ceiling((decimal) (logsAmount / bufferSize)));
+            _dummy.Requests.Count.ShouldBe(logsAmount / bufferSize);
         }
 
         private static LogzioAppender SetupAppender(int bufferSize)
         {
-            var hierarchy = (Hierarchy) LogManager.GetRepository();
+            var hierarchy = (Hierarchy)LogManager.GetRepository(Assembly.GetCallingAssembly());
             var logzioAppender = new LogzioAppender();
-            logzioAppender.AddToken("DKJiomZjbFyVvssJDmUAWeEOSNnDARWz");
+            logzioAppender.AddToken("iWnDeXJFJtuEPPcgWRDpkCdkBksbrUAO");
             logzioAppender.AddListenerUrl(LogzioListenerDummy.DefaultUrl);
             logzioAppender.AddBufferSize(bufferSize);
             hierarchy.Root.AddAppender(logzioAppender);
