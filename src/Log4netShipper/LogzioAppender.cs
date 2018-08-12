@@ -18,11 +18,11 @@ namespace Logzio.DotNet.Log4net
         private readonly IShipper _shipper;
         private readonly IInternalLogger _internalLogger;
 
-        private readonly ShipperOptions _shipperOptions = new ShipperOptions {BulkSenderOptions = {Type = "log4net"}};
+        private readonly ShipperOptions _shipperOptions = new ShipperOptions { BulkSenderOptions = { Type = "log4net" } };
         private readonly List<LogzioAppenderCustomField> _customFields = new List<LogzioAppenderCustomField>();
-	    private Task _lastTask;
+        private Task _lastTask;
 
-	    public LogzioAppender()
+        public LogzioAppender()
         {
             var bootstraper = new Bootstraper();
             bootstraper.Bootstrap();
@@ -69,9 +69,10 @@ namespace Logzio.DotNet.Log4net
                     if (value == null || ReferenceEquals(value, ""))
                         continue;
 
-                    var key = property.Key.ToString();
+                    var key = property.Key?.ToString() ?? string.Empty;
                     key = key.Replace(":", "").Replace(".", "").Replace("log4net", "");
-                    values[key] = value;
+                    if (!string.IsNullOrEmpty(key))
+                        values[key] = value;
                 }
 
                 ExtendValues(loggingEvent, values);
@@ -85,6 +86,22 @@ namespace Logzio.DotNet.Log4net
             }
         }
 
+        public override bool Flush(int millisecondsTimeout)
+        {
+            try
+            {
+                _lastTask?.Wait();
+                _shipper?.Flush(_shipperOptions);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                if (_shipperOptions.Debug)
+                    _internalLogger.Log("Couldn't flush log messages: " + ex);
+                return false;
+            }
+        }
+
         protected virtual void ExtendValues(LoggingEvent loggingEvent, Dictionary<string, object> values)
         {
 
@@ -92,10 +109,10 @@ namespace Logzio.DotNet.Log4net
 
         protected override void OnClose()
         {
-			base.OnClose();
-	        _lastTask?.Wait();
-			//Shipper can be null if there was an error in the ctor, we don't
-			//want to create another exception in the closing
+            base.OnClose();
+            _lastTask?.Wait();
+            //Shipper can be null if there was an error in the ctor, we don't
+            //want to create another exception in the closing
             _shipper?.Flush(_shipperOptions);
         }
 

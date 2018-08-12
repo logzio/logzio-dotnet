@@ -41,9 +41,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
 
             logger.Info("Just a random log line");
 
-            new Bootstraper().Resolve<IShipper>().WaitForSendLogsTask();
-            logzioAppender.Close();
-            LogManager.Shutdown();
+            LogManager.Shutdown();  // Flushes and closes
 
             _dummy.Requests.Count.ShouldBe(1);
             _dummy.Requests[0].ShouldContain("Just a random log line");
