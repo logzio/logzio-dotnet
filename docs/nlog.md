@@ -13,7 +13,7 @@ Install the NLog target from the Package Manager Console:
 
 If you prefer to install the library manually, download the latest version from the releases page.
 
-##Configuration
+## Configuration
 ### XML
 If you configure your logging in an XML file, you need to register the assembly and then reference the target.
 
@@ -41,7 +41,7 @@ If you configure your logging in an XML file, you need to register the assembly 
 		</rules>
 	</nlog>
 ```
-###Code
+### Code
 To add the Logz.io target via code, add the following lines:
 
 ```C#			
@@ -54,7 +54,7 @@ To add the Logz.io target via code, add the following lines:
 	LogManager.Configuration = config;
 ```
 
-##Variables
+## Variables
 
 Any variables defined in the NLog configuration will be forwarded to Logzio. For example:
 
@@ -65,7 +65,7 @@ Any variables defined in the NLog configuration will be forwarded to Logzio. For
 	</nlog>
 ```
 
-##Extensibility 
+## Extensibility 
 
 If you want to change some of the fields or add some of your own, inherit the target and override the `ExtendValues` method:
 
