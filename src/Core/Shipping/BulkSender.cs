@@ -27,9 +27,9 @@ namespace Logzio.DotNet.Core.Shipping
 
 		public BulkSender(IWebClientFactory webClientFactory, IInternalLogger internalLogger)
 		{
-		    _webClientFactory = webClientFactory;
-		    _internalLogger = internalLogger;
-		    _jsonSerializer = new JsonSerializer { ContractResolver = new CamelCasePropertyNamesContractResolver() };
+			_webClientFactory = webClientFactory;
+			_internalLogger = internalLogger;
+			_jsonSerializer = new JsonSerializer { ContractResolver = new CamelCasePropertyNamesContractResolver() };
 		}
 
 		public Task SendAsync(ICollection<LogzioLoggingEvent> logz, BulkSenderOptions options)
@@ -39,16 +39,15 @@ namespace Logzio.DotNet.Core.Shipping
 
 		public void Send(ICollection<LogzioLoggingEvent> logz, BulkSenderOptions options, int attempt = 0)
 		{
-		    if (logz == null || logz.Count == 0)
-		        return;
+			if (logz == null || logz.Count == 0)
+				return;
 
 			var url = string.Format(UrlTemplate, options.ListenerUrl, options.Token, options.Type);
 			try
 			{
 				using (var client = _webClientFactory.GetWebClient())
 				{
-					var serializedLogLines = logz.Select(x => Serialize(x.LogData)).ToArray();
-					var body = String.Join(Environment.NewLine, serializedLogLines);
+					var body = SerializeLogEvents(logz);
 					client.UploadString(url, body);
 					if (options.Debug)
 						_internalLogger.Log("Sent bulk of [{0}] log messages to [{1}] successfully.", logz.Count, url);
@@ -64,12 +63,19 @@ namespace Logzio.DotNet.Core.Shipping
 			}
 		}
 
-		private string Serialize(object obj)
+		private string SerializeLogEvents(ICollection<LogzioLoggingEvent> logz)
 		{
-			using (var sb = new StringWriter())
+			bool firstItem = true;
+			using (var sw = new StringWriter())
 			{
-				_jsonSerializer.Serialize(sb, obj);
-				return sb.ToString();
+				foreach (var logEvent in logz)
+				{
+					if (!firstItem)
+						sw.WriteLine();
+					_jsonSerializer.Serialize(sw, logEvent);
+					firstItem = false;
+				}
+				return sw.ToString();
 			}
 		}
 	}
