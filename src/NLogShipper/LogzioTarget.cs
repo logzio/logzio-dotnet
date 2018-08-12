@@ -1,26 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Logzio.DotNet.Core.Bootstrap;
 using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
 using NLog;
+using NLog.Common;
 using NLog.Config;
 using NLog.Targets;
 
 namespace Logzio.DotNet.NLog
 {
 	[Target("Logzio")]
-	public class LogzioTarget : Target
+	public class LogzioTarget : TargetWithContext
 	{
-	    private readonly IShipper _shipper;
-	    private readonly IInternalLogger _internalLogger;
+		private IShipper _shipper;
+		private IInternalLogger _internalLogger;
 
-	    private readonly ShipperOptions _shipperOptions = new ShipperOptions { BulkSenderOptions = { Type = "nlog" }};
-		private Task _lastTask;
+		private readonly ShipperOptions _shipperOptions = new ShipperOptions { BulkSenderOptions = { Type = "nlog" } };
 
-	    [RequiredParameter]
+		[RequiredParameter]
 		public string Token { get { return _shipperOptions.BulkSenderOptions.Token; } set { _shipperOptions.BulkSenderOptions.Token = value; } }
 
 		public string LogzioType { get { return _shipperOptions.BulkSenderOptions.Type; } set { _shipperOptions.BulkSenderOptions.Type = value; } }
@@ -31,26 +30,52 @@ namespace Logzio.DotNet.NLog
 		public TimeSpan RetriesInterval { get { return _shipperOptions.BulkSenderOptions.RetriesInterval; } set { _shipperOptions.BulkSenderOptions.RetriesInterval = value; } }
 		public bool Debug { get { return _shipperOptions.BulkSenderOptions.Debug; } set { _shipperOptions.BulkSenderOptions.Debug = _shipperOptions.Debug = value; } }
 
+		/// <summary>
+		/// Configuration of additional properties to include with each LogEvent (Ex. ${logger}, ${machinename}, ${threadid} etc.)
+		/// </summary>
+		public override IList<TargetPropertyWithContext> ContextProperties { get; } = new List<TargetPropertyWithContext>();
+
+		private readonly string DefaultLayout;
+		private bool _usingDefaultLayout;
+
 		public LogzioTarget()
 		{
-		    var bootstraper = new Bootstraper();
-		    bootstraper.Bootstrap();
-		    _shipper = bootstraper.Resolve<IShipper>();
-		    _internalLogger = bootstraper.Resolve<IInternalLogger>();
+			IncludeEventProperties = true;
+			OptimizeBufferReuse = true;
+			DefaultLayout = Layout?.ToString();
 		}
 
-	    public LogzioTarget(IShipper shipper, IInternalLogger internalLogger)
-	    {
-	        _shipper = shipper;
-	        _internalLogger = internalLogger;
-	    }
+		public LogzioTarget(IShipper shipper, IInternalLogger internalLogger)
+			: this()
+		{
+			_shipper = shipper;
+			_internalLogger = internalLogger;
+		}
+
+		protected override void InitializeTarget()
+		{
+			if (_shipper == null && _internalLogger == null)
+			{
+				try
+				{
+					var bootstraper = new Bootstraper();
+					bootstraper.Bootstrap();
+					_shipper = bootstraper.Resolve<IShipper>();
+					_internalLogger = bootstraper.Resolve<IInternalLogger>();
+				}
+				catch (Exception ex)
+				{
+					// TinyIOC does not always work, fallback to manual resolve
+					_internalLogger = new Core.InternalLogger.InternalLogger();
+					_internalLogger.Log("Couldn't resolve dependencies: " + ex);
+					_shipper = new Shipper(new BulkSender(new Core.WebClient.WebClientFactory(), _internalLogger), _internalLogger);
+				}
+			}
+			_usingDefaultLayout = Layout?.ToString() == DefaultLayout;
+			base.InitializeTarget();
+		}
 
 		protected override void Write(LogEventInfo logEvent)
-		{
-			_lastTask = Task.Run(() => { WriteImpl(logEvent); });
-		}
-
-		private void WriteImpl(LogEventInfo logEvent)
 		{
 			try
 			{
@@ -59,19 +84,42 @@ namespace Logzio.DotNet.NLog
 					{"@timestamp", logEvent.TimeStamp.ToString("o")},
 					{"logger", logEvent.LoggerName},
 					{"level", logEvent.Level.Name},
-					{"message", logEvent.FormattedMessage},
+					{"message", _usingDefaultLayout ? logEvent.FormattedMessage : RenderLogEvent(Layout, logEvent)},
 					{"exception", logEvent.Exception?.ToString()},
 					{"sequenceId", logEvent.SequenceID.ToString()}
 				};
 
-				foreach (var pair in logEvent.Properties.Where(pair => pair.Key != null))
+				if (ShouldIncludeProperties(logEvent))
 				{
-					values[pair.Key.ToString()] = pair.Value;
+					var properties = GetAllProperties(logEvent);
+					foreach (var property in properties)
+					{
+						string key = property.Key;
+						if (string.IsNullOrEmpty(key))
+							continue;
+
+						if (key.IndexOf('.') != -1)
+							key = key.Replace('.', '_');
+						if (key.IndexOf(':') != -1)
+							key = key.Replace(':', '_');
+
+						if (!values.ContainsKey(key))
+						{
+							values[key] = property.Value;
+						}
+					}
 				}
-		
-				foreach (var pair in LogManager.Configuration.Variables.Where(pair => pair.Key != null))
+				else if (ContextProperties.Count > 0)
 				{
-					values[pair.Key] = pair.Value?.OriginalText;
+					for (int i = 0; i < ContextProperties.Count; ++i)
+					{
+						var property = ContextProperties[i];
+						var propertyValue = RenderLogEvent(property.Layout, logEvent);
+						if (property.IncludeEmptyValue || !string.IsNullOrEmpty(propertyValue))
+						{
+							values[property.Name] = propertyValue;
+						}
+					}
 				}
 
 				ExtendValues(logEvent, values);
@@ -81,14 +129,28 @@ namespace Logzio.DotNet.NLog
 			catch (Exception ex)
 			{
 				if (Debug)
-					_internalLogger.Log("Couldn't handle log message: " + ex);
+					_internalLogger?.Log("Couldn't handle log message: " + ex);
+			}
+		}
+
+		protected override void FlushAsync(AsyncContinuation asyncContinuation)
+		{
+			try
+			{
+				_shipper?.Flush(_shipperOptions);
+				asyncContinuation(null);
+			}
+			catch (Exception ex)
+			{
+				asyncContinuation(ex);
+				if (Debug)
+					_internalLogger?.Log("Couldn't handle log message: " + ex);
 			}
 		}
 
 		protected override void CloseTarget()
 		{
 			base.CloseTarget();
-			_lastTask?.Wait();
 			//Shipper can be null if there was an error in the ctor, we don't
 			//want to create another exception in the closing
 			_shipper?.Flush(_shipperOptions);
