@@ -1,28 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2047
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{60CE186A-525E-4078-8ED0-5CDD521A3F77}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shippers", "Shippers", "{FC6D6E6A-04FF-4337-ADE3-E7BC12ED9D63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{83260D70-F07C-4D06-B60F-FE0EE633CF77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{83260D70-F07C-4D06-B60F-FE0EE633CF77}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3DDF8FF3-6C86-4563-8B44-FA2988354866}"
-	ProjectSection(SolutionItems) = preProject
-		Log4net\global.json = Log4net\global.json
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{46DE7DBF-1A5D-4EA1-986E-8461C1311AE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{82CC453F-99AB-4C5B-99BB-BDCB9A26D83A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{82CC453F-99AB-4C5B-99BB-BDCB9A26D83A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests", "IntegrationTests\IntegrationTests.csproj", "{5E76ACE2-64FB-4093-83D0-AFAB5D0A6C39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTests", "IntegrationTests\IntegrationTests.csproj", "{5E76ACE2-64FB-4093-83D0-AFAB5D0A6C39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Log4netShipper", "Log4netShipper\Log4netShipper.csproj", "{21AA4336-7888-4D92-83DC-ECA624C10E33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Log4netShipper", "Log4netShipper\Log4netShipper.csproj", "{21AA4336-7888-4D92-83DC-ECA624C10E33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLogShipper", "NLogShipper\NLogShipper.csproj", "{74371DFF-55AF-4712-93FE-CE76F6BCDC69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NLogShipper", "NLogShipper\NLogShipper.csproj", "{74371DFF-55AF-4712-93FE-CE76F6BCDC69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,5 +57,8 @@ Global
 		{5E76ACE2-64FB-4093-83D0-AFAB5D0A6C39} = {46DE7DBF-1A5D-4EA1-986E-8461C1311AE8}
 		{21AA4336-7888-4D92-83DC-ECA624C10E33} = {FC6D6E6A-04FF-4337-ADE3-E7BC12ED9D63}
 		{74371DFF-55AF-4712-93FE-CE76F6BCDC69} = {FC6D6E6A-04FF-4337-ADE3-E7BC12ED9D63}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F15DC914-962B-40AC-A019-1B5FBEDE3E53}
 	EndGlobalSection
 EndGlobal
