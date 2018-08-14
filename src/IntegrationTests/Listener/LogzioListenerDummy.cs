@@ -53,7 +53,7 @@ namespace Logzio.DotNet.IntegrationTests.Listener
             // TODO: remove sleep ater bug is fixed (milestone of dotnet 2.1.0)
             // Disposing Socket then rebinding fails with SocketError.AddressAlreadyInUse on Unix
             // https://github.com/dotnet/corefx/issues/25016     
-            Thread.Sleep(TimeSpan.FromMilliseconds(100)); 
+            Thread.Sleep(TimeSpan.FromMilliseconds(100));
         }
     }
 }
