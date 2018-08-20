@@ -1,63 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+    
+    <TargetFrameworks Condition=" ' $(TargetFrameworks) ' == '  ' ">netstandard2.0</TargetFrameworks>
+
+    <AssemblyName>Logzio.DotNet.Core</AssemblyName>
+    <Company>Logz.io</Company>
+    <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
+    <Copyright>Copyright (c) $(CurrentYear) - Logz.io</Copyright>
+    <Description>Core BulkSender that sends logs to the logz.io bulk HTTP service</Description>
+
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="newtonsoft.json" Version="10.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
-</Project>
-<!--<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+
   <PropertyGroup>
-    
+    <AssemblyTitle>$(Title)</AssemblyTitle>
+    <!-- SonarQube WARNING: The following projects do not have a valid ProjectGuid and were not built using a valid solution (.sln) thus will be skipped from analysis… -->
+    <ProjectGuid>{83260D70-F07C-4D06-B60F-FE0EE633CF77}</ProjectGuid>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Bootstrap\Bootstraper.cs" />
-    <Compile Include="InternalLogger\InternalLogger.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Shipping\BulkSender.cs" />
-    <Compile Include="Shipping\BulkSenderOptions.cs" />
-    <Compile Include="Shipping\LogzioLoggingEvent.cs" />
-    <Compile Include="Shipping\Shipper.cs" />
-    <Compile Include="Shipping\ShipperOptions.cs" />
-    <Compile Include="WebClient\WebClientFactory.cs" />
-    <Compile Include="WebClient\IWebClient.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Bootstrap\TinyIoc.cs" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-</Project>-->
+</Project>

@@ -1,15 +1,15 @@
 ﻿namespace Logzio.DotNet.Core.WebClient
 {
-	public interface IWebClientFactory
-	{
-		IWebClient GetWebClient();
-	}
+    public interface IWebClientFactory
+    {
+        IWebClient GetWebClient();
+    }
 
-	public class WebClientFactory : IWebClientFactory
-	{
-		public IWebClient GetWebClient()
-		{
-			return new SystemWebClient();
-		}
-	}
+    public class WebClientFactory : IWebClientFactory
+    {
+        public IWebClient GetWebClient()
+        {
+            return new SystemWebClient();
+        }
+    }
 }

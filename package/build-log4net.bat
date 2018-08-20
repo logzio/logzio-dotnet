@@ -1,5 +1,3 @@
 @ECHO OFF
-
-call _build-package log4net Log4net
-
+powershell.exe -ExecutionPolicy Bypass .\build.ps1 Log4netShipper %1
 pause

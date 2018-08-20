@@ -13,7 +13,7 @@ Install the NLog target from the Package Manager Console:
 
 If you prefer to install the library manually, download the latest version from the releases page.
 
-##Configuration
+## Configuration
 ### XML
 If you configure your logging in an XML file, you need to register the assembly and then reference the target.
 
@@ -22,7 +22,6 @@ If you configure your logging in an XML file, you need to register the assembly 
 		<extensions>
 			<add assembly="Logzio.DotNet.NLog"/>
 		</extensions>
-		
 		<targets>
 			<!-- parameters are shown here with their default values. 
 				Other than the token, all of the fields are optional and can be safely omitted. -->
@@ -34,14 +33,17 @@ If you configure your logging in an XML file, you need to register the assembly 
 				bufferTimeout="00:00:05"
 				retriesMaxAttempts="3"
 				retriesInterval="00:00:02"
-				debug="false" />
+				debug="false">
+				<contextproperty name="host" layout="${machinename}" />
+				<contextproperty name="threadid" layout="${threadid}" />
+			</target>
 		</targets>
 		<rules>
 				<logger name="*" minlevel="Info" writeTo="logzio" />
 		</rules>
 	</nlog>
 ```
-###Code
+### Code
 To add the Logz.io target via code, add the following lines:
 
 ```C#			
@@ -54,22 +56,29 @@ To add the Logz.io target via code, add the following lines:
 	LogManager.Configuration = config;
 ```
 
-##Variables
+## Context Properties
 
-Any variables defined in the NLog configuration will be forwarded to Logzio. For example:
+You can configure the target to include your own custom values when forwarding to Logzio. For example:
 
 ```xml
 	<nlog>
 		<variable name="site" value="New Zealand" />
 		<variable name="rings" value="one" />
+		<target name="logzio" type="Logzio" token="DKJiomZjbFyVvssJDmUAWeEOSNnDARWz">
+				<contextproperty name="site" layout="${site}" />
+				<contextproperty name="rings" layout="${rings}" />
+		</target>
 	</nlog>
 ```
 
-##Extensibility 
+You can also include NLog MDLC properties by configuring `includeMdlc="true"`
+
+## Extensibility 
 
 If you want to change some of the fields or add some of your own, inherit the target and override the `ExtendValues` method:
 
 ```C#
+	[Target("MyAppLogzio")]
 	public class MyAppLogzioTarget : LogzioTarget
 	{
 		protected override void ExtendValues(LogEventInfo logEvent, Dictionary<string, string> values)

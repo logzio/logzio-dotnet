@@ -1,5 +1,3 @@
 @ECHO OFF
-
-call _build-package nlog NLog
-
+powershell.exe -ExecutionPolicy Bypass .\build.ps1 NLogShipper %1
 pause
