@@ -72,7 +72,7 @@ namespace Logzio.DotNet.Core.Shipping
                 {
                     if (!firstItem)
                         sw.WriteLine();
-                    _jsonSerializer.Serialize(sw, logEvent);
+                    _jsonSerializer.Serialize(sw, logEvent.LogData);
                     firstItem = false;
                 }
                 return sw.ToString();

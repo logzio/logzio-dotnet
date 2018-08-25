@@ -27,10 +27,11 @@ namespace Logzio.DotNet.UnitTests.Shipping
         [Test]
         public void SendAsync_Logs_LogsAreSent()
         {
-            _target.SendAsync(new[] { GetLoggingEventWithSomeData(), GetLoggingEventWithSomeData() }, new BulkSenderOptions()).Wait();
-
-            _webClientFactory.Received().GetWebClient();
-            _webClient.Received().UploadString(Arg.Any<string>(), Arg.Any<string>());
+            var log = GetLoggingEventWithSomeData();
+            log.LogData.Remove("@timestamp");
+            _target.SendAsync(new[] { log }, new BulkSenderOptions()).Wait();
+            _webClient.Received()
+                .UploadString(Arg.Any<string>(), Arg.Is<string>(x => x.Equals("{\"message\":\"hey\"}")));
         }
 
         [Test]
