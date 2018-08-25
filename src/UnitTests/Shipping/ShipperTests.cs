@@ -78,7 +78,7 @@ namespace Logzio.DotNet.UnitTests.Shipping
             var options = new ShipperOptions
             {
                 BufferSize = 10,
-                BufferTimeLimit = TimeSpan.FromMilliseconds(20)
+                BufferTimeLimit = TimeSpan.FromMilliseconds(50)
             };
 
             _target.Ship(GetLoggingEventWithSomeData(), options);
@@ -87,7 +87,7 @@ namespace Logzio.DotNet.UnitTests.Shipping
 
             _bulkSender.DidNotReceiveWithAnyArgs().Send(Arg.Any<ICollection<LogzioLoggingEvent>>(), Arg.Any<BulkSenderOptions>());
 
-            Thread.Sleep(TimeSpan.FromMilliseconds(30)); //wait for the actual timeout // Measured timing based instability. Hard to reproduce.
+            Thread.Sleep(TimeSpan.FromMilliseconds(100)); //wait for the actual timeout // Measured timing based instability. Hard to reproduce.
             _bulkSender.Received().Send(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 2), Arg.Any<BulkSenderOptions>());
         }
 
