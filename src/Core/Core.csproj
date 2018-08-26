@@ -12,13 +12,9 @@
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+ 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <AssemblyTitle>$(Title)</AssemblyTitle>
-    <!-- SonarQube WARNING: The following projects do not have a valid ProjectGuid and were not built using a valid solution (.sln) thus will be skipped from analysis… -->
-    <ProjectGuid>{83260D70-F07C-4D06-B60F-FE0EE633CF77}</ProjectGuid>
-  </PropertyGroup>
 </Project>

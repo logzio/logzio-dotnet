@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using log4net.Appender;
 using log4net.Core;
-using Logzio.DotNet.Core.Bootstrap;
 using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
 
@@ -15,8 +14,8 @@ namespace Logzio.DotNet.Log4net
     {
         private static readonly string ProcessId = Process.GetCurrentProcess().Id.ToString();
 
-        private readonly IShipper _shipper;
-        private readonly IInternalLogger _internalLogger;
+        private IShipper _shipper;
+        private IInternalLogger _internalLogger;
 
         private readonly ShipperOptions _shipperOptions = new ShipperOptions { BulkSenderOptions = { Type = "log4net" } };
         private readonly List<LogzioAppenderCustomField> _customFields = new List<LogzioAppenderCustomField>();
@@ -24,16 +23,25 @@ namespace Logzio.DotNet.Log4net
 
         public LogzioAppender()
         {
-            var bootstraper = new Bootstraper();
-            bootstraper.Bootstrap();
-            _shipper = bootstraper.Resolve<IShipper>();
-            _internalLogger = bootstraper.Resolve<IInternalLogger>();
         }
 
         public LogzioAppender(IShipper shipper, IInternalLogger internalLogger)
+            :this()
         {
             _shipper = shipper;
             _internalLogger = internalLogger;
+        }
+
+        public override void ActivateOptions()
+        {
+            if (_shipper == null)
+            {
+                if (_internalLogger == null)
+                    _internalLogger = new InternalLoggerLog4net(_shipperOptions, new Core.InternalLogger.InternalLogger());
+                _shipper = new Shipper(new BulkSender(new Core.WebClient.WebClientFactory(), _internalLogger), _internalLogger);
+            }
+
+            base.ActivateOptions();
         }
 
         protected override void Append(LoggingEvent loggingEvent)
@@ -81,8 +89,7 @@ namespace Logzio.DotNet.Log4net
             }
             catch (Exception ex)
             {
-                if (_shipperOptions.Debug)
-                    _internalLogger.Log("Couldn't handle log message: " + ex);
+                _internalLogger?.Log(ex, "Logz.io: Couldn't handle log message");
             }
         }
 
@@ -96,8 +103,7 @@ namespace Logzio.DotNet.Log4net
             }
             catch (Exception ex)
             {
-                if (_shipperOptions.Debug)
-                    _internalLogger.Log("Couldn't flush log messages: " + ex);
+                _internalLogger?.Log(ex, "Logz.io: Couldn't flush log messages");
                 return false;
             }
         }

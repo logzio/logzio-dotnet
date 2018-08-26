@@ -37,7 +37,7 @@ namespace Logzio.DotNet.Core.Shipping
             // ReSharper disable once InconsistentlySynchronizedField
             _queue.Enqueue(logzioLoggingEvent);
             if (options.Debug)
-                _internalLogger.Log("Added log message. Queue size - [{0}]", _queue.Count);
+                _internalLogger.Log("Logz.io: Added log message. Queue size - [{0}]", _queue.Count);
 
             SendLogsIfBufferIsFull(options);
             if (_delayTask == null || _delayTask.IsCompleted)
@@ -47,7 +47,7 @@ namespace Logzio.DotNet.Core.Shipping
         public void Flush(ShipperOptions options)
         {
             if (options.Debug)
-                _internalLogger.Log("Flushing remaining logz.");
+                _internalLogger.Log("Logz.io: Flushing remaining logz.");
 
             SendLogs(options, true);
             WaitForSendLogsTask();
@@ -64,7 +64,7 @@ namespace Logzio.DotNet.Core.Shipping
                     return;
 
                 if (options.Debug)
-                    _internalLogger.Log("Buffer is full. Sending logs.");
+                    _internalLogger.Log("Logz.io: Buffer is full. Sending logs.");
 
                 SendLogs(options);
             }
@@ -81,7 +81,7 @@ namespace Logzio.DotNet.Core.Shipping
                     return;
 
                 if (options.Debug)
-                    _internalLogger.Log("Buffer is timed out. Sending logs.");
+                    _internalLogger.Log("Logz.io: Buffer is timed out. Sending logs.");
 
                 _timeoutReached = true;
                 SendLogs(options);
@@ -110,13 +110,13 @@ namespace Logzio.DotNet.Core.Shipping
                             logz.Add(log);
                         }
                         if (options.Debug)
-                            _internalLogger.Log("Sending [{0}] logs ([{1}] in queue)...", logz.Count, _queue.Count);
+                            _internalLogger.Log("Logz.io: Sending [{0}] logs ([{1}] in queue)...", logz.Count, _queue.Count);
 
                         if (logz.Count > 0)
                             _bulkSender.Send(logz, options.BulkSenderOptions);
 
                         if (options.Debug)
-                            _internalLogger.Log("Sent logs. [{0}] in queue.", _queue.Count);
+                            _internalLogger.Log("Logz.io: Sent logs. [{0}] in queue.", _queue.Count);
 
                     } while (_queue.Count >= options.BufferSize || ((_timeoutReached || flush) && !_queue.IsEmpty));
                 });
