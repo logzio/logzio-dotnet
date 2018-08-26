@@ -99,5 +99,28 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             _dummy.Requests.Count.ShouldBe(1);
             _dummy.Requests[0].ShouldContain("threadid");
         }
+
+        [Test]
+        public void SanityWithDuplicateProperty()
+        {
+            var config = new LoggingConfiguration();
+            var logzioTarget = new LogzioTarget
+            {
+                Token = "DKJiomZjbFyVvssJDmUAWeEOSNnDARWz",
+                ListenerUrl = LogzioListenerDummy.DefaultUrl,
+            };
+            config.AddTarget("Logzio", logzioTarget);
+            config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio", "*");
+            LogManager.Configuration = config;
+
+            var logger = LogManager.GetCurrentClassLogger();
+            logger.Info("Received {sequenceId}", 42);
+
+            LogManager.Shutdown();  // Flushes and closes
+
+            _dummy.Requests.Count.ShouldBe(1);
+            _dummy.Requests[0].ShouldContain("sequenceId");
+            _dummy.Requests[0].ShouldContain("sequenceId_1");
+        }
     }
 }

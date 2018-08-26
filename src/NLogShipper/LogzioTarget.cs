@@ -103,10 +103,18 @@ namespace Logzio.DotNet.NLog
                         if (key.IndexOf(':') != -1)
                             key = key.Replace(':', '_');
 
-                        if (!values.ContainsKey(key))
+                        if (values.ContainsKey(key))
                         {
-                            values[key] = property.Value;
+                            string newKey = string.Concat(key, "_1");
+                            int i = 1;
+                            while (values.ContainsKey(newKey))
+                            {
+                                i++;
+                                newKey = string.Concat(key, "_", i.ToString("d"));
+                            }
+                            key = newKey;
                         }
+                        values[key] = property.Value;
                     }
                 }
                 else if (ContextProperties.Count > 0)
