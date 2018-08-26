@@ -19,7 +19,7 @@ namespace Logzio.DotNet.IntegrationTests.Shipper
             _dummy.Start();
 
             var internalLogger = new Core.InternalLogger.InternalLogger();
-            _shipper = new Core.Shipping.Shipper(new BulkSender(new Core.WebClient.WebClientFactory(), internalLogger), internalLogger);
+            _shipper = new Core.Shipping.Shipper(new BulkSender(new Core.WebClient.HttpClientHandler()), internalLogger);
         }
 
         [TearDown]

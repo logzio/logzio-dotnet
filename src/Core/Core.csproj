@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
     
-    <TargetFrameworks Condition=" ' $(TargetFrameworks) ' == '  ' ">netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition=" ' $(TargetFrameworks) ' == '  ' ">netstandard2.0;netstandard1.3</TargetFrameworks>
 
     <AssemblyName>Logzio.DotNet.Core</AssemblyName>
     <Company>Logz.io</Company>
@@ -14,7 +14,11 @@
   </PropertyGroup>
  
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
 
 </Project>

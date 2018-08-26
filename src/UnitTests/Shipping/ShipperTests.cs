@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
 using NSubstitute;
@@ -21,6 +23,7 @@ namespace Logzio.DotNet.UnitTests.Shipping
         {
             _bulkSender = Substitute.For<IBulkSender>();
             _target = new Shipper(_bulkSender, Substitute.For<IInternalLogger>());
+            _bulkSender.SendAsync(Arg.Any<ICollection<LogzioLoggingEvent>>(), Arg.Any<BulkSenderOptions>()).Returns(x => Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)));
         }
 
         [Test]
@@ -29,7 +32,7 @@ namespace Logzio.DotNet.UnitTests.Shipping
             _target.Ship(GetLoggingEventWithSomeData(), new ShipperOptions { BufferSize = 1 });
             _target.WaitForSendLogsTask();
 
-            _bulkSender.Received().Send(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 1), Arg.Any<BulkSenderOptions>());
+            _bulkSender.Received().SendAsync(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 1), Arg.Any<BulkSenderOptions>());
         }
 
         [Test]
@@ -42,7 +45,7 @@ namespace Logzio.DotNet.UnitTests.Shipping
 
             _target.WaitForSendLogsTask();
 
-            _bulkSender.Received().Send(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 10), Arg.Any<BulkSenderOptions>());
+            _bulkSender.Received().SendAsync(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 10), Arg.Any<BulkSenderOptions>());
         }
 
         [Test]
@@ -69,7 +72,7 @@ namespace Logzio.DotNet.UnitTests.Shipping
             _target.Ship(GetLoggingEventWithSomeData(), new ShipperOptions { BufferSize = 2 });
             _target.WaitForSendLogsTask();
 
-            _bulkSender.DidNotReceiveWithAnyArgs().Send(Arg.Any<ICollection<LogzioLoggingEvent>>(), Arg.Any<BulkSenderOptions>());
+            _bulkSender.DidNotReceiveWithAnyArgs().SendAsync(Arg.Any<ICollection<LogzioLoggingEvent>>(), Arg.Any<BulkSenderOptions>());
         }
 
         [Test]
@@ -85,10 +88,10 @@ namespace Logzio.DotNet.UnitTests.Shipping
             _target.Ship(GetLoggingEventWithSomeData(), options);
             _target.WaitForSendLogsTask();
 
-            _bulkSender.DidNotReceiveWithAnyArgs().Send(Arg.Any<ICollection<LogzioLoggingEvent>>(), Arg.Any<BulkSenderOptions>());
+            _bulkSender.DidNotReceiveWithAnyArgs().SendAsync(Arg.Any<ICollection<LogzioLoggingEvent>>(), Arg.Any<BulkSenderOptions>());
 
             Thread.Sleep(TimeSpan.FromMilliseconds(100)); //wait for the actual timeout // Measured timing based instability. Hard to reproduce.
-            _bulkSender.Received().Send(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 2), Arg.Any<BulkSenderOptions>());
+            _bulkSender.Received().SendAsync(Arg.Is<ICollection<LogzioLoggingEvent>>(x => x.Count == 2), Arg.Any<BulkSenderOptions>());
         }
 
         [Test]

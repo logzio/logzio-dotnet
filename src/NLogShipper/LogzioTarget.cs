@@ -58,7 +58,7 @@ namespace Logzio.DotNet.NLog
             {
                 if (_internalLogger == null)
                     _internalLogger = new InternalLoggerNLog(_shipperOptions, new Core.InternalLogger.InternalLogger());
-                _shipper = new Shipper(new BulkSender(new Core.WebClient.WebClientFactory(), _internalLogger), _internalLogger);
+                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler()), _internalLogger);
             }
             _usingDefaultLayout = Layout?.ToString() == DefaultLayout;
             base.InitializeTarget();

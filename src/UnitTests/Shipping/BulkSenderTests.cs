@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.Core.WebClient;
@@ -12,16 +14,13 @@ namespace Logzio.DotNet.UnitTests.Shipping
     public class BulkSenderTests
     {
         private BulkSender _target;
-        private IWebClientFactory _webClientFactory;
-        private IWebClient _webClient;
+        private IHttpClient _httpClient;
 
         [SetUp]
         public void SetUp()
         {
-            _webClientFactory = Substitute.For<IWebClientFactory>();
-            _target = new BulkSender(_webClientFactory, Substitute.For<IInternalLogger>());
-            _webClient = Substitute.For<IWebClient>();
-            _webClientFactory.GetWebClient().Returns(x => _webClient);
+            _httpClient = Substitute.For<IHttpClient>();
+            _target = new BulkSender(_httpClient);
         }
 
         [Test]
@@ -30,18 +29,18 @@ namespace Logzio.DotNet.UnitTests.Shipping
             var log = GetLoggingEventWithSomeData();
             log.LogData.Remove("@timestamp");
             _target.SendAsync(new[] { log }, new BulkSenderOptions()).Wait();
-            _webClient.Received()
-                .UploadString(Arg.Any<string>(), Arg.Is<string>(x => x.Equals("{\"message\":\"hey\"}")));
+            _httpClient.Received()
+                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(ms.ToArray()).Equals("{\"message\":\"hey\"}")), Arg.Any<Encoding>());
         }
 
         [Test]
         public void Send_Logs_LogsAreFormatted()
         {
-            _target.Send(new[] { GetLoggingEventWithSomeData(), GetLoggingEventWithSomeData(), GetLoggingEventWithSomeData() },
-                new BulkSenderOptions());
+            _target.SendAsync(new[] { GetLoggingEventWithSomeData(), GetLoggingEventWithSomeData(), GetLoggingEventWithSomeData() },
+                new BulkSenderOptions()).Wait();
 
-            _webClient.Received()
-                .UploadString(Arg.Any<string>(), Arg.Is<string>(x => x.Contains("\"message\":\"hey\"")));
+            _httpClient.Received()
+                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(ms.ToArray()).Contains("\"message\":\"hey\"")), Arg.Any<Encoding>());
         }
 
         [Test]
@@ -50,10 +49,10 @@ namespace Logzio.DotNet.UnitTests.Shipping
             var log = GetLoggingEventWithSomeData();
             log.LogData["id"] = 300;
 
-            _target.Send(new[] { log }, new BulkSenderOptions());
+            _target.SendAsync(new[] { log }, new BulkSenderOptions()).Wait();
 
-            _webClient.Received()
-                .UploadString(Arg.Any<string>(), Arg.Is<string>(x => x.Contains("\"id\":300")));
+            _httpClient.Received()
+                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(ms.ToArray()).Contains("\"id\":300")), Arg.Any<Encoding>());
         }
 
         [Test]
@@ -66,18 +65,18 @@ namespace Logzio.DotNet.UnitTests.Shipping
                 SomeString = "The Answer"
             };
 
-            _target.Send(new[] { log }, new BulkSenderOptions());
+            _target.SendAsync(new[] { log }, new BulkSenderOptions()).Wait();
 
-            _webClient.Received()
-                .UploadString(Arg.Any<string>(), Arg.Is<string>(x => x.Contains("\"dummy\":{\"someId\":42,\"someString\":\"The Answer\"}")));
+            _httpClient.Received()
+                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(ms.ToArray()).Contains("\"dummy\":{\"someId\":42,\"someString\":\"The Answer\"}")), Arg.Any<Encoding>());
         }
 
         [Test]
         public void Send_EmptyLogsList_ShouldntSendAnything()
         {
-            _target.Send(new List<LogzioLoggingEvent>(), new BulkSenderOptions());
+            _target.SendAsync(new List<LogzioLoggingEvent>(), new BulkSenderOptions()).Wait();
 
-            _webClient.ReceivedCalls().ShouldBeEmpty();
+            _httpClient.ReceivedCalls().ShouldBeEmpty();
         }
 
         private LogzioLoggingEvent GetLoggingEventWithSomeData()
