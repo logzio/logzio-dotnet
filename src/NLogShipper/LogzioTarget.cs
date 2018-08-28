@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Logzio.DotNet.Core.Bootstrap;
 using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
 using NLog;
@@ -43,6 +42,7 @@ namespace Logzio.DotNet.NLog
             IncludeEventProperties = true;
             OptimizeBufferReuse = true;
             DefaultLayout = Layout?.ToString();
+
         }
 
         public LogzioTarget(IShipper shipper, IInternalLogger internalLogger)
@@ -54,22 +54,11 @@ namespace Logzio.DotNet.NLog
 
         protected override void InitializeTarget()
         {
-            if (_shipper == null && _internalLogger == null)
+            if (_shipper == null)
             {
-                try
-                {
-                    var bootstraper = new Bootstraper();
-                    bootstraper.Bootstrap();
-                    _shipper = bootstraper.Resolve<IShipper>();
-                    _internalLogger = bootstraper.Resolve<IInternalLogger>();
-                }
-                catch (Exception ex)
-                {
-                    // TinyIOC does not always work, fallback to manual resolve
-                    _internalLogger = new Core.InternalLogger.InternalLogger();
-                    _internalLogger.Log("Couldn't resolve dependencies: " + ex);
-                    _shipper = new Shipper(new BulkSender(new Core.WebClient.WebClientFactory(), _internalLogger), _internalLogger);
-                }
+                if (_internalLogger == null)
+                    _internalLogger = new InternalLoggerNLog(_shipperOptions, new Core.InternalLogger.InternalLogger());
+                _shipper = new Shipper(new BulkSender(new Core.WebClient.WebClientFactory(), _internalLogger), _internalLogger);
             }
             _usingDefaultLayout = Layout?.ToString() == DefaultLayout;
             base.InitializeTarget();
@@ -136,8 +125,7 @@ namespace Logzio.DotNet.NLog
             }
             catch (Exception ex)
             {
-                if (Debug)
-                    _internalLogger?.Log("Couldn't handle log message: " + ex);
+                _internalLogger?.Log(ex, "Logz.io: Couldn't handle log message");
             }
         }
 
@@ -151,8 +139,7 @@ namespace Logzio.DotNet.NLog
             catch (Exception ex)
             {
                 asyncContinuation(ex);
-                if (Debug)
-                    _internalLogger?.Log("Couldn't handle log message: " + ex);
+                _internalLogger?.Log(ex, "Logz.io: Couldn't handle log message");
             }
         }
 

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Logzio.DotNet.Core.Bootstrap;
 using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.IntegrationTests.Listener;
 using NUnit.Framework;
@@ -19,9 +18,8 @@ namespace Logzio.DotNet.IntegrationTests.Shipper
             _dummy = new LogzioListenerDummy();
             _dummy.Start();
 
-            var bootstraper = new Bootstraper();
-            bootstraper.Bootstrap();
-            _shipper = bootstraper.Resolve<IShipper>();
+            var internalLogger = new Core.InternalLogger.InternalLogger();
+            _shipper = new Core.Shipping.Shipper(new BulkSender(new Core.WebClient.WebClientFactory(), internalLogger), internalLogger);
         }
 
         [TearDown]
@@ -36,7 +34,7 @@ namespace Logzio.DotNet.IntegrationTests.Shipper
             var options = new ShipperOptions
             {
                 BufferSize = 1,
-                BulkSenderOptions = { ListenerUrl = LogzioListenerDummy.DefaultUrl }
+                BulkSenderOptions = { ListenerUrl = _dummy.DefaultUrl }
             };
 
             _shipper.Ship(GetLogging(), options);

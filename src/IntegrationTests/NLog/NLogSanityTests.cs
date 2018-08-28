@@ -1,5 +1,4 @@
 ﻿using System;
-using Logzio.DotNet.Core.Bootstrap;
 using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.IntegrationTests.Listener;
 using Logzio.DotNet.NLog;
@@ -38,7 +37,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             var logzioTarget = new LogzioTarget
             {
                 Token = "DKJiomZjbFyVvssJDmUAWeEOSNnDARWz",
-                ListenerUrl = LogzioListenerDummy.DefaultUrl
+                ListenerUrl = _dummy.DefaultUrl,
             };
             config.AddTarget("Logzio", logzioTarget);
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio");
@@ -61,7 +60,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             var logzioTarget = new LogzioTarget
             {
                 Token = "DKJiomZjbFyVvssJDmUAWeEOSNnDARWz",
-                ListenerUrl = LogzioListenerDummy.DefaultUrl,
+                ListenerUrl = _dummy.DefaultUrl,
                 Layout = layout
             };
             config.AddTarget("Logzio", logzioTarget);
@@ -84,7 +83,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             var logzioTarget = new LogzioTarget
             {
                 Token = "DKJiomZjbFyVvssJDmUAWeEOSNnDARWz",
-                ListenerUrl = LogzioListenerDummy.DefaultUrl,
+                ListenerUrl = _dummy.DefaultUrl,
             };
             logzioTarget.ContextProperties.Add(new TargetPropertyWithContext { Name = "threadid", Layout = "${threadid}" });
             config.AddTarget("Logzio", logzioTarget);
@@ -107,7 +106,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             var logzioTarget = new LogzioTarget
             {
                 Token = "DKJiomZjbFyVvssJDmUAWeEOSNnDARWz",
-                ListenerUrl = LogzioListenerDummy.DefaultUrl,
+                ListenerUrl = _dummy.DefaultUrl,
             };
             config.AddTarget("Logzio", logzioTarget);
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio", "*");

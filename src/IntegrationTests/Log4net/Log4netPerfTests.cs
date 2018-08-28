@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Reflection;
 using log4net;
 using log4net.Repository.Hierarchy;
-using Logzio.DotNet.Core.Bootstrap;
 using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.IntegrationTests.Listener;
 using Logzio.DotNet.Log4net;
@@ -35,7 +34,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
         {
             const int bufferSize = 100;
             var logzioAppender = SetupAppender(bufferSize);
-            logzioAppender.AddDebug(true);
+            log4net.Util.LogLog.InternalDebugging = true;
             var logger = LogManager.GetLogger(typeof(Log4netSanityTests));
 
             logger.Info("A Fish");  // Warm the engine
@@ -50,20 +49,21 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
 
             stopwatch.Stop();
             Console.WriteLine("Total time: " + stopwatch.Elapsed);
-            stopwatch.Elapsed.ShouldBeLessThanOrEqualTo(TimeSpan.FromMilliseconds(100));
+            stopwatch.Elapsed.ShouldBeLessThanOrEqualTo(TimeSpan.FromMilliseconds(120));
 
             LogManager.Shutdown();  // Flushes and closes
 
             _dummy.Requests.Count.ShouldBe(logsAmount / bufferSize);
         }
 
-        private static LogzioAppender SetupAppender(int bufferSize)
+        private LogzioAppender SetupAppender(int bufferSize)
         {
             var hierarchy = (Hierarchy)LogManager.GetRepository(Assembly.GetCallingAssembly());
             var logzioAppender = new LogzioAppender();
             logzioAppender.AddToken("DKJiomZjbFyVvssJDmUAWeEOSNnDARWz");
-            logzioAppender.AddListenerUrl(LogzioListenerDummy.DefaultUrl);
+            logzioAppender.AddListenerUrl(_dummy.DefaultUrl);
             logzioAppender.AddBufferSize(bufferSize);
+            logzioAppender.ActivateOptions();
             hierarchy.Root.AddAppender(logzioAppender);
             hierarchy.Configured = true;
             return logzioAppender;

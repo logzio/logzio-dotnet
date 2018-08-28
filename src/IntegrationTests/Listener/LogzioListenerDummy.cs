@@ -8,17 +8,19 @@ namespace Logzio.DotNet.IntegrationTests.Listener
 {
     public class LogzioListenerDummy
     {
-        public const string DefaultUrl = "http://127.0.0.1:7621/";
+        private readonly static Random _random = new Random();
+
+        public string DefaultUrl { get; } = string.Concat("http://127.0.0.1", ":", _random.Next(7601, 7699).ToString(), "/");
 
         public IList<string> Requests { get; set; }
 
         private bool _isActive;
         private HttpListener _httpListener;
 
-        public void Start(string url = DefaultUrl)
+        public void Start(string url = null)
         {
             _httpListener = new HttpListener();
-            _httpListener.Prefixes.Add(url);
+            _httpListener.Prefixes.Add(url ?? DefaultUrl);
             _httpListener.Start();
             _isActive = true;
             Requests = new List<string>();

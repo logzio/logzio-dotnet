@@ -42,23 +42,25 @@ namespace Logzio.DotNet.Core.Shipping
             if (logz == null || logz.Count == 0)
                 return;
 
-            var url = string.Format(UrlTemplate, options.ListenerUrl, options.Token, options.Type);
+            string url = string.Empty;
+
             try
             {
+                url = string.Format(UrlTemplate, options.ListenerUrl, options.Token, options.Type);
+
                 using (var client = _webClientFactory.GetWebClient())
                 {
                     var body = SerializeLogEvents(logz);
                     client.UploadString(url, body);
                     if (options.Debug)
-                        _internalLogger.Log("Sent bulk of [{0}] log messages to [{1}] successfully.", logz.Count, url);
+                        _internalLogger.Log("Logz.io: Sent bulk of [{0}] log messages to [{1}] successfully.", logz.Count, url);
                 }
             }
             catch (Exception ex)
             {
-                if (options.Debug)
-                    _internalLogger.Log("Logzio.DotNet ERROR: " + ex);
+                _internalLogger.Log(ex, "Logz.io: ERROR");
 
-                if (attempt < options.RetriesMaxAttempts - 1)
+                if (!string.IsNullOrEmpty(url) && attempt < options.RetriesMaxAttempts - 1)
                     Task.Delay(options.RetriesInterval).ContinueWith(task => Send(logz, options, attempt + 1));
             }
         }
