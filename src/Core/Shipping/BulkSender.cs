@@ -24,7 +24,10 @@ namespace Logzio.DotNet.Core.Shipping
 
         public BulkSender(IHttpClient httpClient)
         {
-            _jsonSerializer = new JsonSerializer { ContractResolver = new CamelCasePropertyNamesContractResolver() };
+            var jsonSettings = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
+            jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            jsonSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+            _jsonSerializer = JsonSerializer.CreateDefault(jsonSettings);
             _httpClient = httpClient;
         }
 
