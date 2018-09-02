@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
-using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.WebClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -12,64 +11,42 @@ namespace Logzio.DotNet.Core.Shipping
 {
     public interface IBulkSender
     {
-        Task SendAsync(ICollection<LogzioLoggingEvent> logz, BulkSenderOptions options);
-        void Send(ICollection<LogzioLoggingEvent> logz, BulkSenderOptions options, int attempt = 0);
+        Task<HttpResponseMessage> SendAsync(ICollection<LogzioLoggingEvent> logz, BulkSenderOptions options);
     }
 
     public class BulkSender : IBulkSender
     {
         private const string UrlTemplate = "{0}/?token={1}&type={2}";
 
-        private readonly IWebClientFactory _webClientFactory;
-        private readonly IInternalLogger _internalLogger;
-
         private readonly JsonSerializer _jsonSerializer;
+        private static readonly System.Text.Encoding _encodingUtf8 = new System.Text.UTF8Encoding(false);
+        private readonly IHttpClient _httpClient;
 
-        public BulkSender(IWebClientFactory webClientFactory, IInternalLogger internalLogger)
+        public BulkSender(IHttpClient httpClient)
         {
-            _webClientFactory = webClientFactory;
-            _internalLogger = internalLogger;
-            _jsonSerializer = new JsonSerializer { ContractResolver = new CamelCasePropertyNamesContractResolver() };
+            var jsonSettings = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
+            jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            jsonSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+            _jsonSerializer = JsonSerializer.CreateDefault(jsonSettings);
+            _httpClient = httpClient;
         }
 
-        public Task SendAsync(ICollection<LogzioLoggingEvent> logz, BulkSenderOptions options)
-        {
-            return Task.Run(() => Send(logz, options));
-        }
-
-        public void Send(ICollection<LogzioLoggingEvent> logz, BulkSenderOptions options, int attempt = 0)
+        public Task<HttpResponseMessage> SendAsync(ICollection<LogzioLoggingEvent> logz, BulkSenderOptions options)
         {
             if (logz == null || logz.Count == 0)
-                return;
+                return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK));
 
-            string url = string.Empty;
-
-            try
-            {
-                url = string.Format(UrlTemplate, options.ListenerUrl, options.Token, options.Type);
-
-                using (var client = _webClientFactory.GetWebClient())
-                {
-                    var body = SerializeLogEvents(logz);
-                    client.UploadString(url, body);
-                    if (options.Debug)
-                        _internalLogger.Log("Logz.io: Sent bulk of [{0}] log messages to [{1}] successfully.", logz.Count, url);
-                }
-            }
-            catch (Exception ex)
-            {
-                _internalLogger.Log(ex, "Logz.io: ERROR");
-
-                if (!string.IsNullOrEmpty(url) && attempt < options.RetriesMaxAttempts - 1)
-                    Task.Delay(options.RetriesInterval).ContinueWith(task => Send(logz, options, attempt + 1));
-            }
+            var url = string.Format(UrlTemplate, options.ListenerUrl, options.Token, options.Type);
+            var body = SerializeLogEvents(logz, _encodingUtf8);
+            return _httpClient.PostAsync(url, body, _encodingUtf8);
         }
 
-        private string SerializeLogEvents(ICollection<LogzioLoggingEvent> logz)
+        private MemoryStream SerializeLogEvents(ICollection<LogzioLoggingEvent> logz, System.Text.Encoding encodingUtf8)
         {
-            bool firstItem = true;
-            using (var sw = new StringWriter())
+            var ms = new MemoryStream(logz.Count * 512);
+            using (var sw = new StreamWriter(ms, encodingUtf8, 1024, true))
             {
+                bool firstItem = true;
                 foreach (var logEvent in logz)
                 {
                     if (!firstItem)
@@ -77,8 +54,10 @@ namespace Logzio.DotNet.Core.Shipping
                     _jsonSerializer.Serialize(sw, logEvent.LogData);
                     firstItem = false;
                 }
-                return sw.ToString();
+                sw.Flush();
             }
+            ms.Position = 0;
+            return ms;
         }
     }
 }

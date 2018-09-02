@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using log4net.Appender;
 using log4net.Core;
 using Logzio.DotNet.Core.InternalLogger;
@@ -12,14 +11,13 @@ namespace Logzio.DotNet.Log4net
 {
     public class LogzioAppender : AppenderSkeleton
     {
-        private static readonly string ProcessId = Process.GetCurrentProcess().Id.ToString();
+        private static readonly object ProcessId = Process.GetCurrentProcess().Id;
 
         private IShipper _shipper;
         private IInternalLogger _internalLogger;
 
         private readonly ShipperOptions _shipperOptions = new ShipperOptions { BulkSenderOptions = { Type = "log4net" } };
         private readonly List<LogzioAppenderCustomField> _customFields = new List<LogzioAppenderCustomField>();
-        private Task _lastTask;
 
         public LogzioAppender()
         {
@@ -38,7 +36,7 @@ namespace Logzio.DotNet.Log4net
             {
                 if (_internalLogger == null)
                     _internalLogger = new InternalLoggerLog4net(_shipperOptions, new Core.InternalLogger.InternalLogger());
-                _shipper = new Shipper(new BulkSender(new Core.WebClient.WebClientFactory(), _internalLogger), _internalLogger);
+                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler()), _internalLogger);
             }
 
             base.ActivateOptions();
@@ -46,7 +44,7 @@ namespace Logzio.DotNet.Log4net
 
         protected override void Append(LoggingEvent loggingEvent)
         {
-            _lastTask = Task.Run(() => { WriteImpl(loggingEvent); });
+            WriteImpl(loggingEvent);
         }
 
         private void WriteImpl(LoggingEvent loggingEvent)
@@ -97,7 +95,6 @@ namespace Logzio.DotNet.Log4net
         {
             try
             {
-                _lastTask?.Wait();
                 _shipper?.Flush(_shipperOptions);
                 return true;
             }
@@ -116,7 +113,6 @@ namespace Logzio.DotNet.Log4net
         protected override void OnClose()
         {
             base.OnClose();
-            _lastTask?.Wait();
             //Shipper can be null if there was an error in the ctor, we don't
             //want to create another exception in the closing
             _shipper?.Flush(_shipperOptions);

@@ -18,12 +18,16 @@ namespace Logzio.DotNet.Core.InternalLogger
 
             if (ex != null)
             {
+#if !NETSTANDARD1_3
                 Trace.TraceError(formattedMessage);
+#endif
                 Console.Error.WriteLine(formattedMessage);
             }
             else
             {
+#if !NETSTANDARD1_3
                 Trace.WriteLine(formattedMessage);
+#endif
                 Console.WriteLine(formattedMessage);
             }
         }
@@ -33,7 +37,11 @@ namespace Logzio.DotNet.Core.InternalLogger
     {
         public static void Log(this IInternalLogger logger, string message)
         {
+#if !NET45
             logger.Log(null, message, Array.Empty<object>());
+#else
+            logger.Log(null, message);
+#endif
         }
 
         public static void Log(this IInternalLogger logger, string message, params object[] args)

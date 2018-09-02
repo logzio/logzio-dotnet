@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,8 +20,6 @@ namespace Logzio.DotNet.Core.Shipping
         private readonly IInternalLogger _internalLogger;
 
         private readonly ConcurrentQueue<LogzioLoggingEvent> _queue = new ConcurrentQueue<LogzioLoggingEvent>();
-        private readonly object _fullBufferLocker = new object();
-        private readonly object _timedOutBufferLocker = new object();
         private readonly object _sendLogsLocker = new object();
         private Task _delayTask;
         private Task _sendLogsTask;
@@ -34,7 +33,6 @@ namespace Logzio.DotNet.Core.Shipping
 
         public void Ship(LogzioLoggingEvent logzioLoggingEvent, ShipperOptions options)
         {
-            // ReSharper disable once InconsistentlySynchronizedField
             _queue.Enqueue(logzioLoggingEvent);
             if (options.Debug)
                 _internalLogger.Log("Logz.io: Added log message. Queue size - [{0}]", _queue.Count);
@@ -58,7 +56,7 @@ namespace Logzio.DotNet.Core.Shipping
             if (_queue.Count < options.BufferSize)
                 return;
 
-            lock (_fullBufferLocker)
+            lock (_sendLogsLocker)
             {
                 if (_queue.Count < options.BufferSize)
                     return;
@@ -75,7 +73,7 @@ namespace Logzio.DotNet.Core.Shipping
             if (_queue.IsEmpty)
                 return;
 
-            lock (_timedOutBufferLocker)
+            lock (_sendLogsLocker)
             {
                 if (_queue.IsEmpty)
                     return;
@@ -95,7 +93,7 @@ namespace Logzio.DotNet.Core.Shipping
                 if (_sendLogsTask != null && !_sendLogsTask.IsCompleted)
                     return;
 
-                _sendLogsTask = Task.Run(() =>
+                _sendLogsTask = Task.Run(async () =>
                 {
                     do
                     {
@@ -113,7 +111,29 @@ namespace Logzio.DotNet.Core.Shipping
                             _internalLogger.Log("Logz.io: Sending [{0}] logs ([{1}] in queue)...", logz.Count, _queue.Count);
 
                         if (logz.Count > 0)
-                            _bulkSender.Send(logz, options.BulkSenderOptions);
+                        {
+                            int i = 0;
+                            do
+                            {
+                                try
+                                {
+                                    using (var response = await _bulkSender.SendAsync(logz, options.BulkSenderOptions).ConfigureAwait(false))
+                                    {
+                                        if (response.IsSuccessStatusCode)
+                                            break;
+
+                                        if (options.Debug)
+                                            _internalLogger.Log("Logz.io: Failed: " + response.StatusCode);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    _internalLogger.Log(ex, "Logz.io: ERROR");
+                                }
+
+                                await Task.Delay(options.BulkSenderOptions.RetriesInterval).ConfigureAwait(false);
+                            } while (++i < options.BulkSenderOptions.RetriesMaxAttempts);
+                        }
 
                         if (options.Debug)
                             _internalLogger.Log("Logz.io: Sent logs. [{0}] in queue.", _queue.Count);
