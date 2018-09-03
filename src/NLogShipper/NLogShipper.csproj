@@ -18,6 +18,8 @@
  
   <ItemGroup>
     <PackageReference Include="NLog" Version="4.5.0" />
+    <!-- Newtonsoft.Json MUST be here for correct nuget-package generation -->
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>
  
   <ItemGroup>
