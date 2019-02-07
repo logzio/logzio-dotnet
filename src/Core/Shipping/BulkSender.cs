@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Logzio.DotNet.Core.WebClient;
@@ -44,7 +45,8 @@ namespace Logzio.DotNet.Core.Shipping
         private MemoryStream SerializeLogEvents(ICollection<LogzioLoggingEvent> logz, System.Text.Encoding encodingUtf8)
         {
             var ms = new MemoryStream(logz.Count * 512);
-            using (var sw = new StreamWriter(ms, encodingUtf8, 1024, true))
+            var zipStream = new GZipStream(ms, CompressionLevel.Optimal);
+            using (var sw = new StreamWriter(zipStream, encodingUtf8, 1024, true))
             {
                 bool firstItem = true;
                 foreach (var logEvent in logz)

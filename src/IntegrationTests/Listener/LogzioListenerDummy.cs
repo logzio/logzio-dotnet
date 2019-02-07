@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Threading;
 
@@ -37,7 +38,8 @@ namespace Logzio.DotNet.IntegrationTests.Listener
             _httpListener.BeginGetContext(OnContext, null);
 
             var request = context.Request;
-            using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
+            var gzStream = new GZipStream(request.InputStream, CompressionMode.Decompress);
+            using (var reader = new StreamReader(gzStream, request.ContentEncoding))
             {
                 Requests.Add(reader.ReadToEnd());
             }
