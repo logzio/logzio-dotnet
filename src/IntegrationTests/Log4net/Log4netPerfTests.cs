@@ -63,6 +63,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
             logzioAppender.AddToken("DKJiomZjbFyVvssJDmUAWeEOSNnDARWz");
             logzioAppender.AddListenerUrl(_dummy.DefaultUrl);
             logzioAppender.AddBufferSize(bufferSize);
+            //logzioAppender.AddCompression(true);
             logzioAppender.ActivateOptions();
             hierarchy.Root.AddAppender(logzioAppender);
             hierarchy.Configured = true;

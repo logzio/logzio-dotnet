@@ -31,7 +31,7 @@ namespace Logzio.DotNet.UnitTests.Shipping
             log.LogData.Remove("@timestamp");
             _target.SendAsync(new[] { log }, new BulkSenderOptions()).Wait();
             _httpClient.Received()
-                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(Decompress(ms.ToArray())).Equals("{\"message\":\"hey\"}")), Arg.Any<Encoding>());
+                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(ms.ToArray()).Equals("{\"message\":\"hey\"}")), Arg.Any<Encoding>());
         }
 
         [Test]
@@ -41,7 +41,7 @@ namespace Logzio.DotNet.UnitTests.Shipping
                 new BulkSenderOptions()).Wait();
 
             _httpClient.Received()
-                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(Decompress(ms.ToArray())).Contains("\"message\":\"hey\"")), Arg.Any<Encoding>());
+                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(ms.ToArray()).Contains("\"message\":\"hey\"")), Arg.Any<Encoding>());
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace Logzio.DotNet.UnitTests.Shipping
             _target.SendAsync(new[] { log }, new BulkSenderOptions()).Wait();
 
             _httpClient.Received()
-                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(Decompress(ms.ToArray())).Contains("\"id\":300")), Arg.Any<Encoding>());
+                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(ms.ToArray()).Contains("\"id\":300")), Arg.Any<Encoding>());
         }
 
         [Test]
@@ -69,13 +69,69 @@ namespace Logzio.DotNet.UnitTests.Shipping
             _target.SendAsync(new[] { log }, new BulkSenderOptions()).Wait();
 
             _httpClient.Received()
-                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(Decompress(ms.ToArray())).Contains("\"dummy\":{\"someId\":42,\"someString\":\"The Answer\"}")), Arg.Any<Encoding>());
+                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(ms.ToArray()).Contains("\"dummy\":{\"someId\":42,\"someString\":\"The Answer\"}")), Arg.Any<Encoding>());
         }
 
         [Test]
         public void Send_EmptyLogsList_ShouldntSendAnything()
         {
             _target.SendAsync(new List<LogzioLoggingEvent>(), new BulkSenderOptions()).Wait();
+
+            _httpClient.ReceivedCalls().ShouldBeEmpty();
+        }
+
+        [Test]
+        public void SendAsync_Logs_LogsAreSent_with_compression()
+        {
+            var log = GetLoggingEventWithSomeData();
+            log.LogData.Remove("@timestamp");
+            _target.SendAsync(new[] { log }, new BulkSenderOptions { UseCompression = true }).Wait();
+            _httpClient.Received()
+                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(Decompress(ms.ToArray())).Equals("{\"message\":\"hey\"}")), Arg.Any<Encoding>(),true);
+        }
+
+        [Test]
+        public void Send_Logs_LogsAreFormatted_with_compression()
+        {
+            _target.SendAsync(new[] { GetLoggingEventWithSomeData(), GetLoggingEventWithSomeData(), GetLoggingEventWithSomeData() },
+                new BulkSenderOptions { UseCompression = true }).Wait();
+
+            _httpClient.Received()
+                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(Decompress(ms.ToArray())).Contains("\"message\":\"hey\"")), Arg.Any<Encoding>(), true);
+        }
+
+        [Test]
+        public void Send_LogWithNumericField_LogsAreFormatted_with_compression()
+        {
+            var log = GetLoggingEventWithSomeData();
+            log.LogData["id"] = 300;
+
+            _target.SendAsync(new[] { log }, new BulkSenderOptions { UseCompression = true }).Wait();
+
+            _httpClient.Received()
+                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(Decompress(ms.ToArray())).Contains("\"id\":300")), Arg.Any<Encoding>(), true);
+        }
+
+        [Test]
+        public void Send_LogWithObjectField_LogsAreFormatted_with_compression()
+        {
+            var log = GetLoggingEventWithSomeData();
+            log.LogData["dummy"] = new DummyLogObject
+            {
+                SomeId = 42,
+                SomeString = "The Answer"
+            };
+
+            _target.SendAsync(new[] { log }, new BulkSenderOptions { UseCompression = true }).Wait();
+
+            _httpClient.Received()
+                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(Decompress(ms.ToArray())).Contains("\"dummy\":{\"someId\":42,\"someString\":\"The Answer\"}")), Arg.Any<Encoding>(), true);
+        }
+
+        [Test]
+        public void Send_EmptyLogsList_ShouldntSendAnything_with_compression()
+        {
+            _target.SendAsync(new List<LogzioLoggingEvent>(), new BulkSenderOptions { UseCompression = true }).Wait();
 
             _httpClient.ReceivedCalls().ShouldBeEmpty();
         }

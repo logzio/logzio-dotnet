@@ -38,8 +38,7 @@ namespace Logzio.DotNet.IntegrationTests.Listener
             _httpListener.BeginGetContext(OnContext, null);
 
             var request = context.Request;
-            var gzStream = new GZipStream(request.InputStream, CompressionMode.Decompress);
-            using (var reader = new StreamReader(gzStream, request.ContentEncoding))
+            using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
             {
                 Requests.Add(reader.ReadToEnd());
             }

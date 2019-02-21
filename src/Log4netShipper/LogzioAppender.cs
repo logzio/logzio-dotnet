@@ -163,5 +163,10 @@ namespace Logzio.DotNet.Log4net
             _shipperOptions.Debug = value;
             _shipperOptions.BulkSenderOptions.Debug = value;
         }
+
+        public void AddCompression(bool value)
+        {
+            _shipperOptions.BulkSenderOptions.UseCompression = value;
+        }
     }
 }
