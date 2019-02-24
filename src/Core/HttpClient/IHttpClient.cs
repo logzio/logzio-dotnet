@@ -17,8 +17,7 @@ namespace Logzio.DotNet.Core.WebClient
     {
         private readonly HttpClient _client;
         private static readonly System.Text.Encoding _encodingUtf8 = new System.Text.UTF8Encoding(false);
-        private readonly MediaTypeHeaderValue _headerCompressed = new MediaTypeHeaderValue("text/html") { CharSet = _encodingUtf8.WebName };
-        private readonly MediaTypeHeaderValue _headerJson = new MediaTypeHeaderValue("text/html") { CharSet = _encodingUtf8.WebName };
+        private readonly MediaTypeHeaderValue _headerJson = new MediaTypeHeaderValue("application/json") { CharSet = _encodingUtf8.WebName };
 
         public HttpClientHandler()
         {
@@ -34,7 +33,7 @@ namespace Logzio.DotNet.Core.WebClient
             var content = new StreamContent(body);
             if (useCompression)
             {
-                content.Headers.ContentType = _headerCompressed;
+                content.Headers.ContentType = _headerJson;
                 content.Headers.Add("Content-Encoding", "gzip");
                 _client.DefaultRequestHeaders.AcceptEncoding.Clear();
                 _client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
