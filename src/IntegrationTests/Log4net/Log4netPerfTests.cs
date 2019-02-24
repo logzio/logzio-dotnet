@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Reflection;
 using log4net;
 using log4net.Repository.Hierarchy;
-using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.IntegrationTests.Listener;
 using Logzio.DotNet.Log4net;
 using NUnit.Framework;
@@ -60,7 +59,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
         {
             var hierarchy = (Hierarchy)LogManager.GetRepository(Assembly.GetCallingAssembly());
             var logzioAppender = new LogzioAppender();
-            logzioAppender.AddToken("DKJiomZjbFyVvssJDmUAWeEOSNnDARWz");
+            logzioAppender.AddToken("123456789");
             logzioAppender.AddListenerUrl(_dummy.DefaultUrl);
             logzioAppender.AddBufferSize(bufferSize);
             logzioAppender.ActivateOptions();

@@ -32,7 +32,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
         {
             var hierarchy = (Hierarchy)LogManager.GetRepository(Assembly.GetCallingAssembly());
             var logzioAppender = new LogzioAppender();
-            logzioAppender.AddToken("DKJiomZjbFyVvssJDmUAWeEOSNnDARWz");
+            logzioAppender.AddToken("123456789");
             logzioAppender.AddListenerUrl(_dummy.DefaultUrl);
             logzioAppender.ActivateOptions();
             hierarchy.Root.AddAppender(logzioAppender);

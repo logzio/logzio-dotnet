@@ -35,7 +35,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
 
             var logzioTarget = new LogzioTarget
             {
-                Token = "DKJiomZjbFyVvssJDmUAWeEOSNnDARWz",
+                Token = "123456789",
                 ListenerUrl = _dummy.DefaultUrl,
             };
             config.AddTarget("Logzio", logzioTarget);
