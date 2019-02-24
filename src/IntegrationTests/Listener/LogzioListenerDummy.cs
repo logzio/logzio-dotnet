@@ -12,7 +12,7 @@ namespace Logzio.DotNet.IntegrationTests.Listener
         private readonly static Random _random = new Random();
 
         public string DefaultUrl { get; } = string.Concat("http://127.0.0.1", ":", _random.Next(7601, 7699).ToString(), "/");
-
+       
         public IList<string> Requests { get; set; }
 
         private bool _isActive;
