@@ -1,6 +1,4 @@
-﻿using System;
-using Logzio.DotNet.Core.Shipping;
-using Logzio.DotNet.IntegrationTests.Listener;
+﻿using Logzio.DotNet.IntegrationTests.Listener;
 using Logzio.DotNet.NLog;
 using NLog;
 using NLog.Config;
@@ -38,6 +36,30 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             {
                 Token = "123456789",
                 ListenerUrl = _dummy.DefaultUrl,
+            };
+            config.AddTarget("Logzio", logzioTarget);
+            config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio");
+            LogManager.Configuration = config;
+
+            var logger = LogManager.GetCurrentClassLogger();
+            logger.Info("Hello");
+
+            LogManager.Shutdown();  // Flushes and closes
+
+            _dummy.Requests.Count.ShouldBe(1);
+            _dummy.Requests[0].ShouldContain("Hello");
+        }
+
+        [Test]
+        public void SanityCompressed()
+        {
+            var config = new LoggingConfiguration();
+
+            var logzioTarget = new LogzioTarget
+            {
+                Token = "123456789",
+                ListenerUrl = _dummy.DefaultUrl,
+                UseCompression = true,
             };
             config.AddTarget("Logzio", logzioTarget);
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio");

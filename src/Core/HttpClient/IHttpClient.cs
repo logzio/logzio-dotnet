@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Core.HttpClient;
 
 namespace Logzio.DotNet.Core.WebClient
 {
@@ -31,12 +30,17 @@ namespace Logzio.DotNet.Core.WebClient
         public async Task<HttpResponseMessage> PostAsync(string url, MemoryStream body, System.Text.Encoding encoding, bool useCompression = false)
         {
             var content = new StreamContent(body);
-            content.Headers.ContentType = _headerValue;
+            content.Headers.ContentType = _encodingUtf8.WebName == encoding.WebName
+                ? _headerValue
+                : new MediaTypeHeaderValue("application/json")
+                {
+                    CharSet = encoding.WebName
+                };
+
             if (useCompression)
             {
-                content.Headers.Add("Content-Encoding", "gzip");
-                _client.DefaultRequestHeaders.AcceptEncoding.Clear();
-                _client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+                using (var compressedContent = new CompressedContent(content, "gzip"))
+                    return await _client.PostAsync(url, compressedContent);
             }
           
             return await _client.PostAsync(url, content);

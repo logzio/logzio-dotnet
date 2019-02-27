@@ -9,6 +9,9 @@ namespace Logzio.DotNet.IntegrationTests.Listener
 {
     public class LogzioListenerDummy
     {
+        private const string ContentEncodingHeader = "Content-Encoding";
+        private const string ContentEncodingGzip = "gzip";
+
         private readonly static Random _random = new Random();
 
         public string DefaultUrl { get; } = string.Concat("http://127.0.0.1", ":", _random.Next(7601, 7699).ToString(), "/");
@@ -38,7 +41,11 @@ namespace Logzio.DotNet.IntegrationTests.Listener
             _httpListener.BeginGetContext(OnContext, null);
 
             var request = context.Request;
-            using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
+            var inStream = !string.IsNullOrEmpty(context.Request.Headers[ContentEncodingHeader]) 
+                && context.Request.Headers[ContentEncodingHeader] == ContentEncodingGzip
+                ? new GZipStream(request.InputStream, CompressionMode.Decompress)
+                : request.InputStream;
+            using (var reader = new StreamReader(inStream, request.ContentEncoding))
             {
                 Requests.Add(reader.ReadToEnd());
             }
