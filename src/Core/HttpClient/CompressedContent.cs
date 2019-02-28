@@ -15,22 +15,17 @@ namespace Core.HttpClient
 
         public CompressedContent(HttpContent content, string encodingType)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException("content");
-            }
-
             if (encodingType == null)
             {
                 throw new ArgumentNullException("encodingType");
             }
 
-            originalContent = content;
+            originalContent = content ?? throw new ArgumentNullException("content");
             this.encodingType = encodingType.ToLowerInvariant();
 
-            if (this.encodingType != "gzip" && this.encodingType != "deflate")
+            if (this.encodingType != "gzip")
             {
-                throw new InvalidOperationException(string.Format("Encoding '{0}' is not supported. Only supports gzip or deflate encoding.", this.encodingType));
+                throw new InvalidOperationException(string.Format("Encoding '{0}' is not supported. Only supports gzip encoding.", this.encodingType));
             }
 
             foreach (KeyValuePair<string, IEnumerable<string>> header in originalContent.Headers)
@@ -55,10 +50,6 @@ namespace Core.HttpClient
             if (encodingType == "gzip")
             {
                 compressedStream = new GZipStream(stream, CompressionMode.Compress, leaveOpen: true);
-            }
-            else if (encodingType == "deflate")
-            {
-                compressedStream = new DeflateStream(stream, CompressionMode.Compress, leaveOpen: true);
             }
 
             return originalContent.CopyToAsync(compressedStream).ContinueWith(tsk =>
