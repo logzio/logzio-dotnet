@@ -9,7 +9,7 @@ namespace Logzio.DotNet.Core.WebClient
     public interface IHttpClient
     {
         Task<HttpResponseMessage> GetAsync(string url);
-        Task<HttpResponseMessage> PostAsync(string url, MemoryStream body, System.Text.Encoding encoding, bool optionsUseGzip = false);
+        Task<HttpResponseMessage> PostAsync(string url, MemoryStream body, System.Text.Encoding encoding, bool useGzip = false);
     }
 
     public class HttpClientHandler : IHttpClient
