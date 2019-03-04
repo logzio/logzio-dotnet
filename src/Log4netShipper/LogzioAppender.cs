@@ -164,7 +164,7 @@ namespace Logzio.DotNet.Log4net
             _shipperOptions.BulkSenderOptions.Debug = value;
         }
 
-        public void addGzip(bool value)
+        public void AddGzip(bool value)
         {
             _shipperOptions.BulkSenderOptions.UseGzip = value;
         }
