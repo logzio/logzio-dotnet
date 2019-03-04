@@ -36,11 +36,11 @@ namespace Logzio.DotNet.Core.Shipping
                 return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK));
 
             var url = string.Format(UrlTemplate, options.ListenerUrl, options.Token, options.Type);
-            var body = SerializeLogEvents(logz, _encodingUtf8, options.UseCompression);
-            return _httpClient.PostAsync(url, body, _encodingUtf8, options.UseCompression);
+            var body = SerializeLogEvents(logz, _encodingUtf8, options.UseGzip);
+            return _httpClient.PostAsync(url, body, _encodingUtf8, options.UseGzip);
         }
 
-        private MemoryStream SerializeLogEvents(ICollection<LogzioLoggingEvent> logz, System.Text.Encoding encodingUtf8, bool UseCompression)
+        private MemoryStream SerializeLogEvents(ICollection<LogzioLoggingEvent> logz, System.Text.Encoding encodingUtf8, bool useGzip)
         {
             var ms = new MemoryStream(logz.Count * 512);
             using (var sw = new StreamWriter(ms, encodingUtf8, 1024, true))

@@ -47,7 +47,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             LogManager.Shutdown();  // Flushes and closes
 
             _dummy.Requests.Count.ShouldBe(1);
-            _dummy.Requests[0].ShouldContain("Hello");
+            _dummy.Requests[0].Body.ShouldContain("Hello");
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             {
                 Token = "123456789",
                 ListenerUrl = _dummy.DefaultUrl,
-                UseCompression = true,
+                UseGzip = true,
             };
             config.AddTarget("Logzio", logzioTarget);
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio");
@@ -71,7 +71,8 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             LogManager.Shutdown();  // Flushes and closes
 
             _dummy.Requests.Count.ShouldBe(1);
-            _dummy.Requests[0].ShouldContain("Hello");
+            _dummy.Requests[0].Body.ShouldContain("Hello");
+            _dummy.Requests[0].Headers["Content-Encoding"].ShouldBe("gzip");
         }
 
         [Test]
@@ -95,7 +96,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             LogManager.Shutdown();  // Flushes and closes
 
             _dummy.Requests.Count.ShouldBe(1);
-            _dummy.Requests[0].ShouldContain("INFO|Hello");
+            _dummy.Requests[0].Body.ShouldContain("INFO|Hello");
         }
 
         [Test]
@@ -118,7 +119,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             LogManager.Shutdown();  // Flushes and closes
 
             _dummy.Requests.Count.ShouldBe(1);
-            _dummy.Requests[0].ShouldContain("threadid");
+            _dummy.Requests[0].Body.ShouldContain("threadid");
         }
 
         [Test]
@@ -140,8 +141,8 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             LogManager.Shutdown();  // Flushes and closes
 
             _dummy.Requests.Count.ShouldBe(1);
-            _dummy.Requests[0].ShouldContain("sequenceId");
-            _dummy.Requests[0].ShouldContain("sequenceId_1");
+            _dummy.Requests[0].Body.ShouldContain("sequenceId");
+            _dummy.Requests[0].Body.ShouldContain("sequenceId_1");
         }
     }
 }

@@ -83,7 +83,7 @@ namespace Logzio.DotNet.UnitTests.Shipping
         {
             var log = GetLoggingEventWithSomeData();
             log.LogData.Remove("@timestamp");
-            _target.SendAsync(new[] { log }, new BulkSenderOptions { UseCompression = true }).Wait();
+            _target.SendAsync(new[] { log }, new BulkSenderOptions { UseGzip = true }).Wait();
             _httpClient.Received()
                 .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(ms.ToArray()).Equals("{\"message\":\"hey\"}")), Arg.Any<Encoding>(), true);
         }

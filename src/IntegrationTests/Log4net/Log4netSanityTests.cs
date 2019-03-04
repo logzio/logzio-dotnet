@@ -43,7 +43,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
             LogManager.Shutdown();  // Flushes and closes
 
             _dummy.Requests.Count.ShouldBe(1);
-            _dummy.Requests[0].ShouldContain("Just a random log line");
+            _dummy.Requests[0].Body.ShouldContain("Just a random log line");
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
             var logzioAppender = new LogzioAppender();
             logzioAppender.AddToken("123456789");
             logzioAppender.AddListenerUrl(_dummy.DefaultUrl);
-            logzioAppender.AddCompression(true);
+            logzioAppender.addGzip(true);
             logzioAppender.ActivateOptions();
             hierarchy.Root.AddAppender(logzioAppender);
             hierarchy.Configured = true;
@@ -64,7 +64,8 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
             LogManager.Shutdown();  // Flushes and closes
 
             _dummy.Requests.Count.ShouldBe(1);
-            _dummy.Requests[0].ShouldContain("Just a random log line");
+            _dummy.Requests[0].Body.ShouldContain("Just a random log line");
+            _dummy.Requests[0].Headers["Content-Encoding"].ShouldBe("gzip");
         }
     }
 }
