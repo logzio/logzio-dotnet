@@ -10,6 +10,6 @@ namespace Logzio.DotNet.Core.Shipping
         public int RetriesMaxAttempts { get; set; } = 3;
         public string Type { get; set; } = "dotnet";
         public bool Debug { get; set; }
-        public bool UseCompression { get; set; } = false;
+        public bool UseGzip { get; set; } = false;
     }
 }

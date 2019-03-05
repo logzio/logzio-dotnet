@@ -4,16 +4,20 @@ using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Threading;
+using IntegrationTests.Listener;
 
 namespace Logzio.DotNet.IntegrationTests.Listener
 {
     public class LogzioListenerDummy
     {
+        public const string ContentEncodingHeader = "Content-Encoding";
+        public const string ContentEncodingGzip = "gzip";
+
         private readonly static Random _random = new Random();
 
         public string DefaultUrl { get; } = string.Concat("http://127.0.0.1", ":", _random.Next(7601, 7699).ToString(), "/");
-       
-        public IList<string> Requests { get; set; }
+
+        public IList<HttpRequest> Requests { get; set; }
 
         private bool _isActive;
         private HttpListener _httpListener;
@@ -24,7 +28,7 @@ namespace Logzio.DotNet.IntegrationTests.Listener
             _httpListener.Prefixes.Add(url ?? DefaultUrl);
             _httpListener.Start();
             _isActive = true;
-            Requests = new List<string>();
+            Requests = new List<HttpRequest>();
             _httpListener.BeginGetContext(OnContext, null);
         }
 
@@ -38,9 +42,18 @@ namespace Logzio.DotNet.IntegrationTests.Listener
             _httpListener.BeginGetContext(OnContext, null);
 
             var request = context.Request;
-            using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
+            var encodingHeader = context.Request.Headers[ContentEncodingHeader];
+            var inStream = request.InputStream;
+
+            if (!string.IsNullOrEmpty(encodingHeader) && encodingHeader == ContentEncodingGzip)
             {
-                Requests.Add(reader.ReadToEnd());
+                inStream = new GZipStream(inStream, CompressionMode.Decompress);
+            }
+
+            using (var reader = new StreamReader(inStream, request.ContentEncoding))
+            {
+                var httpRequest = new HttpRequest(reader.ReadToEnd(), context.Request.Headers);
+                Requests.Add(httpRequest);
             }
 
             context.Response.StatusCode = 200;
