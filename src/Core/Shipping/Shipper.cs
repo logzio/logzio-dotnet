@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Logzio.DotNet.Core.InternalLogger;
 
@@ -120,6 +121,12 @@ namespace Logzio.DotNet.Core.Shipping
                                     {
                                         if (response.IsSuccessStatusCode)
                                             break;
+
+                                        if (response.StatusCode == HttpStatusCode.Unauthorized)
+                                        {
+                                            _internalLogger.Log("Logz.io: Warning, got unauthorized status code in the response. Dropping bad logs");
+                                            break;
+                                        }
 
                                         if (options.Debug)
                                             _internalLogger.Log("Logz.io: Failed: " + response.StatusCode);
