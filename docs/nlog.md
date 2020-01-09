@@ -36,6 +36,7 @@ If you configure your logging in an XML file, you need to register the assembly 
 				debug="false">
 				<contextproperty name="host" layout="${machinename}" />
 				<contextproperty name="threadid" layout="${threadid}" />
+				<layout includeAllProperties="false"/>
 			</target>
 		</targets>
 		<rules>
@@ -72,6 +73,10 @@ You can configure the target to include your own custom values when forwarding t
 ```
 
 You can also include NLog MDLC properties by configuring `includeMdlc="true"`
+
+## includeAllProperties
+
+As a default, the 'includeAllProperties' property is set to '"true"', meaning all of the log event's properties will be included as part of the log message. This can, depending on the events being logged, result in a message growing in size to the point where it exceeds the endpoint's capacity; including '<layout includeAllProperties="false"/>' will ensure no additional fields are appended to the message being shipped.
 
 ## Extensibility 
 
