@@ -22,7 +22,7 @@ namespace Logzio.DotNet.Core.WebClient
         }
         public async Task<HttpResponseMessage> GetAsync(string url)
         {
-            return await _client.GetAsync(url);
+            return await _client.GetAsync(url).ConfigureAwait(false);
         }
 
         public async Task<HttpResponseMessage> PostAsync(string url, MemoryStream body, System.Text.Encoding encoding, bool useGzip = false)
@@ -33,10 +33,10 @@ namespace Logzio.DotNet.Core.WebClient
             if (useGzip)
             {
                 using (var gzipContent = new GzipContent(content))
-                    return await _client.PostAsync(url, gzipContent);
+                    return await _client.PostAsync(url, gzipContent).ConfigureAwait(false);
             }
           
-            return await _client.PostAsync(url, content);
+            return await _client.PostAsync(url, content).ConfigureAwait(false);
         }
     }
 
