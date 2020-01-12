@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
 using NLog;
@@ -43,7 +42,6 @@ namespace Logzio.DotNet.NLog
             IncludeEventProperties = true;
             OptimizeBufferReuse = true;
             DefaultLayout = Layout?.ToString();
-
         }
 
         public LogzioTarget(IShipper shipper, IInternalLogger internalLogger)
@@ -127,6 +125,7 @@ namespace Logzio.DotNet.NLog
             catch (Exception ex)
             {
                 _internalLogger?.Log(ex, "Logz.io: Couldn't handle log message");
+                throw;  // Notify the NLog engine about this error
             }
         }
 

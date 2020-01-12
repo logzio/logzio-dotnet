@@ -33,10 +33,11 @@ If you configure your logging in an XML file, you need to register the assembly 
 				bufferTimeout="00:00:05"
 				retriesMaxAttempts="3"
 				retriesInterval="00:00:02"
+				includeEventProperties="true"
+				useGzip="false"
 				debug="false">
 				<contextproperty name="host" layout="${machinename}" />
 				<contextproperty name="threadid" layout="${threadid}" />
-				<layout includeAllProperties="false"/>
 			</target>
 		</targets>
 		<rules>
@@ -65,18 +66,17 @@ You can configure the target to include your own custom values when forwarding t
 	<nlog>
 		<variable name="site" value="New Zealand" />
 		<variable name="rings" value="one" />
-		<target name="logzio" type="Logzio" token="DKJiomZjbFyVvssJDmUAWeEOSNnDARWz">
+		<target name="logzio" type="Logzio" token="DKJiomZjbFyVvssJDmUAWeEOSNnDARWz" includeEventProperties="true" includeMdlc="false">
 				<contextproperty name="site" layout="${site}" />
 				<contextproperty name="rings" layout="${rings}" />
 		</target>
 	</nlog>
 ```
 
-You can also include NLog MDLC properties by configuring `includeMdlc="true"`
+- includeEventProperties - Include NLog LogEvent Properties. Default=True
+- includeMdlc - Include NLog MDLC properties by configuring. Default=False
 
-## includeAllProperties
-
-As a default, the 'includeAllProperties' property is set to '"true"', meaning all of the log event's properties will be included as part of the log message. This can, depending on the events being logged, result in a message growing in size to the point where it exceeds the endpoint's capacity; including '<layout includeAllProperties="false"/>' will ensure no additional fields are appended to the message being shipped.
+Notice that the resulting messeage can grow in size to the point where it exceeds the endpoint's capacity. Changing to 'includeEventProperties="false"' will reduce the size of the message being shipped. Alternative you can enable `useGzip="true"`.
 
 ## Extensibility 
 
