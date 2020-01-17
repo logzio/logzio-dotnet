@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -15,10 +16,28 @@ namespace Logzio.DotNet.Core.WebClient
     public class HttpClientHandler : IHttpClient
     {
         private readonly HttpClient _client;
-        
+
         public HttpClientHandler()
         {
             _client = new HttpClient();
+        }
+
+        public HttpClientHandler(String proxyAddress)
+        {
+            if (proxyAddress != String.Empty)
+            {
+                var handler = new System.Net.Http.HttpClientHandler
+                {
+                    UseProxy = true,
+                    Proxy = new Proxy(new Uri(proxyAddress))
+                };
+                _client = new HttpClient(handler: handler);
+            }
+            else
+            {
+                _client = new HttpClient();
+            }
+            
         }
         public async Task<HttpResponseMessage> GetAsync(string url)
         {

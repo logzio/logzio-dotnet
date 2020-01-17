@@ -28,6 +28,7 @@ namespace Logzio.DotNet.NLog
         public TimeSpan RetriesInterval { get { return _shipperOptions.BulkSenderOptions.RetriesInterval; } set { _shipperOptions.BulkSenderOptions.RetriesInterval = value; } }
         public bool Debug { get { return _shipperOptions.BulkSenderOptions.Debug; } set { _shipperOptions.BulkSenderOptions.Debug = _shipperOptions.Debug = value; } }
         public bool UseGzip { get { return _shipperOptions.BulkSenderOptions.UseGzip; } set { _shipperOptions.BulkSenderOptions.UseGzip = value; } }
+        public string ProxyAddress { get { return _shipperOptions.BulkSenderOptions.ProxyAddress; } set { _shipperOptions.BulkSenderOptions.ProxyAddress = value; } }
 
         /// <summary>
         /// Configuration of additional properties to include with each LogEvent (Ex. ${logger}, ${machinename}, ${threadid} etc.)
@@ -57,7 +58,7 @@ namespace Logzio.DotNet.NLog
             {
                 if (_internalLogger == null)
                     _internalLogger = new InternalLoggerNLog(_shipperOptions, new Core.InternalLogger.InternalLogger());
-                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler()), _internalLogger);
+                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler(ProxyAddress)), _internalLogger);
             }
             _usingDefaultLayout = Layout?.ToString() == DefaultLayout;
             base.InitializeTarget();

@@ -11,5 +11,6 @@ namespace Logzio.DotNet.Core.Shipping
         public string Type { get; set; } = "dotnet";
         public bool Debug { get; set; }
         public bool UseGzip { get; set; } = false;
+        public string ProxyAddress { get; set; } = String.Empty;
     }
 }
