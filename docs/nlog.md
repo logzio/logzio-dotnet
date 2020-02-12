@@ -24,7 +24,10 @@ If you configure your logging in an XML file, you need to register the assembly 
 		</extensions>
 		<targets>
 			<!-- parameters are shown here with their default values. 
-				Other than the token, all of the fields are optional and can be safely omitted. -->
+				Other than the token, all of the fields are optional and can be safely omitted. 
+                You can also add and edit this parameter to enable proxy routing:
+                proxyAddress = "http://your.proxy.com:port"            
+            -->
 			<target name="logzio" type="Logzio" 
 				token="DKJiomZjbFyVvssJDmUAWeEOSNnDARWz" 
 				logzioType="nlog"
@@ -52,6 +55,8 @@ To add the Logz.io target via code, add the following lines:
 	var config = new LoggingConfiguration();
 	var logzioTarget = new LogzioTarget {
 		Token = "DKJiomZjbFyVvssJDmUAWeEOSNnDARWz",
+		// Uncomment and edit this line to add a proxy routing
+		// ProxyAddress = "http://your.proxy.com:port"
 	};
 	config.AddTarget("Logzio", logzioTarget);
 	config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio", "*");
