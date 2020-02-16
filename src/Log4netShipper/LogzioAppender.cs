@@ -18,8 +18,6 @@ namespace Logzio.DotNet.Log4net
 
         private readonly ShipperOptions _shipperOptions = new ShipperOptions { BulkSenderOptions = { Type = "log4net" } };
         private readonly List<LogzioAppenderCustomField> _customFields = new List<LogzioAppenderCustomField>();
-        public string ProxyAddress { get { return _shipperOptions.BulkSenderOptions.ProxyAddress; } set { _shipperOptions.BulkSenderOptions.ProxyAddress = value; } }
-
 
         public LogzioAppender()
         {
@@ -38,7 +36,7 @@ namespace Logzio.DotNet.Log4net
             {
                 if (_internalLogger == null)
                     _internalLogger = new InternalLoggerLog4net(_shipperOptions, new Core.InternalLogger.InternalLogger());
-                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler(ProxyAddress)), _internalLogger);
+                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler(_shipperOptions.BulkSenderOptions.ProxyAddress)), _internalLogger);
             }
 
             base.ActivateOptions();
@@ -153,6 +151,11 @@ namespace Logzio.DotNet.Log4net
         public void AddRetriesInterval(TimeSpan value)
         {
             _shipperOptions.BulkSenderOptions.RetriesInterval = value;
+        }
+
+        public void AddProxyAddress(string proxyAddress)
+        {
+            _shipperOptions.BulkSenderOptions.ProxyAddress = proxyAddress;
         }
 
         public void AddCustomField(LogzioAppenderCustomField customField)
