@@ -36,7 +36,7 @@ namespace Logzio.DotNet.Log4net
             {
                 if (_internalLogger == null)
                     _internalLogger = new InternalLoggerLog4net(_shipperOptions, new Core.InternalLogger.InternalLogger());
-                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler()), _internalLogger);
+                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler(_shipperOptions.BulkSenderOptions.ProxyAddress)), _internalLogger);
             }
 
             base.ActivateOptions();
@@ -151,6 +151,11 @@ namespace Logzio.DotNet.Log4net
         public void AddRetriesInterval(TimeSpan value)
         {
             _shipperOptions.BulkSenderOptions.RetriesInterval = value;
+        }
+
+        public void AddProxyAddress(string proxyAddress)
+        {
+            _shipperOptions.BulkSenderOptions.ProxyAddress = proxyAddress;
         }
 
         public void AddCustomField(LogzioAppenderCustomField customField)
