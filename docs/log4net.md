@@ -34,6 +34,8 @@ If you configure your logging in an XML file, simply add a reference to the Logz
     		<type>log4net</type>
 			<!-- The URL of the Lgz.io listener -->
     		<listenerUrl>https://listener.logz.io:8071</listenerUrl>
+            <!--Optional proxy server address:
+                proxyAddress = "http://your.proxy.com:port" -->
 			<!-- The maximum number of log lines to send in each bulk -->
     		<bufferSize>100</bufferSize>
 			<!-- The maximum time to wait for more log lines, in a hh:mm:ss.fff format -->
@@ -59,6 +61,8 @@ To add the Logz.io appender via code, add the following lines:
 	var hierarchy = (Hierarchy)LogManager.GetRepository();
 	var logzioAppender = new LogzioAppender();
 	logzioAppender.AddToken("DKJiomZjbFyVvssSZmWATeHAHAnDARWz");
+    // Uncomment and edit this line to enable proxy routing: 
+    // logzioAppender.AddProxyAddress("http://your.proxy.com:port");
 	hierarchy.Root.AddAppender(logzioAppender);
 	hierarchy.Configured = true;
 ```

@@ -24,14 +24,15 @@ If you configure your logging in an XML file, you need to register the assembly 
 		</extensions>
 		<targets>
 			<!-- parameters are shown here with their default values. 
-				Other than the token, all of the fields are optional and can be safely omitted. 
-                You can also add and edit this parameter to enable proxy routing:
-                proxyAddress = "http://your.proxy.com:port"            
+				Other than the token, all of the fields are optional and can be safely omitted.            
             -->
+
 			<target name="logzio" type="Logzio" 
 				token="DKJiomZjbFyVvssJDmUAWeEOSNnDARWz" 
 				logzioType="nlog"
 				listenerUrl="https://listener.logz.io:8071"
+                <!--Optional proxy server address:
+                proxyAddress = "http://your.proxy.com:port" -->
 				bufferSize="100"
 				bufferTimeout="00:00:05"
 				retriesMaxAttempts="3"
