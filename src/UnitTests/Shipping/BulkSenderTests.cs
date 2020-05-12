@@ -71,6 +71,18 @@ namespace Logzio.DotNet.UnitTests.Shipping
         }
 
         [Test]
+        public void Send_LogBadLogObjectField_LogsAreFormatted()
+        {
+            var log = GetLoggingEventWithSomeData();
+            log.LogData["badobject"] = new BadLogObject();
+
+            _target.SendAsync(new[] { log }, new BulkSenderOptions()).Wait();
+
+            _httpClient.Received()
+                .PostAsync(Arg.Any<string>(), Arg.Is<MemoryStream>(ms => Encoding.UTF8.GetString(ms.ToArray()).Contains("\"badobject\":{\"badArray\":[],\"badProperty\"")), Arg.Any<Encoding>());
+        }
+
+        [Test]
         public void Send_EmptyLogsList_ShouldntSendAnything()
         {
             _target.SendAsync(new List<LogzioLoggingEvent>(), new BulkSenderOptions()).Wait();
@@ -103,5 +115,18 @@ namespace Logzio.DotNet.UnitTests.Shipping
     {
         public int SomeId { get; set; }
         public string SomeString { get; set; }
+    }
+
+    public class BadLogObject
+    {
+        public object[] BadArray { get; }
+        public System.Reflection.Assembly BadProperty => typeof(BadLogObject).Assembly;
+
+        public object ExceptionalBadProperty => throw new System.NotSupportedException();
+
+        public BadLogObject()
+        {
+            BadArray = new object[] { this };
+        }
     }
 }
