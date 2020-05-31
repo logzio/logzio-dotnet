@@ -60,11 +60,12 @@ var logzioTarget = new LogzioTarget {
   Token = "<<SHIPPING-TOKEN>>",
   LogzioType = "nlog",
   ListenerUrl = "<<LISTENER-HOST>>:8071",
-  BufferSize = "100",
-  BufferTimeout = "00:00:05",
+  BufferSize = 100,
+  BufferTimeout = TimeSpan.Parse("00:00:05"),
   RetriesMaxAttempts = "3",
-  RetriesInterval = "00:00:02",
-  Debug = "false",
+  RetriesInterval = TimeSpan.Parse("00:00:02"),
+  Debug = false,
+  // ProxyAddress = "http://your.proxy.com:port"
 };
 
 config.AddTarget("Logzio", logzioTarget);
