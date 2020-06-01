@@ -26,6 +26,13 @@ namespace Logzio.DotNet.Core.Shipping
             var jsonSettings = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
             jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             jsonSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+            jsonSettings.Converters.Add(new JsonToStringConverter(typeof(System.Reflection.MemberInfo)));
+            jsonSettings.Converters.Add(new JsonToStringConverter(typeof(System.Reflection.Assembly)));
+            jsonSettings.Converters.Add(new JsonToStringConverter(typeof(System.Reflection.Module)));
+            jsonSettings.Error = (sender, args) =>
+            {
+                args.ErrorContext.Handled = true;   // Ignore Properties that throws Exceptions
+            };
             _jsonSerializer = JsonSerializer.CreateDefault(jsonSettings);
             _httpClient = httpClient;
         }
@@ -36,11 +43,11 @@ namespace Logzio.DotNet.Core.Shipping
                 return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK));
 
             var url = string.Format(UrlTemplate, options.ListenerUrl, options.Token, options.Type);
-            var body = SerializeLogEvents(logz, _encodingUtf8, options.UseGzip);
+            var body = SerializeLogEvents(logz, _encodingUtf8);
             return _httpClient.PostAsync(url, body, _encodingUtf8, options.UseGzip);
         }
 
-        private MemoryStream SerializeLogEvents(ICollection<LogzioLoggingEvent> logz, System.Text.Encoding encodingUtf8, bool useGzip)
+        private MemoryStream SerializeLogEvents(ICollection<LogzioLoggingEvent> logz, System.Text.Encoding encodingUtf8)
         {
             var ms = new MemoryStream(logz.Count * 512);
             using (var sw = new StreamWriter(ms, encodingUtf8, 1024, true))
