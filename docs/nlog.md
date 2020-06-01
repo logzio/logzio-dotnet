@@ -57,19 +57,19 @@ var config = new LoggingConfiguration();
 
 // Replace these parameters with your configuration
 var logzioTarget = new LogzioTarget {
+  Name = "Logzio"
   Token = "<<SHIPPING-TOKEN>>",
   LogzioType = "nlog",
   ListenerUrl = "<<LISTENER-HOST>>:8071",
   BufferSize = 100,
   BufferTimeout = TimeSpan.Parse("00:00:05"),
-  RetriesMaxAttempts = "3",
+  RetriesMaxAttempts = 3,
   RetriesInterval = TimeSpan.Parse("00:00:02"),
   Debug = false,
   // ProxyAddress = "http://your.proxy.com:port"
 };
 
-config.AddTarget("Logzio", logzioTarget);
-config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio", "*");
+config.AddRule(LogLevel.Debug, LogLevel.Fatal, logzioTarget);
 LogManager.Configuration = config;
 ```
 
