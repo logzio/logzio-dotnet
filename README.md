@@ -4,6 +4,9 @@
 
 This repository contains the [Logz.io](http://www.logz.io) shippers for .NET frameworks, currently including [log4net](https://logging.apache.org/log4net/) and [NLog](http://nlog-project.org/).
 
+Prerequisites:
+.Net Core SDK version 2.0 or above
+
 - [log4net appender installation and configuration](docs/log4net.md)  [![NuGet](https://img.shields.io/nuget/v/Logzio.DotNet.Log4net.svg)](https://www.nuget.org/packages/Logzio.DotNet.Log4net)
 - [NLog target installation and configuration](docs/nlog.md) [![NuGet](https://img.shields.io/nuget/v/Logzio.DotNet.NLog.svg)](https://www.nuget.org/packages/Logzio.DotNet.NLog)
 
