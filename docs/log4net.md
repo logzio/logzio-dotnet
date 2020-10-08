@@ -31,7 +31,7 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 			-->
 			<!-- The type field will be added to each log message, making it 
 			easier for you to differ between different types of logs. -->
-    		<type>log4net</type>
+    		        <type>log4net</type>
 			<!-- The URL of the Lgz.io listener -->
     		        <listenerUrl>https://listener.logz.io:8071</listenerUrl>
                         <!--Optional proxy server address:
