@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="log4net" Version="2.0.10" />
     <!-- Newtonsoft.Json MUST be here for correct nuget-package generation -->
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>
