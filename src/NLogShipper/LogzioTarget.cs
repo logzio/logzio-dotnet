@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NLog;
 using NLog.Common;
 using NLog.Config;
@@ -29,6 +31,8 @@ namespace Logzio.DotNet.NLog
         public bool Debug { get { return _shipperOptions.BulkSenderOptions.Debug; } set { _shipperOptions.BulkSenderOptions.Debug = _shipperOptions.Debug = value; } }
         public bool UseGzip { get { return _shipperOptions.BulkSenderOptions.UseGzip; } set { _shipperOptions.BulkSenderOptions.UseGzip = value; } }
         public string ProxyAddress { get { return _shipperOptions.BulkSenderOptions.ProxyAddress; } set { _shipperOptions.BulkSenderOptions.ProxyAddress = value; } }
+
+        public string Format { get { return _shipperOptions.BulkSenderOptions.Format; } set { _shipperOptions.BulkSenderOptions.Format = value; } }
 
         /// <summary>
         /// Configuration of additional properties to include with each LogEvent (Ex. ${logger}, ${machinename}, ${threadid} etc.)
@@ -63,20 +67,28 @@ namespace Logzio.DotNet.NLog
             _usingDefaultLayout = Layout?.ToString() == DefaultLayout;
             base.InitializeTarget();
         }
-
+        
         protected override void Write(LogEventInfo logEvent)
         {
             try
             {
+                var jsonmsg = JObject.Parse(logEvent.FormattedMessage);
                 var values = new Dictionary<string, object>
                 {
                     {"@timestamp", logEvent.TimeStamp.ToString("o")},
                     {"logger", logEvent.LoggerName},
                     {"level", logEvent.Level.Name},
-                    {"message", _usingDefaultLayout ? logEvent.FormattedMessage : RenderLogEvent(Layout, logEvent)},
                     {"exception", logEvent.Exception?.ToString()},
                     {"sequenceId", logEvent.SequenceID.ToString()}
                 };
+                if (Format.ToLower() == "json")
+                {
+                    values.Add("msg", JObject.Parse(logEvent.FormattedMessage));
+                }
+                else
+                {
+                    values.Add( "message", logEvent.FormattedMessage);
+                }
 
                 if (ShouldIncludeProperties(logEvent))
                 {
@@ -155,6 +167,38 @@ namespace Logzio.DotNet.NLog
         protected virtual void ExtendValues(LogEventInfo logEvent, Dictionary<string, object> values)
         {
 
+        }
+        
+        private static bool IsValidJson(string data)
+        {
+            {
+                if (string.IsNullOrWhiteSpace(data)) { return false;}
+                data = data.Trim();
+                if ((data.StartsWith("{") && data.EndsWith("}")) || //For object
+                    (data.StartsWith("[") && data.EndsWith("]"))) //For array
+                {
+                    try
+                    {
+                        var obj = JToken.Parse(data);
+                        return true;
+                    }
+                    catch (JsonReaderException jex)
+                    {
+                        //Exception in parsing json
+                        Console.WriteLine(jex.Message);
+                        return false;
+                    }
+                    catch (Exception ex) //some other exception
+                    {
+                        Console.WriteLine(ex.ToString());
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
     }
 }

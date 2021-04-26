@@ -28,7 +28,7 @@ If you configure your logging in an XML file, you need to register the assembly 
             -->
 
 			<target name="logzio" type="Logzio" 
-				token="DKJiomZjbFyVvssJDmUAWeEOSNnDARWz" 
+				token="VRumDxNPhJyNAHmAZXnqJKPqDuGJVesn" 
 				logzioType="nlog"
 				listenerUrl="https://listener.logz.io:8071"
                 <!--Optional proxy server address:
@@ -39,9 +39,16 @@ If you configure your logging in an XML file, you need to register the assembly 
 				retriesInterval="00:00:02"
 				includeEventProperties="true"
 				useGzip="false"
-				debug="false">
+				debug="false"
+				format="json"
+				>
 				<contextproperty name="host" layout="${machinename}" />
 				<contextproperty name="threadid" layout="${threadid}" />
+				<layout type="JsonLayout" includeAllProperties="true">
+					<attribute name="msg" encode="false">
+						<layout type='JsonLayout' includeAllProperties="true"  maxRecursionLimit="20"/>
+					</attribute>
+				</layout>
 			</target>
 		</targets>
 		<rules>
