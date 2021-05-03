@@ -72,24 +72,30 @@ namespace Logzio.DotNet.NLog
         {
             try
             {
-                var jsonmsg = JObject.Parse(logEvent.FormattedMessage);
                 var values = new Dictionary<string, object>
                 {
                     {"@timestamp", logEvent.TimeStamp.ToString("o")},
                     {"logger", logEvent.LoggerName},
                     {"level", logEvent.Level.Name},
                     {"exception", logEvent.Exception?.ToString()},
+                    {"message", _usingDefaultLayout ? logEvent.FormattedMessage : RenderLogEvent(Layout, logEvent)},
                     {"sequenceId", logEvent.SequenceID.ToString()}
                 };
                 if (Format.ToLower() == "json")
                 {
-                    values.Add("msg", JObject.Parse(logEvent.FormattedMessage));
+                    try
+                    {
+                        foreach (var keyValuePair in JObject.Parse(values["message"].ToString()))
+                        {
+                            values.Add(keyValuePair.Key, keyValuePair.Value);
+                        }
+                        values.Remove("message");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Sending message as a string.");
+                    }
                 }
-                else
-                {
-                    values.Add( "message", logEvent.FormattedMessage);
-                }
-
                 if (ShouldIncludeProperties(logEvent))
                 {
                     var properties = GetAllProperties(logEvent);

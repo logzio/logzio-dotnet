@@ -6,6 +6,7 @@ using log4net.Appender;
 using log4net.Core;
 using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
+using Newtonsoft.Json.Linq;
 
 namespace Logzio.DotNet.Log4net
 {
@@ -62,6 +63,20 @@ namespace Logzio.DotNet.Log4net
                     {"exception", loggingEvent.GetExceptionString()},
                     {"processId", ProcessId}
                 };
+                if (_shipperOptions.BulkSenderOptions.Format.ToLower() == "json")
+                {
+                    try
+                    {
+                        foreach (var keyValuePair in JObject.Parse(values["message"].ToString()))
+                        {
+                            values.Add(keyValuePair.Key, keyValuePair.Value);
+                        }
+                        values.Remove("message");
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
 
                 foreach (var customField in _customFields)
                 {
@@ -136,6 +151,11 @@ namespace Logzio.DotNet.Log4net
         public void AddBufferSize(int bufferSize)
         {
             _shipperOptions.BufferSize = bufferSize;
+        }
+        
+        public void AddFormat(string format)
+        {
+            _shipperOptions.BulkSenderOptions.Format = format;
         }
 
         public void AddBufferTimeout(TimeSpan value)

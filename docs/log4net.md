@@ -46,6 +46,8 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 			<retriesInterval>00:00:02</retriesInterval>
 			<!-- Set the appender to compress the message before sending it -->
 		        <gzip>true</gzip>
+			<!-- Uncomment this to send logs in Json format -->
+				<!--<format>json</format>-->
 			<!-- Enable the appender's internal debug logger (sent to the console output and trace log) -->
 			<debug>false</debug>
     	</appender>
@@ -69,6 +71,8 @@ To add the Logz.io appender via code, add the following lines:
 	 // Uncomment these lines to enable gzip compression 
 	 // logzioAppender.AddGzip(true);
          // logzioAppender.ActivateOptions();
+         // Uncomment these lines to enable Json format 
+	 // logzioAppender.AddFormat("Json");
 	hierarchy.Root.AddAppender(logzioAppender);
 	hierarchy.Configured = true;
 ```

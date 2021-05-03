@@ -1,5 +1,7 @@
-﻿using Logzio.DotNet.IntegrationTests.Listener;
+﻿using System;
+using Logzio.DotNet.IntegrationTests.Listener;
 using Logzio.DotNet.NLog;
+using Newtonsoft.Json.Linq;
 using NLog;
 using NLog.Config;
 using NLog.Layouts;
@@ -82,7 +84,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             var layout = Layout.FromString("${level:uppercase=true}|${message}");
             var logzioTarget = new LogzioTarget
             {
-                Token = "DKJiomZjbFyVvssJDmUAWeEOSNnDARWz",
+                Token = "132456789",
                 ListenerUrl = _dummy.DefaultUrl,
                 Layout = layout
             };
@@ -105,7 +107,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             var config = new LoggingConfiguration();
             var logzioTarget = new LogzioTarget
             {
-                Token = "DKJiomZjbFyVvssJDmUAWeEOSNnDARWz",
+                Token = "123456789",
                 ListenerUrl = _dummy.DefaultUrl,
             };
             logzioTarget.ContextProperties.Add(new TargetPropertyWithContext { Name = "threadid", Layout = "${threadid}" });
@@ -143,6 +145,97 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             _dummy.Requests.Count.ShouldBe(1);
             _dummy.Requests[0].Body.ShouldContain("sequenceId");
             _dummy.Requests[0].Body.ShouldContain("sequenceId_1");
+        }
+        
+        [Test]
+        public void SanityJson()
+        {
+            var config = new LoggingConfiguration();
+            var logzioTarget = new LogzioTarget
+            {
+                Token = "DKJiomZjbFyVvssJDmUAWeEOSNnDARWz",
+                ListenerUrl = _dummy.DefaultUrl,
+                Format = "Json"
+            };
+            config.AddTarget("Logzio", logzioTarget);
+            config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio", "*");
+            LogManager.Configuration = config;
+
+            var logger = LogManager.GetCurrentClassLogger();
+
+            logger.Info("{ \"key1\" : \"val1\", \"key2\" : { \"key3\" : \"val3\"} }");
+            LogManager.Shutdown();  // Flushes and closes
+            JObject body = JObject.Parse(_dummy.Requests[0].Body);
+            try
+            {
+                //Should append key-value pairs to log and parse them as Json
+                body["key1"].ShouldBe("val1");
+                body["key2"]["key3"].ShouldBe("val3");
+            }
+            catch (NullReferenceException e)
+            {
+                Assert.Fail("Failed to parse log as Json.");
+            }
+        }
+        
+        [Test]
+        public void SanityJsonWithLayout()
+        {
+
+            var config = new LoggingConfiguration();
+            var layout = Layout.FromString("JsonLayout=msg-'${message}'");
+            var logzioTarget = new LogzioTarget
+            {
+                Token = "12345678",
+                ListenerUrl = _dummy.DefaultUrl,
+                Format = "Json",
+                Layout = layout
+            };
+            
+            config.AddTarget("Logzio", logzioTarget);
+            config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio", "*");
+            LogManager.Configuration = config;
+
+            var logger = LogManager.GetCurrentClassLogger();
+            
+            logger.Info("{ \"key1\" : \"val1\", \"key2\" : { \"key3\" : \"val3\"} }");
+            LogManager.Shutdown();  // Flushes and closes
+            JObject body = JObject.Parse(_dummy.Requests[0].Body);
+            Console.WriteLine(body);
+            try
+            {
+                //Should append key-value pairs to log and parse them as Json
+                body["key1"].ShouldBe("val1");
+                body["key2"]["key3"].ShouldBe("val3");
+            }
+            catch (NullReferenceException e)
+            {
+                Assert.Fail("Failed to parse log as Json.");
+            }
+        }
+
+        [Test]
+        public void SanityInvalidJsonAsString()
+        {
+            var config = new LoggingConfiguration();
+            var logzioTarget = new LogzioTarget
+            {
+                Token = "123456789",
+                ListenerUrl = _dummy.DefaultUrl,
+                Format = "Json"
+            };
+            config.AddTarget("Logzio", logzioTarget);
+            config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio", "*");
+            LogManager.Configuration = config;
+
+            var logger = LogManager.GetCurrentClassLogger();
+
+            logger.Info("{ Invalid json }");
+            LogManager.Shutdown();  // Flushes and closes
+            JObject body = JObject.Parse(_dummy.Requests[0].Body);
+            
+            //Should leave log as a string under 'message' field
+            body["message"].ShouldBe("{ Invalid json }");
         }
     }
 }
