@@ -3,9 +3,9 @@
 - [Configuration](#configuration)
 	- [XML](#xml)
 	- [Code](#code)
-- [Custom Fields](#custom_fields)
+- [Custom Fields](#custom-fields)
 - [Extensibility](#extensibility)
-- [Code Sample](#code_sample)
+- [Code Sample](#code-sample)
 
 
 Install the log4net appender from the Package Manager Console:
