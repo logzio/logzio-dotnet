@@ -3,11 +3,11 @@
 - [Configuration](#configuration)
     - [XML](#xml)
     - [Code](#code)
-- [Custom Fields](#custom_fields)
+- [Custom Fields](#custom-fields)
 - [Extensibility](#extensibility)
-- [Code Sample](#code_sample)
-    - [ASP.NET Core](#asp.net_core)
-    - [Desktop .Net Core](#desktop_.net_core)
+- [Code Sample](#code-sample)
+    - [ASP.NET Core](#asp.net-core)
+    - [Desktop .Net Core](#desktop-.net-core)
 
 
 Install the log4net appender from the Package Manager Console:
