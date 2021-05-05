@@ -28,9 +28,9 @@ If you configure your logging in an XML file, you need to register the assembly 
             -->
 
 			<target name="logzio" type="Logzio" 
-				token="VRumDxNPhJyNAHmAZXnqJKPqDuGJVesn" 
+				token="<<SHIPPING-TOKEN>>"
 				logzioType="nlog"
-				listenerUrl="https://listener.logz.io:8071"
+				listenerUrl="<<LISTENER-HOST>>:8071"
                 <!--Optional proxy server address:
                 proxyAddress = "http://your.proxy.com:port" -->
 				bufferSize="100"
@@ -73,7 +73,7 @@ var logzioTarget = new LogzioTarget {
   RetriesMaxAttempts = 3,
   RetriesInterval = TimeSpan.Parse("00:00:02"),
   Debug = false,
-  format="text", 
+  Format="text", 
   // ProxyAddress = "http://your.proxy.com:port"
 };
 
@@ -102,7 +102,7 @@ You can configure the target to include your own custom values when forwarding t
 	<nlog>
 		<variable name="site" value="New Zealand" />
 		<variable name="rings" value="one" />
-		<target name="logzio" type="Logzio" token="DKJiomZjbFyVvssJDmUAWeEOSNnDARWz" includeEventProperties="true" includeMdlc="false">
+		<target name="logzio" type="Logzio" token="<<SHIPPING-TOKEN>>" includeEventProperties="true" includeMdlc="false">
 				<contextproperty name="site" layout="${site}" />
 				<contextproperty name="rings" layout="${rings}" />
 		</target>

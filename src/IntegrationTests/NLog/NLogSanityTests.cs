@@ -130,7 +130,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             var config = new LoggingConfiguration();
             var logzioTarget = new LogzioTarget
             {
-                Token = "DKJiomZjbFyVvssJDmUAWeEOSNnDARWz",
+                Token = "123456789",
                 ListenerUrl = _dummy.DefaultUrl,
             };
             config.AddTarget("Logzio", logzioTarget);
@@ -153,7 +153,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             var config = new LoggingConfiguration();
             var logzioTarget = new LogzioTarget
             {
-                Token = "DKJiomZjbFyVvssJDmUAWeEOSNnDARWz",
+                Token = "123456789",
                 ListenerUrl = _dummy.DefaultUrl,
                 Format = "Json"
             };
@@ -166,42 +166,6 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             logger.Info("{ \"key1\" : \"val1\", \"key2\" : { \"key3\" : \"val3\"} }");
             LogManager.Shutdown();  // Flushes and closes
             JObject body = JObject.Parse(_dummy.Requests[0].Body);
-            try
-            {
-                //Should append key-value pairs to log and parse them as Json
-                body["key1"].ShouldBe("val1");
-                body["key2"]["key3"].ShouldBe("val3");
-            }
-            catch (NullReferenceException e)
-            {
-                Assert.Fail("Failed to parse log as Json.");
-            }
-        }
-        
-        [Test]
-        public void SanityJsonWithLayout()
-        {
-
-            var config = new LoggingConfiguration();
-            var layout = Layout.FromString("JsonLayout=msg-'${message}'");
-            var logzioTarget = new LogzioTarget
-            {
-                Token = "12345678",
-                ListenerUrl = _dummy.DefaultUrl,
-                Format = "Json",
-                Layout = layout
-            };
-            
-            config.AddTarget("Logzio", logzioTarget);
-            config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio", "*");
-            LogManager.Configuration = config;
-
-            var logger = LogManager.GetCurrentClassLogger();
-            
-            logger.Info("{ \"key1\" : \"val1\", \"key2\" : { \"key3\" : \"val3\"} }");
-            LogManager.Shutdown();  // Flushes and closes
-            JObject body = JObject.Parse(_dummy.Requests[0].Body);
-            Console.WriteLine(body);
             try
             {
                 //Should append key-value pairs to log and parse them as Json
