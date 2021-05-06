@@ -18,7 +18,7 @@
     <ProjectReference Include="..\NLogShipper\NLogShipper.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="NLog.config">
+    <Content Include="nlog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="log4net.config">
