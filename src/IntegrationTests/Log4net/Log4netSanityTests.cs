@@ -104,7 +104,7 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
             var logzioAppender = new LogzioAppender();
             logzioAppender.AddToken("123456789");
             logzioAppender.AddListenerUrl(_dummy.DefaultUrl);
-            logzioAppender.AddFormat("text");
+            logzioAppender.AddFormat("Json");
             logzioAppender.ActivateOptions();
             hierarchy.Root.AddAppender(logzioAppender);
             hierarchy.Configured = true;

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using log4net;
+using log4net.Config;
 using log4net.Repository.Hierarchy;
 using Logzio.DotNet.IntegrationTests.Listener;
 using Logzio.DotNet.Log4net;
@@ -36,6 +37,9 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
             log4net.Util.LogLog.InternalDebugging = true;
             var logger = LogManager.GetLogger(typeof(Log4netSanityTests));
 
+            // <-- To test through xml declare logger this way and config local dummy listener--> //
+            // log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            
             logger.Info("A Fish");  // Warm the engine
 
             var stopwatch = Stopwatch.StartNew();
@@ -45,11 +49,9 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
             {
                 logger.Info("A Fish");
             }
-
             stopwatch.Stop();
             Console.WriteLine("Total time: " + stopwatch.Elapsed);
             stopwatch.Elapsed.ShouldBeLessThanOrEqualTo(TimeSpan.FromMilliseconds(120));
-
             LogManager.Shutdown();  // Flushes and closes
 
             _dummy.Requests.Count.ShouldBe(logsAmount / bufferSize);

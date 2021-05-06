@@ -27,7 +27,7 @@ If you configure your logging in an XML file, you need to register the assembly 
 				Other than the token, all of the fields are optional and can be safely omitted.            
             -->
 
-			<target name="logzio" type="Logzio" 
+			<target name="logzio" type="Logzio"
 				token="<<SHIPPING-TOKEN>>"
 				logzioType="nlog"
 				listenerUrl="<<LISTENER-HOST>>:8071"
@@ -40,15 +40,10 @@ If you configure your logging in an XML file, you need to register the assembly 
 				includeEventProperties="true"
 				useGzip="false"
 				debug="false"
-				format="text" 
+				<!--format="Json-->
 				>
 				<contextproperty name="host" layout="${machinename}" />
 				<contextproperty name="threadid" layout="${threadid}" />
-				<layout type="JsonLayout" includeAllProperties="true">
-					<attribute name="msg" encode="false">
-						<layout type='JsonLayout' includeAllProperties="true"  maxRecursionLimit="20"/>
-					</attribute>
-				</layout>
 			</target>
 		</targets>
 		<rules>
@@ -73,7 +68,7 @@ var logzioTarget = new LogzioTarget {
   RetriesMaxAttempts = 3,
   RetriesInterval = TimeSpan.Parse("00:00:02"),
   Debug = false,
-  Format="text", 
+  // Format = "Json", 
   // ProxyAddress = "http://your.proxy.com:port"
 };
 
@@ -83,9 +78,9 @@ LogManager.Configuration = config;
 
 ## Json Format
 
-To send your logs as format change the logger's configuration field 'Format' to 'Json'.  
-When using 'JsonLayout', set the name of the attribute 'message' to 'msg'. 
-For example: 
+To send your logs as format add the logger's configuration field 'Format' to 'Json' (or uncomment).  
+When using 'JsonLayout' set the name of the attribute 'message' to 'msg', 
+for example: 
 ```xml
 <layout type="JsonLayout" includeAllProperties="true">
 	<attribute name="msg"  layout="${message}" encode="false"/>

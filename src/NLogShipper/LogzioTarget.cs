@@ -93,7 +93,6 @@ namespace Logzio.DotNet.NLog
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Sending message as a string.");
                     }
                 }
                 if (ShouldIncludeProperties(logEvent))
