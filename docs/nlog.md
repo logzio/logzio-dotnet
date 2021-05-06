@@ -78,7 +78,7 @@ LogManager.Configuration = config;
 
 ## Json Format
 
-To send your logs as 'Json' format add the logger's configuration field 'Format' to 'Json' (or uncomment).  
+To send your logs as format add the logger's configuration field 'Format' to 'Json' (or uncomment).  
 When using 'JsonLayout' set the name of the attribute 'message' to 'msg', 
 for example: 
 ```xml
