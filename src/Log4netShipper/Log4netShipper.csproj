@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">netcoreapp3.1,netstandard2.0;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
 
     <AssemblyName>Logzio.DotNet.Log4net</AssemblyName>
 
@@ -19,7 +19,7 @@
   <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.12" />
     <!-- Newtonsoft.Json MUST be here for correct nuget-package generation -->
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
