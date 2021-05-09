@@ -35,10 +35,14 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
             const int bufferSize = 100;
             var logzioAppender = SetupAppender(bufferSize);
             log4net.Util.LogLog.InternalDebugging = true;
-            var logger = LogManager.GetLogger(typeof(Log4netSanityTests));
+            log4net.ILog logger = LogManager.GetLogger(typeof(Log4netSanityTests));
 
-            // <-- To test through xml declare logger this way and config local dummy listener--> //
+            // <-- To test through xml
+            //     declare this logger instead:
             // log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            //     config local dummy listener in log4net.config,
+            //     and uncomment log4net configuration in 'IntegrationTests.csproj'
+            // --> //
             
             logger.Info("A Fish");  // Warm the engine
 
