@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
 using NLog.Common;
@@ -172,38 +171,6 @@ namespace Logzio.DotNet.NLog
         protected virtual void ExtendValues(LogEventInfo logEvent, Dictionary<string, object> values)
         {
 
-        }
-        
-        private static bool IsValidJson(string data)
-        {
-            {
-                if (string.IsNullOrWhiteSpace(data)) { return false;}
-                data = data.Trim();
-                if ((data.StartsWith("{") && data.EndsWith("}")) || //For object
-                    (data.StartsWith("[") && data.EndsWith("]"))) //For array
-                {
-                    try
-                    {
-                        var obj = JToken.Parse(data);
-                        return true;
-                    }
-                    catch (JsonReaderException jex)
-                    {
-                        //Exception in parsing json
-                        Console.WriteLine(jex.Message);
-                        return false;
-                    }
-                    catch (Exception ex) //some other exception
-                    {
-                        Console.WriteLine(ex.ToString());
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
-            }
         }
     }
 }
