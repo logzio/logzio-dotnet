@@ -40,7 +40,7 @@ If you configure your logging in an XML file, you need to register the assembly 
 				includeEventProperties="true"
 				useGzip="false"
 				debug="false"
-				<!--format="Json-->
+				<!-- enableJson="true"-->
 				>
 				<contextproperty name="host" layout="${machinename}" />
 				<contextproperty name="threadid" layout="${threadid}" />
@@ -68,7 +68,7 @@ var logzioTarget = new LogzioTarget {
   RetriesMaxAttempts = 3,
   RetriesInterval = TimeSpan.Parse("00:00:02"),
   Debug = false,
-  // Format = "Json", 
+  // EnableJson = true, 
   // ProxyAddress = "http://your.proxy.com:port"
 };
 
@@ -78,8 +78,8 @@ LogManager.Configuration = config;
 
 ## Json Format
 
-To send your logs as format add the logger's configuration field 'Format' to 'Json' (or uncomment).  
-When using 'JsonLayout' set the name of the attribute 'message' to 'msg', 
+To send your logs as json format add the logger's configuration the field 'EnableJson' with the value 'true' (or uncomment).  
+When using 'JsonLayout' set the name of the attribute to **other than** 'message'. 
 for example: 
 ```xml
 <layout type="JsonLayout" includeAllProperties="true">

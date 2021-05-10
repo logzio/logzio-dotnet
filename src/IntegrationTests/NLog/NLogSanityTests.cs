@@ -155,7 +155,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             {
                 Token = "123456789",
                 ListenerUrl = _dummy.DefaultUrl,
-                Format = "Json"
+                EnableJson = true
             };
             config.AddTarget("Logzio", logzioTarget);
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio", "*");
@@ -186,7 +186,7 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             {
                 Token = "123456789",
                 ListenerUrl = _dummy.DefaultUrl,
-                Format = "Json"
+                EnableJson = true 
             };
             config.AddTarget("Logzio", logzioTarget);
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio", "*");

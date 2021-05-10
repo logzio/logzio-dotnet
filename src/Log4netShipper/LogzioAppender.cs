@@ -63,7 +63,7 @@ namespace Logzio.DotNet.Log4net
                     {"exception", loggingEvent.GetExceptionString()},
                     {"processId", ProcessId}
                 };
-                if (_shipperOptions.BulkSenderOptions.Format.ToLower() == "json")
+                if (_shipperOptions.BulkSenderOptions.EnableJson)
                 {
                     try
                     {
@@ -152,10 +152,10 @@ namespace Logzio.DotNet.Log4net
         {
             _shipperOptions.BufferSize = bufferSize;
         }
-        
-        public void AddFormat(string format)
+
+        public void EnableJson(bool value)
         {
-            _shipperOptions.BulkSenderOptions.Format = format;
+            _shipperOptions.BulkSenderOptions.EnableJson = value;
         }
 
         public void AddBufferTimeout(TimeSpan value)

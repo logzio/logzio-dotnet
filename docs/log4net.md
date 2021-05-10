@@ -46,8 +46,8 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 			<retriesInterval>00:00:02</retriesInterval>
 			<!-- Set the appender to compress the message before sending it -->
 		        <gzip>true</gzip>
-			<!-- Uncomment this to send logs in Json format -->
-				<!--<format>json</format>-->
+			<!-- Uncomment this to enable sending logs in Json format -->
+				<!--<enableJson>true</enableJson>-->
 			<!-- Enable the appender's internal debug logger (sent to the console output and trace log) -->
 			<debug>false</debug>
     	</appender>
@@ -66,13 +66,13 @@ To add the Logz.io appender via code, add the following lines:
 	var logzioAppender = new LogzioAppender();
 	logzioAppender.AddToken("DKJiomZjbFyVvssSZmWATeHAHAnDARWz");
 	logzioAppender.AddListenerUrl("https://webhook.site/b229776a-3396-4c9d-9e05-b5350aeb98fa");
-         // Uncomment and edit this line to enable proxy routing: 
-         // logzioAppender.AddProxyAddress("http://your.proxy.com:port");
-	 // Uncomment these lines to enable gzip compression 
+	 // <-- Uncomment and edit this line to enable proxy routing: --> 
+	 // logzioAppender.AddProxyAddress("http://your.proxy.com:port");
+	 // <-- Uncomment this to enable sending logs in Json format -->  
+	 // logzioAppender.EnableJson(true);
+	 // <-- Uncomment these lines to enable gzip compression --> 
 	 // logzioAppender.AddGzip(true);
          // logzioAppender.ActivateOptions();
-         // Uncomment these lines to enable Json format 
-	 // logzioAppender.AddFormat("Json");
 	hierarchy.Root.AddAppender(logzioAppender);
 	hierarchy.Configured = true;
 ```
