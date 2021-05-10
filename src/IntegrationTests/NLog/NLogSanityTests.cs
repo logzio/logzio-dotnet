@@ -148,14 +148,14 @@ namespace Logzio.DotNet.IntegrationTests.NLog
         }
         
         [Test]
-        public void SanityJson()
+        public void SanityJsonMessage()
         {
             var config = new LoggingConfiguration();
             var logzioTarget = new LogzioTarget
             {
                 Token = "123456789",
                 ListenerUrl = _dummy.DefaultUrl,
-                EnableJson = true
+                EnableJsonMessage = true
             };
             config.AddTarget("Logzio", logzioTarget);
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio", "*");
@@ -179,14 +179,14 @@ namespace Logzio.DotNet.IntegrationTests.NLog
         }
 
         [Test]
-        public void SanityInvalidJsonAsString()
+        public void SanityInvalidJsonMessageAsString()
         {
             var config = new LoggingConfiguration();
             var logzioTarget = new LogzioTarget
             {
                 Token = "123456789",
                 ListenerUrl = _dummy.DefaultUrl,
-                EnableJson = true 
+                EnableJsonMessage = true 
             };
             config.AddTarget("Logzio", logzioTarget);
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio", "*");
