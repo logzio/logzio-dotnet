@@ -71,13 +71,13 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
         }
         
         [Test]
-        public void SanityJsonMessage()
+        public void SanityParseJsonMessage()
         {
             var hierarchy = (Hierarchy)LogManager.GetRepository(Assembly.GetCallingAssembly());
             var logzioAppender = new LogzioAppender();
             logzioAppender.AddToken("123456789");
             logzioAppender.AddListenerUrl(_dummy.DefaultUrl);
-            logzioAppender.EnableJsonMessage(true);
+            logzioAppender.ParseJsonMessage(true);
             logzioAppender.ActivateOptions();
             hierarchy.Root.AddAppender(logzioAppender);
             hierarchy.Configured = true;
@@ -98,13 +98,13 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
         }
         
         [Test]
-        public void SanityInvalidJsonMessageAsString()
+        public void SanityParseInvalidJsonMessageAsString()
         {
             var hierarchy = (Hierarchy)LogManager.GetRepository(Assembly.GetCallingAssembly());
             var logzioAppender = new LogzioAppender();
             logzioAppender.AddToken("123456789");
             logzioAppender.AddListenerUrl(_dummy.DefaultUrl);
-            logzioAppender.EnableJsonMessage(true);
+            logzioAppender.ParseJsonMessage(true);
             logzioAppender.ActivateOptions();
             hierarchy.Root.AddAppender(logzioAppender);
             hierarchy.Configured = true;
