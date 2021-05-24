@@ -27,10 +27,10 @@ If you configure your logging in an XML file, you need to register the assembly 
 				Other than the token, all of the fields are optional and can be safely omitted.            
             -->
 
-			<target name="logzio" type="Logzio" 
-				token="DKJiomZjbFyVvssJDmUAWeEOSNnDARWz" 
+			<target name="logzio" type="Logzio"
+				token="<<SHIPPING-TOKEN>>"
 				logzioType="nlog"
-				listenerUrl="https://listener.logz.io:8071"
+				listenerUrl="<<LISTENER-HOST>>:8071"
                 <!--Optional proxy server address:
                 proxyAddress = "http://your.proxy.com:port" -->
 				bufferSize="100"
@@ -39,7 +39,9 @@ If you configure your logging in an XML file, you need to register the assembly 
 				retriesInterval="00:00:02"
 				includeEventProperties="true"
 				useGzip="false"
-				debug="false">
+				debug="false"
+				<!-- parseJsonMessage="true"-->
+				>
 				<contextproperty name="host" layout="${machinename}" />
 				<contextproperty name="threadid" layout="${threadid}" />
 			</target>
@@ -66,12 +68,26 @@ var logzioTarget = new LogzioTarget {
   RetriesMaxAttempts = 3,
   RetriesInterval = TimeSpan.Parse("00:00:02"),
   Debug = false,
+  // ParseJsonMessage = true, 
   // ProxyAddress = "http://your.proxy.com:port"
 };
 
 config.AddRule(LogLevel.Debug, LogLevel.Fatal, logzioTarget);
 LogManager.Configuration = config;
 ```
+
+## Json Format
+
+To parse your messages as Json add to the logger's configuration the field 'parseJsonMessage' with the value 'true' (or uncomment).  
+When using 'JsonLayout' set the name of the attribute to **other than** 'message'. 
+for example: 
+```xml
+<layout type="JsonLayout" includeAllProperties="true">
+	<attribute name="msg"  layout="${message}" encode="false"/>
+</layout>
+````
+Click here for more information about [JsonLayout](https://github.com/NLog/NLog/wiki/JsonLayout).
+
 
 ## Context Properties
 
@@ -81,7 +97,7 @@ You can configure the target to include your own custom values when forwarding t
 	<nlog>
 		<variable name="site" value="New Zealand" />
 		<variable name="rings" value="one" />
-		<target name="logzio" type="Logzio" token="DKJiomZjbFyVvssJDmUAWeEOSNnDARWz" includeEventProperties="true" includeMdlc="false">
+		<target name="logzio" type="Logzio" token="<<SHIPPING-TOKEN>>" includeEventProperties="true" includeMdlc="false">
 				<contextproperty name="site" layout="${site}" />
 				<contextproperty name="rings" layout="${rings}" />
 		</target>

@@ -32,7 +32,6 @@ namespace Logzio.DotNet.IntegrationTests.NLog
         public void Perf()
         {
             var config = new LoggingConfiguration();
-
             var logzioTarget = new LogzioTarget
             {
                 Token = "123456789",
@@ -40,10 +39,11 @@ namespace Logzio.DotNet.IntegrationTests.NLog
             };
             config.AddTarget("Logzio", logzioTarget);
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, "Logzio");
+
+            // <-- To test through xml comment the following line and config local dummy listener--> //
             LogManager.Configuration = config;
 
             var logger = LogManager.GetCurrentClassLogger();
-
             logger.Info("A Fish");  // Warm the engine
 
             var stopwatch = Stopwatch.StartNew();

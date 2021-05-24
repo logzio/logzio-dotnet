@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">netstandard2.0;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">netcoreapp3.1;netstandard2.0;netstandard1.3</TargetFrameworks>
 
     <AssemblyName>Logzio.DotNet.Log4net</AssemblyName>
 
@@ -14,12 +14,14 @@
     <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/logzio/logzio-dotnet</RepositoryUrl>
+    <PackageVersion>1.0.11</PackageVersion>
+    <PackageReleaseNotes>Option to format message as json</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="log4net" Version="2.0.12" />
     <!-- Newtonsoft.Json MUST be here for correct nuget-package generation -->
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>

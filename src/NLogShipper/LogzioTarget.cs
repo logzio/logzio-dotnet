@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
+using Newtonsoft.Json.Linq;
 using NLog;
 using NLog.Common;
 using NLog.Config;
@@ -29,6 +30,8 @@ namespace Logzio.DotNet.NLog
         public bool Debug { get { return _shipperOptions.BulkSenderOptions.Debug; } set { _shipperOptions.BulkSenderOptions.Debug = _shipperOptions.Debug = value; } }
         public bool UseGzip { get { return _shipperOptions.BulkSenderOptions.UseGzip; } set { _shipperOptions.BulkSenderOptions.UseGzip = value; } }
         public string ProxyAddress { get { return _shipperOptions.BulkSenderOptions.ProxyAddress; } set { _shipperOptions.BulkSenderOptions.ProxyAddress = value; } }
+
+        public bool ParseJsonMessage { get { return _shipperOptions.BulkSenderOptions.ParseJsonMessage; } set { _shipperOptions.BulkSenderOptions.ParseJsonMessage = value; } }
 
         /// <summary>
         /// Configuration of additional properties to include with each LogEvent (Ex. ${logger}, ${machinename}, ${threadid} etc.)
@@ -63,7 +66,7 @@ namespace Logzio.DotNet.NLog
             _usingDefaultLayout = Layout?.ToString() == DefaultLayout;
             base.InitializeTarget();
         }
-
+        
         protected override void Write(LogEventInfo logEvent)
         {
             try
@@ -73,11 +76,24 @@ namespace Logzio.DotNet.NLog
                     {"@timestamp", logEvent.TimeStamp.ToString("o")},
                     {"logger", logEvent.LoggerName},
                     {"level", logEvent.Level.Name},
-                    {"message", _usingDefaultLayout ? logEvent.FormattedMessage : RenderLogEvent(Layout, logEvent)},
                     {"exception", logEvent.Exception?.ToString()},
+                    {"message", _usingDefaultLayout ? logEvent.FormattedMessage : RenderLogEvent(Layout, logEvent)},
                     {"sequenceId", logEvent.SequenceID.ToString()}
                 };
-
+                if (ParseJsonMessage)
+                {
+                    try
+                    {
+                        foreach (var keyValuePair in JObject.Parse(values["message"].ToString()))
+                        {
+                            values.Add(keyValuePair.Key, keyValuePair.Value);
+                        }
+                        values.Remove("message");
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
                 if (ShouldIncludeProperties(logEvent))
                 {
                     var properties = GetAllProperties(logEvent);

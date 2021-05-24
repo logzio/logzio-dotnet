@@ -1,8 +1,10 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using log4net;
 using log4net.Repository.Hierarchy;
 using Logzio.DotNet.IntegrationTests.Listener;
 using Logzio.DotNet.Log4net;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Shouldly;
 
@@ -66,6 +68,53 @@ namespace Logzio.DotNet.IntegrationTests.Log4net
             _dummy.Requests.Count.ShouldBe(1);
             _dummy.Requests[0].Body.ShouldContain("Just a random log line");
             _dummy.Requests[0].Headers["Content-Encoding"].ShouldBe("gzip");
+        }
+        
+        [Test]
+        public void SanityParseJsonMessage()
+        {
+            var hierarchy = (Hierarchy)LogManager.GetRepository(Assembly.GetCallingAssembly());
+            var logzioAppender = new LogzioAppender();
+            logzioAppender.AddToken("123456789");
+            logzioAppender.AddListenerUrl(_dummy.DefaultUrl);
+            logzioAppender.ParseJsonMessage(true);
+            logzioAppender.ActivateOptions();
+            hierarchy.Root.AddAppender(logzioAppender);
+            hierarchy.Configured = true;
+            var logger = LogManager.GetLogger(typeof(Log4netSanityTests));
+            logger.Info("{ \"key1\" : \"val1\", \"key2\" : { \"key3\" : \"val3\"} }");
+            LogManager.Shutdown();  // Flushes and closes
+            JObject body = JObject.Parse(_dummy.Requests[0].Body);
+            try
+            {
+                //Should append key-value pairs to log and parse them as Json
+                body["key1"].ShouldBe("val1");
+                body["key2"]["key3"].ShouldBe("val3");
+            }
+            catch (NullReferenceException e)
+            {
+                Assert.Fail("Failed to parse log as Json.");
+            }
+        }
+        
+        [Test]
+        public void SanityParseInvalidJsonMessageAsString()
+        {
+            var hierarchy = (Hierarchy)LogManager.GetRepository(Assembly.GetCallingAssembly());
+            var logzioAppender = new LogzioAppender();
+            logzioAppender.AddToken("123456789");
+            logzioAppender.AddListenerUrl(_dummy.DefaultUrl);
+            logzioAppender.ParseJsonMessage(true);
+            logzioAppender.ActivateOptions();
+            hierarchy.Root.AddAppender(logzioAppender);
+            hierarchy.Configured = true;
+            var logger = LogManager.GetLogger(typeof(Log4netSanityTests));
+            logger.Info("{ Invalid json }");
+            LogManager.Shutdown();  // Flushes and closes
+            JObject body = JObject.Parse(_dummy.Requests[0].Body);
+            
+            //Should leave log as a string under 'message' field
+            body["message"].ShouldBe("{ Invalid json }");
         }
     }
 }
