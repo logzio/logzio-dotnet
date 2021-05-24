@@ -47,7 +47,7 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 			<!-- Set the appender to compress the message before sending it -->
 		        <gzip>true</gzip>
 			<!-- Uncomment this to enable sending logs in Json format -->
-				<!--<enableJsonMessage>true</enableJsonMessage>-->
+				<!--<parseJsonMessage>true</parseJsonMessage>-->
 			<!-- Enable the appender's internal debug logger (sent to the console output and trace log) -->
 			<debug>false</debug>
     	</appender>
@@ -69,7 +69,7 @@ To add the Logz.io appender via code, add the following lines:
 	 // <-- Uncomment and edit this line to enable proxy routing: --> 
 	 // logzioAppender.AddProxyAddress("http://your.proxy.com:port");
 	 // <-- Uncomment this to enable sending logs in Json format -->  
-	 // logzioAppender.EnableJsonMessage(true);
+	 // logzioAppender.ParseJsonMessage(true);
 	 // <-- Uncomment these lines to enable gzip compression --> 
 	 // logzioAppender.AddGzip(true);
          // logzioAppender.ActivateOptions();

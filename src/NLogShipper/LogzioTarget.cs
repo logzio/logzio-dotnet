@@ -31,7 +31,7 @@ namespace Logzio.DotNet.NLog
         public bool UseGzip { get { return _shipperOptions.BulkSenderOptions.UseGzip; } set { _shipperOptions.BulkSenderOptions.UseGzip = value; } }
         public string ProxyAddress { get { return _shipperOptions.BulkSenderOptions.ProxyAddress; } set { _shipperOptions.BulkSenderOptions.ProxyAddress = value; } }
 
-        public bool EnableJsonMessage { get { return _shipperOptions.BulkSenderOptions.EnableJsonMessage; } set { _shipperOptions.BulkSenderOptions.EnableJsonMessage = value; } }
+        public bool ParseJsonMessage { get { return _shipperOptions.BulkSenderOptions.ParseJsonMessage; } set { _shipperOptions.BulkSenderOptions.ParseJsonMessage = value; } }
 
         /// <summary>
         /// Configuration of additional properties to include with each LogEvent (Ex. ${logger}, ${machinename}, ${threadid} etc.)
@@ -80,7 +80,7 @@ namespace Logzio.DotNet.NLog
                     {"message", _usingDefaultLayout ? logEvent.FormattedMessage : RenderLogEvent(Layout, logEvent)},
                     {"sequenceId", logEvent.SequenceID.ToString()}
                 };
-                if (EnableJsonMessage)
+                if (ParseJsonMessage)
                 {
                     try
                     {
