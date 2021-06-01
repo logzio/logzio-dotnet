@@ -10,16 +10,16 @@
     <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
     <Copyright>Copyright (c) $(CurrentYear) - Logz.io</Copyright>
     <PackageTags>logging;log;logzio;nlog</PackageTags>
-    <PackageProjectUrl>https://github.com/logzio/logzio-dotnet</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/jcapellman/logzio-dotnet</PackageProjectUrl>
     <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>git://github.com/logzio/logzio-dotnet</RepositoryUrl>
+    <RepositoryUrl>https://github.com/jcapellman/logzio-dotnet</RepositoryUrl>
   </PropertyGroup>
  
   <ItemGroup>
-    <PackageReference Include="NLog" Version="4.5.0" />
+    <PackageReference Include="NLog" Version="4.7.10" />
     <!-- Newtonsoft.Json MUST be here for correct nuget-package generation -->
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
  
   <ItemGroup>
@@ -30,6 +30,10 @@
     <TargetsForTfmSpecificBuildOutput>
       $(TargetsForTfmSpecificBuildOutput);PackReferencedProjectOutputs
     </TargetsForTfmSpecificBuildOutput>
+    <PackageId>Logzio.NLog.NET5</PackageId>
+    <Version>1.3.0</Version>
+    <Product>Logzio.NLog.NET5</Product>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
  
   <Target Name="PackReferencedProjectOutputs" DependsOnTargets="BuildOnlySettings;ResolveReferences">
