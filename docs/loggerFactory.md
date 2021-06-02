@@ -1,16 +1,22 @@
-# Logz.io log4net Appender
+# Logz.io loggerFactory Appender
 
 - [Configuration](#configuration)
-	- [XML](#xml)
-	- [Code](#code)
+    - [XML](#xml)
+    - [Code](#code)
 - [Custom Fields](#custom-fields)
 - [Extensibility](#extensibility)
 - [Code Sample](#code-sample)
+    - [ASP.NET Core](#aspnet-core)
+    - [Desktop .Net Core](#desktop-net-core)
 
 
 Install the log4net appender from the Package Manager Console:
 
     Install-Package Logzio.DotNet.Log4net
+
+Install the log4net as Microsoft Extensions Logging handler from the Package Manager Console:
+
+    Install-Package Microsoft.Extensions.Logging.Log4Net.AspNetCore
 
 If you prefer to install the library manually, download the latest version from the releases page.
 
@@ -47,8 +53,6 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 			<retriesInterval>00:00:02</retriesInterval>
 			<!-- Set the appender to compress the message before sending it -->
 		        <gzip>true</gzip>
-			<!-- Uncomment this to enable sending logs in Json format -->
-				<!--<parseJsonMessage>true</parseJsonMessage>-->
 			<!-- Enable the appender's internal debug logger (sent to the console output and trace log) -->
 			<debug>false</debug>
     	</appender>
@@ -67,11 +71,9 @@ To add the Logz.io appender via code, add the following lines:
 	var logzioAppender = new LogzioAppender();
 	logzioAppender.AddToken("DKJiomZjbFyVvssSZmWATeHAHAnDARWz");
 	logzioAppender.AddListenerUrl("https://webhook.site/b229776a-3396-4c9d-9e05-b5350aeb98fa");
-	 // <-- Uncomment and edit this line to enable proxy routing: --> 
-	 // logzioAppender.AddProxyAddress("http://your.proxy.com:port");
-	 // <-- Uncomment this to enable sending logs in Json format -->  
-	 // logzioAppender.ParseJsonMessage(true);
-	 // <-- Uncomment these lines to enable gzip compression --> 
+         // Uncomment and edit this line to enable proxy routing: 
+         // logzioAppender.AddProxyAddress("http://your.proxy.com:port");
+	 // Uncomment these lines to enable gzip compression 
 	 // logzioAppender.AddGzip(true);
          // logzioAppender.ActivateOptions();
 	hierarchy.Root.AddAppender(logzioAppender);
@@ -96,7 +98,7 @@ You can add static keys and values to be added to all log messages. For example:
     	</appender>
 ```
 
-## Extensibility 
+## Extensibility
 
 If you want to change some of the fields or add some of your own, inherit the appender and override the `ExtendValues` method:
 
@@ -115,30 +117,85 @@ You will then have to change your configuration in order to use your own appende
 
 ## Code Sample
 
+### ASP.NET Core
+
+Update Startup.cs file in Configure method to include the Log4Net middleware as below.
+
 ```C#
-using System.IO;
-using log4net;
-using log4net.Config;
-using System.Reflection;
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+    {
+        ...
+        
+        loggerFactory.AddLog4Net();
+        
+        ...
+    }
+    
+```
 
-namespace dotnet_log4net
-{
-   class Program
-   {
-       static void Main(string[] args)
-       {
-          var logger = LogManager.GetLogger(typeof(Program));
-          var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+In the Controller add Data Member and Constructor as below.
 
-          // Replace "App.config" with the config file that holds your log4net configuration
-          XmlConfigurator.Configure(logRepository, new FileInfo("App.config"));
+```C#
+    private readonly ILoggerFactory _loggerFactory;
+    
+    public ExampleController(ILoggerFactory loggerFactory, ...)
+        {
+            _loggerFactory = loggerFactory;
+            
+            ...
+        }
+```
 
-          logger.Info("Now I don't blame him 'cause he run and hid");
-          logger.Info("But the meanest thing he ever did");
-          logger.Info("Before he left was he went and named me Sue");
+In the Controller methods:
 
-          LogManager.Shutdown();
-       }
-   }
-}
+```C#
+    [Route("<PUT_HERE_YOUR_ROUTE>")]
+    public ActionResult ExampleMethod()
+    {
+        var logger = _loggerFactory.CreateLogger<ExampleController>();
+        var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+            
+        // Replace "App.config" with the config file that holds your log4net configuration
+        XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+            
+        logger.LogInformation("Hello");
+        logger.LogInformation("Is it me you looking for?");
+            
+        LogManager.Shutdown();
+            
+        return Ok();
+    }
+```
+
+### Desktop .Net Core
+
+```C#
+    using System.IO;
+    using System.Reflection;
+    using log4net;
+    using log4net.Config;
+    using Microsoft.Extensions.Logging;
+
+    namespace LoggerFactoryAppender
+    {
+        class Program
+        {
+            static void Main(string[] args)
+            {
+                ILoggerFactory loggerFactory = new LoggerFactory();
+                loggerFactory.AddLog4Net();
+
+                var logger = loggerFactory.CreateLogger<Program>();
+                var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+
+                // Replace "App.config" with the config file that holds your log4net configuration
+                XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+
+                logger.LogInformation("Hello");
+                logger.LogInformation("Is it me you looking for?");
+                
+                LogManager.Shutdown();
+            }
+        }
+    }
 ```
