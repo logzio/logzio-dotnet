@@ -25,7 +25,7 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 				Required fields 
 			-->
 			<!-- Your Logz.io API token -->
-			<token>DKJiomZjbFyVvssSZmWATeHAHAnDARWz</token>
+			<token><<LOG-SHIPPING-TOKEN>></token>
 			
 			<!-- 
 				Optional fields (with their default values) 
@@ -34,7 +34,7 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 			easier for you to differ between different types of logs. -->
     		        <type>log4net</type>
 			<!-- The URL of the Lgz.io listener -->
-    		        <listenerUrl>https://listener.logz.io:8071</listenerUrl>
+    		        <listenerUrl>https://<<LISTENER-HOST>>:8071</listenerUrl>
                         <!--Optional proxy server address:
                         proxyAddress = "http://your.proxy.com:port" -->
 			<!-- The maximum number of log lines to send in each bulk -->
@@ -65,8 +65,8 @@ To add the Logz.io appender via code, add the following lines:
 ```C#
 	var hierarchy = (Hierarchy)LogManager.GetRepository();
 	var logzioAppender = new LogzioAppender();
-	logzioAppender.AddToken("DKJiomZjbFyVvssSZmWATeHAHAnDARWz");
-	logzioAppender.AddListenerUrl("https://webhook.site/b229776a-3396-4c9d-9e05-b5350aeb98fa");
+	logzioAppender.AddToken("<<LOG-SHIPPING-TOKEN>>");
+	logzioAppender.AddListenerUrl("<<LISTENER-HOST>>");
 	 // <-- Uncomment and edit this line to enable proxy routing: --> 
 	 // logzioAppender.AddProxyAddress("http://your.proxy.com:port");
 	 // <-- Uncomment this to enable sending logs in Json format -->  
