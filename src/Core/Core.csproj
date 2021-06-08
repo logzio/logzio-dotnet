@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
 
-    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">netcoreapp3.1;netstandard2.0;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;netstandard2.0;netstandard1.3</TargetFrameworks>
 
     <AssemblyName>Logzio.DotNet.Core</AssemblyName>
     <Company>Logz.io</Company>
