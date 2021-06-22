@@ -59,6 +59,7 @@ If you configure your logging in an XML file, simply add a reference to the Logz
     	</root>
     </log4net>
 ```
+Add a reference to the configuration file in your code, as shown in the example [here](https://github.com/logzio/logzio-dotnet/blob/master/sample-applications/LogzioLog4netSampleApplication/Program.cs).
 ### Code
 To add the Logz.io appender via code, add the following lines:
 
