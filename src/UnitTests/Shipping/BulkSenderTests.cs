@@ -19,7 +19,7 @@ namespace Logzio.DotNet.UnitTests.Shipping
         public void SetUp()
         {
             _httpClient = Substitute.For<IHttpClient>();
-            _target = new BulkSender(_httpClient);
+            _target = new BulkSender(_httpClient, false);
         }
 
         [Test]

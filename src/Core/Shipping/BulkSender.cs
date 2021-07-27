@@ -21,10 +21,15 @@ namespace Logzio.DotNet.Core.Shipping
         private static readonly System.Text.Encoding _encodingUtf8 = new System.Text.UTF8Encoding(false);
         private readonly IHttpClient _httpClient;
 
-        public BulkSender(IHttpClient httpClient)
+        public BulkSender(IHttpClient httpClient, bool jsonKeysCamelCase)
         {
             var jsonSettings = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
-            jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            
+            if (!jsonKeysCamelCase)
+            {
+                jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            }
+            
             jsonSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
             jsonSettings.Converters.Add(new JsonToStringConverter(typeof(System.Reflection.MemberInfo)));
             jsonSettings.Converters.Add(new JsonToStringConverter(typeof(System.Reflection.Assembly)));

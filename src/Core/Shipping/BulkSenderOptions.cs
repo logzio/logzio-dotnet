@@ -13,5 +13,6 @@ namespace Logzio.DotNet.Core.Shipping
         public bool UseGzip { get; set; } = false;
         public string ProxyAddress { get; set; } = String.Empty;
         public bool ParseJsonMessage { get; set; } = false;
+        public bool JsonKeysCamelCase { get; set; } = false;
     }
 }
