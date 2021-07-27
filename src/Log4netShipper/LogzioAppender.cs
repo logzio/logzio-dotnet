@@ -37,7 +37,7 @@ namespace Logzio.DotNet.Log4net
             {
                 if (_internalLogger == null)
                     _internalLogger = new InternalLoggerLog4net(_shipperOptions, new Core.InternalLogger.InternalLogger());
-                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler(_shipperOptions.BulkSenderOptions.ProxyAddress)), _internalLogger);
+                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler(_shipperOptions.BulkSenderOptions.ProxyAddress), _shipperOptions.BulkSenderOptions.JsonKeysCamelCase), _internalLogger);
             }
 
             base.ActivateOptions();
@@ -156,6 +156,11 @@ namespace Logzio.DotNet.Log4net
         public void ParseJsonMessage(bool value)
         {
             _shipperOptions.BulkSenderOptions.ParseJsonMessage = value;
+        }
+        
+        public void JsonKeysCamelCase(bool value)
+        {
+            _shipperOptions.BulkSenderOptions.JsonKeysCamelCase = value;
         }
 
         public void AddBufferTimeout(TimeSpan value)

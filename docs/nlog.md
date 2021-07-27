@@ -54,7 +54,7 @@ If you configure your logging in an XML file, you need to register the assembly 
 ### Code
 To add the Logz.io target via code, add the following lines:
 
-```csharp
+```c#
 var config = new LoggingConfiguration();
 
 // Replace these parameters with your configuration

@@ -51,6 +51,8 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 				<!--<parseJsonMessage>true</parseJsonMessage>-->
 			<!-- Enable the appender's internal debug logger (sent to the console output and trace log) -->
 			<debug>false</debug>
+			<!-- Set to true if you want json keys in Logz.io to be in camel case. The default is false. -->
+			<jsonKeysCamelCase>true</jsonKeysCamelCase>
     	</appender>
     
     	<root>
@@ -75,6 +77,7 @@ To add the Logz.io appender via code, add the following lines:
 	 // <-- Uncomment these lines to enable gzip compression --> 
 	 // logzioAppender.AddGzip(true);
          // logzioAppender.ActivateOptions();
+         // logzioAppender.JsonKeysCamelCase(true)
 	hierarchy.Root.AddAppender(logzioAppender);
 	hierarchy.Configured = true;
 ```
@@ -85,7 +88,6 @@ You can add static keys and values to be added to all log messages. For example:
 
 ```XML
     	<appender name="LogzioAppender" type="Logzio.DotNet.Log4net.LogzioAppender, Logzio.DotNet.Log4net">
-			<token>DKJiomZjbFyVvssSZmWATeHAHAnDARWz</token>
 			<customField>
 				<key>Environment</key>
 				<value>Production</value>

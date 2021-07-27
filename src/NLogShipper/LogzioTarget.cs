@@ -32,6 +32,7 @@ namespace Logzio.DotNet.NLog
         public string ProxyAddress { get { return _shipperOptions.BulkSenderOptions.ProxyAddress; } set { _shipperOptions.BulkSenderOptions.ProxyAddress = value; } }
 
         public bool ParseJsonMessage { get { return _shipperOptions.BulkSenderOptions.ParseJsonMessage; } set { _shipperOptions.BulkSenderOptions.ParseJsonMessage = value; } }
+        public bool JsonKeyCamelCase { get { return _shipperOptions.BulkSenderOptions.JsonKeysCamelCase; } set { _shipperOptions.BulkSenderOptions.JsonKeysCamelCase = value; } }
 
         /// <summary>
         /// Configuration of additional properties to include with each LogEvent (Ex. ${logger}, ${machinename}, ${threadid} etc.)
@@ -61,7 +62,7 @@ namespace Logzio.DotNet.NLog
             {
                 if (_internalLogger == null)
                     _internalLogger = new InternalLoggerNLog(_shipperOptions, new Core.InternalLogger.InternalLogger());
-                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler(ProxyAddress)), _internalLogger);
+                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler(ProxyAddress), _shipperOptions.BulkSenderOptions.JsonKeysCamelCase), _internalLogger);
             }
             _usingDefaultLayout = Layout?.ToString() == DefaultLayout;
             base.InitializeTarget();
