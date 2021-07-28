@@ -52,7 +52,7 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 			<!-- Enable the appender's internal debug logger (sent to the console output and trace log) -->
 			<debug>false</debug>
 			<!-- Set to true if you want json keys in Logz.io to be in camel case. The default is false. -->
-			<jsonKeysCamelCase>true</jsonKeysCamelCase>
+			<jsonKeysCamelCase>false</jsonKeysCamelCase>
     	</appender>
     
     	<root>
@@ -77,7 +77,7 @@ To add the Logz.io appender via code, add the following lines:
 	 // <-- Uncomment these lines to enable gzip compression --> 
 	 // logzioAppender.AddGzip(true);
          // logzioAppender.ActivateOptions();
-         // logzioAppender.JsonKeysCamelCase(true)
+         // logzioAppender.JsonKeysCamelCase(false)
 	hierarchy.Root.AddAppender(logzioAppender);
 	hierarchy.Configured = true;
 ```

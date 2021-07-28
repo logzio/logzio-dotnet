@@ -40,6 +40,7 @@ If you configure your logging in an XML file, you need to register the assembly 
 				includeEventProperties="true"
 				useGzip="false"
 				debug="false"
+				jsonKeysCamelCase="false"
 				<!-- parseJsonMessage="true"-->
 				>
 				<contextproperty name="host" layout="${machinename}" />
@@ -68,6 +69,7 @@ var logzioTarget = new LogzioTarget {
   RetriesMaxAttempts = 3,
   RetriesInterval = TimeSpan.Parse("00:00:02"),
   Debug = false,
+  JsonKeysCamelCase = false,
   // ParseJsonMessage = true, 
   // ProxyAddress = "http://your.proxy.com:port"
 };
