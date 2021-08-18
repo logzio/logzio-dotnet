@@ -31,7 +31,7 @@
       $(TargetsForTfmSpecificBuildOutput);PackReferencedProjectOutputs
     </TargetsForTfmSpecificBuildOutput>
     <PackageId>Logzio.NLog.NET5</PackageId>
-    <Version>1.3.0</Version>
+    <Version>1.3.1</Version>
     <Product>Logzio.NLog.NET5</Product>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
