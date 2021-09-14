@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">netcoreapp3.1;netstandard2.0;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net5.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
 
     <AssemblyName>Logzio.DotNet.Log4net</AssemblyName>
 
@@ -14,7 +14,7 @@
     <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/logzio/logzio-dotnet</RepositoryUrl>
-    <PackageVersion>1.0.12</PackageVersion>
+    <PackageVersion>1.0.13</PackageVersion>
     <PackageReleaseNotes>Option to format message as json</PackageReleaseNotes>
   </PropertyGroup>
 

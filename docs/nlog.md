@@ -60,7 +60,7 @@ var config = new LoggingConfiguration();
 
 // Replace these parameters with your configuration
 var logzioTarget = new LogzioTarget {
-  Name = "Logzio"
+  Name = "Logzio",
   Token = "<<SHIPPING-TOKEN>>",
   LogzioType = "nlog",
   ListenerUrl = "<<LISTENER-HOST>>:8071",

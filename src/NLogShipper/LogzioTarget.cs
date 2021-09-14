@@ -32,7 +32,7 @@ namespace Logzio.DotNet.NLog
         public string ProxyAddress { get { return _shipperOptions.BulkSenderOptions.ProxyAddress; } set { _shipperOptions.BulkSenderOptions.ProxyAddress = value; } }
 
         public bool ParseJsonMessage { get { return _shipperOptions.BulkSenderOptions.ParseJsonMessage; } set { _shipperOptions.BulkSenderOptions.ParseJsonMessage = value; } }
-        public bool JsonKeyCamelCase { get { return _shipperOptions.BulkSenderOptions.JsonKeysCamelCase; } set { _shipperOptions.BulkSenderOptions.JsonKeysCamelCase = value; } }
+        public bool JsonKeysCamelCase { get { return _shipperOptions.BulkSenderOptions.JsonKeysCamelCase; } set { _shipperOptions.BulkSenderOptions.JsonKeysCamelCase = value; } }
 
         /// <summary>
         /// Configuration of additional properties to include with each LogEvent (Ex. ${logger}, ${machinename}, ${threadid} etc.)
