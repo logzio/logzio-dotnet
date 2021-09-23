@@ -51,7 +51,7 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 				<!--<parseJsonMessage>true</parseJsonMessage>-->
 			<!-- Enable the appender's internal debug logger (sent to the console output and trace log) -->
 			<debug>false</debug>
-			<!-- Set to true if you want json keys in Logz.io to be in camel case. The default is false. -->
+			<!-- If you have custom fields keys that start with capital letter and want to see the fields with capital letter in Logz.io, set this field to true. The default is false (first letter will be small letter). -->
 			<jsonKeysCamelCase>false</jsonKeysCamelCase>
     	</appender>
     
