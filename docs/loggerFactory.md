@@ -79,7 +79,9 @@ To add the Logz.io appender via code, add the following lines:
 	 // logzioAppender.AddGzip(true);
          // logzioAppender.ActivateOptions();
          // logzioAppender.JsonKeysCamelCase(false)
+	logzioAppender.ActiveOptions();
 	hierarchy.Root.AddAppender(logzioAppender);
+	hierarchy.Root.Level = Level.All;
 	hierarchy.Configured = true;
 ```
 
