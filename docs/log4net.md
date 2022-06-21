@@ -171,7 +171,7 @@ namespace ConsoleApp9
             var logzioAppender = new LogzioAppender();
             
             logzioAppender.AddToken("<<LOG-SHIPPING-TOKEN>>");
-            logzioAppender.AddListenerUrl("<<LISTENER-HOST>>");
+            logzioAppender.AddListenerUrl("https://<<LISTENER-HOST>>:8071");
             // <-- Uncomment and edit this line to enable proxy routing: --> 
             // logzioAppender.AddProxyAddress("http://your.proxy.com:port");
             // <-- Uncomment this to enable sending logs in Json format -->  
