@@ -5,7 +5,7 @@
 	- [Code](#code)
 - [Custom Fields](#custom-fields)
 - [Extensibility](#extensibility)
-- [Code Sample](#code-sample)
+- [Code Samples](#code-samples)
 
 
 Install the log4net appender from the Package Manager Console:
@@ -120,7 +120,9 @@ If you want to change some of the fields or add some of your own, inherit the ap
 
 You will then have to change your configuration in order to use your own appender.
 
-## Code Sample
+## Code Samples
+
+### XML
 
 ```C#
 using System.IO;
@@ -147,5 +149,49 @@ namespace dotnet_log4net
           LogManager.Shutdown();
        }
    }
+}
+```
+
+### Code
+
+```C#
+using log4net;
+using log4net.Core;
+using log4net.Repository.Hierarchy;
+using Logzio.DotNet.Log4net;
+
+namespace ConsoleApp9
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var hierarchy = (Hierarchy)LogManager.GetRepository();
+            var logger = LogManager.GetLogger(typeof(Program));
+            var logzioAppender = new LogzioAppender();
+            
+            logzioAppender.AddToken("LzOawRqVbEWwXETibMBJxfvBJvJQareA");
+            logzioAppender.AddListenerUrl("https://listener.logz.io");
+            // <-- Uncomment and edit this line to enable proxy routing: --> 
+            // logzioAppender.AddProxyAddress("http://your.proxy.com:port");
+            // <-- Uncomment this to enable sending logs in Json format -->  
+            // logzioAppender.ParseJsonMessage(true);
+            // <-- Uncomment these lines to enable gzip compression --> 
+            // logzioAppender.AddGzip(true);
+            // logzioAppender.ActivateOptions();
+            // logzioAppender.JsonKeysCamelCase(false)
+            logzioAppender.ActivateOptions();
+            
+            hierarchy.Root.AddAppender(logzioAppender);
+            hierarchy.Configured = true;
+            hierarchy.Root.Level = Level.All;
+
+            logger.Info("Now I don't blame him 'cause he run and hid");
+            logger.Info("But the meanest thing he ever did");
+            logger.Info("Before he left was he went and named me Sue");
+
+            LogManager.Shutdown();
+        }
+    }
 }
 ```
