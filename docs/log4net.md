@@ -68,22 +68,22 @@ Add a reference to the configuration file in your code, as shown in the example 
 To add the Logz.io appender via code, add the following lines:
 
 ```C#
-	var hierarchy = (Hierarchy)LogManager.GetRepository();
-	var logzioAppender = new LogzioAppender();
-	logzioAppender.AddToken("<<LOG-SHIPPING-TOKEN>>");
-	logzioAppender.AddListenerUrl("<<LISTENER-HOST>>");
-	 // <-- Uncomment and edit this line to enable proxy routing: --> 
-	 // logzioAppender.AddProxyAddress("http://your.proxy.com:port");
-	 // <-- Uncomment this to enable sending logs in Json format -->  
-	 // logzioAppender.ParseJsonMessage(true);
-	 // <-- Uncomment these lines to enable gzip compression --> 
-	 // logzioAppender.AddGzip(true);
-         // logzioAppender.ActivateOptions();
-         // logzioAppender.JsonKeysCamelCase(false)
-	logzioAppender.ActiveOptions();
-	hierarchy.Root.AddAppender(logzioAppender);
-	hierarchy.Root.Level = Level.All;
-	hierarchy.Configured = true;
+var hierarchy = (Hierarchy)LogManager.GetRepository();
+var logzioAppender = new LogzioAppender();
+logzioAppender.AddToken("<<LOG-SHIPPING-TOKEN>>");
+logzioAppender.AddListenerUrl("<<LISTENER-HOST>>");
+// <-- Uncomment and edit this line to enable proxy routing: --> 
+// logzioAppender.AddProxyAddress("http://your.proxy.com:port");
+// <-- Uncomment this to enable sending logs in Json format -->  
+// logzioAppender.ParseJsonMessage(true);
+// <-- Uncomment these lines to enable gzip compression --> 
+// logzioAppender.AddGzip(true);
+// logzioAppender.ActivateOptions();
+// logzioAppender.JsonKeysCamelCase(false)
+logzioAppender.ActiveOptions();
+hierarchy.Root.AddAppender(logzioAppender);
+hierarchy.Root.Level = Level.All;
+hierarchy.Configured = true;
 ```
 
 ## Custom Fields
@@ -91,16 +91,16 @@ To add the Logz.io appender via code, add the following lines:
 You can add static keys and values to be added to all log messages. For example:
 
 ```XML
-    	<appender name="LogzioAppender" type="Logzio.DotNet.Log4net.LogzioAppender, Logzio.DotNet.Log4net">
-			<customField>
-				<key>Environment</key>
-				<value>Production</value>
-			</customField>
-			<customField>
-				<key>Location</key>
-				<value>New Jerseay B1</value>
-			</customField>
-    	</appender>
+<appender name="LogzioAppender" type="Logzio.DotNet.Log4net.LogzioAppender, Logzio.DotNet.Log4net">
+	<customField>
+		<key>Environment</key>
+		<value>Production</value>
+	</customField>
+	<customField>
+		<key>Location</key>
+		<value>New Jerseay B1</value>
+	</customField>
+</appender>
 ```
 
 ## Extensibility 
@@ -108,14 +108,14 @@ You can add static keys and values to be added to all log messages. For example:
 If you want to change some of the fields or add some of your own, inherit the appender and override the `ExtendValues` method:
 
 ```C#
-	public class MyAppLogzioAppender : LogzioAppender
+public class MyAppLogzioAppender : LogzioAppender
+{
+	protected override void ExtendValues(LoggingEvent loggingEvent, Dictionary<string, string> values)
 	{
-		protected override void ExtendValues(LoggingEvent loggingEvent, Dictionary<string, string> values)
-		{
-			values["logger"] = "MyPrefix." + values["logger"];
-			values["myAppClientId"] = new ClientIdProvider().Get();
-		}
+		values["logger"] = "MyPrefix." + values["logger"];
+		values["myAppClientId"] = new ClientIdProvider().Get();
 	}
+}
 ```
 
 You will then have to change your configuration in order to use your own appender.
