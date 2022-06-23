@@ -20,47 +20,47 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 
 ```xml
 <log4net>
-	<appender name="LogzioAppender" type="Logzio.DotNet.Log4net.LogzioAppender, Logzio.DotNet.Log4net">
-    		<!-- 
-			Required fields 
-		-->
-		<!-- Your Logz.io API token -->
-		<token><<LOG-SHIPPING-TOKEN>></token>
+    <appender name="LogzioAppender" type="Logzio.DotNet.Log4net.LogzioAppender, Logzio.DotNet.Log4net">
+    	<!-- 
+		Required fields 
+	-->
+	<!-- Your Logz.io API token -->
+	<token><<LOG-SHIPPING-TOKEN>></token>
 			
-		<!-- 
-			Optional fields (with their default values) 
-		-->
-		<!-- The type field will be added to each log message, making it 
-		easier for you to differ between different types of logs. -->
-    		<type>log4net</type>
-		<!-- The URL of the Lgz.io listener -->
-    		<listenerUrl>https://<<LISTENER-HOST>>:8071</listenerUrl>
-                <!--Optional proxy server address:
-                proxyAddress = "http://your.proxy.com:port" -->
-		<!-- The maximum number of log lines to send in each bulk -->
-    		<bufferSize>100</bufferSize>
-		<!-- The maximum time to wait for more log lines, in a hh:mm:ss.fff format -->
-    		<bufferTimeout>00:00:05</bufferTimeout>
-		<!-- If connection to Logz.io API fails, how many times to retry -->
-    	        <retriesMaxAttempts>3</retriesMaxAttempts>
-    		<!-- Time to wait between retries, in a hh:mm:ss.fff format -->
-		<retriesInterval>00:00:02</retriesInterval>
-		<!-- Set the appender to compress the message before sending it -->
-		<gzip>true</gzip>
-		<!-- Uncomment this to enable sending logs in Json format -->
-		<!--<parseJsonMessage>true</parseJsonMessage>-->
-		<!-- Enable the appender's internal debug logger (sent to the console output and trace log) -->
-		<debug>false</debug>
-		<!-- If you have custom fields keys that start with capital letter and want to see the fields 
-		with capital letter in Logz.io, set this field to true. The default is false 
-		(first letter will be small letter). -->
-		<jsonKeysCamelCase>false</jsonKeysCamelCase>
-    	</appender>
+	<!-- 
+		Optional fields (with their default values) 
+	-->
+	<!-- The type field will be added to each log message, making it 
+	easier for you to differ between different types of logs. -->
+    	<type>log4net</type>
+	<!-- The URL of the Lgz.io listener -->
+    	<listenerUrl>https://<<LISTENER-HOST>>:8071</listenerUrl>
+        <!--Optional proxy server address:
+        proxyAddress = "http://your.proxy.com:port" -->
+	<!-- The maximum number of log lines to send in each bulk -->
+    	<bufferSize>100</bufferSize>
+	<!-- The maximum time to wait for more log lines, in a hh:mm:ss.fff format -->
+    	<bufferTimeout>00:00:05</bufferTimeout>
+	<!-- If connection to Logz.io API fails, how many times to retry -->
+    	<retriesMaxAttempts>3</retriesMaxAttempts>
+    	<!-- Time to wait between retries, in a hh:mm:ss.fff format -->
+	<retriesInterval>00:00:02</retriesInterval>
+	<!-- Set the appender to compress the message before sending it -->
+	<gzip>true</gzip>
+	<!-- Uncomment this to enable sending logs in Json format -->
+	<!--<parseJsonMessage>true</parseJsonMessage>-->
+	<!-- Enable the appender's internal debug logger (sent to the console output and trace log) -->
+	<debug>false</debug>
+	<!-- If you have custom fields keys that start with capital letter and want to see the fields 
+	with capital letter in Logz.io, set this field to true. The default is false 
+	(first letter will be small letter). -->
+	<jsonKeysCamelCase>false</jsonKeysCamelCase>
+    </appender>
     
-    	<root>
-    		<level value="INFO" />
-    		<appender-ref ref="LogzioAppender" />
-    	</root>
+    <root>
+    	<level value="INFO" />
+    	<appender-ref ref="LogzioAppender" />
+    </root>
 </log4net>
 ```
 Add a reference to the configuration file in your code, as shown in the example [here](https://github.com/logzio/logzio-dotnet/blob/master/sample-applications/LogzioLog4netSampleApplication/Program.cs).
@@ -92,14 +92,14 @@ You can add static keys and values to be added to all log messages. For example:
 
 ```XML
 <appender name="LogzioAppender" type="Logzio.DotNet.Log4net.LogzioAppender, Logzio.DotNet.Log4net">
-	<customField>
-		<key>Environment</key>
-		<value>Production</value>
-	</customField>
-	<customField>
-		<key>Location</key>
-		<value>New Jerseay B1</value>
-	</customField>
+    <customField>
+	<key>Environment</key>
+	<value>Production</value>
+    </customField>
+    <customField>
+	<key>Location</key>
+	<value>New Jerseay B1</value>
+    </customField>
 </appender>
 ```
 
