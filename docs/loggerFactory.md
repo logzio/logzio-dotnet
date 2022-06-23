@@ -109,11 +109,11 @@ If you want to change some of the fields or add some of your own, inherit the ap
 ```C#
 public class MyAppLogzioAppender : LogzioAppender
 {
-	protected override void ExtendValues(LoggingEvent loggingEvent, Dictionary<string, string> values)
-	{
-		values["logger"] = "MyPrefix." + values["logger"];
-		values["myAppClientId"] = new ClientIdProvider().Get();
-	}
+    protected override void ExtendValues(LoggingEvent loggingEvent, Dictionary<string, string> values)
+    {
+        values["logger"] = "MyPrefix." + values["logger"];
+	values["myAppClientId"] = new ClientIdProvider().Get();
+    }
 }
 ```
 
@@ -128,11 +128,11 @@ Update Startup.cs file in Configure method to include the Log4Net middleware as 
 ```C#
 public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
 {
-	...
+    ...
         
-        loggerFactory.AddLog4Net();
+    loggerFactory.AddLog4Net();
         
-        ...
+    ...
 }    
 ```
 
@@ -143,9 +143,9 @@ private readonly ILoggerFactory _loggerFactory;
     
 public ExampleController(ILoggerFactory loggerFactory, ...)
 {
-	_loggerFactory = loggerFactory;
+    _loggerFactory = loggerFactory;
             
-        ...
+    ...
 }
 ```
 
@@ -155,18 +155,18 @@ In the Controller methods:
 [Route("<PUT_HERE_YOUR_ROUTE>")]
 public ActionResult ExampleMethod()
 {
-	var logger = _loggerFactory.CreateLogger<ExampleController>();
-        var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+    var logger = _loggerFactory.CreateLogger<ExampleController>();
+    var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             
-        // Replace "App.config" with the config file that holds your log4net configuration
-        XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+    // Replace "App.config" with the config file that holds your log4net configuration
+    XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
             
-        logger.LogInformation("Hello");
-        logger.LogInformation("Is it me you looking for?");
+    logger.LogInformation("Hello");
+    logger.LogInformation("Is it me you looking for?");
             
-        LogManager.Shutdown();
+    LogManager.Shutdown();
             
-        return Ok();
+    return Ok();
 }
 ```
 
