@@ -110,11 +110,11 @@ If you want to change some of the fields or add some of your own, inherit the ap
 ```C#
 public class MyAppLogzioAppender : LogzioAppender
 {
-	protected override void ExtendValues(LoggingEvent loggingEvent, Dictionary<string, string> values)
-	{
-		values["logger"] = "MyPrefix." + values["logger"];
-		values["myAppClientId"] = new ClientIdProvider().Get();
-	}
+    protected override void ExtendValues(LoggingEvent loggingEvent, Dictionary<string, string> values)
+    {
+	values["logger"] = "MyPrefix." + values["logger"];
+	values["myAppClientId"] = new ClientIdProvider().Get();
+    }
 }
 ```
 
@@ -132,23 +132,23 @@ using System.Reflection;
 
 namespace dotnet_log4net
 {
-   class Program
-   {
-       static void Main(string[] args)
-       {
-          var logger = LogManager.GetLogger(typeof(Program));
-          var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var logger = LogManager.GetLogger(typeof(Program));
+            var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
 
-          // Replace "App.config" with the config file that holds your log4net configuration
-          XmlConfigurator.Configure(logRepository, new FileInfo("App.config"));
+            // Replace "App.config" with the config file that holds your log4net configuration
+            XmlConfigurator.Configure(logRepository, new FileInfo("App.config"));
 
-          logger.Info("Now I don't blame him 'cause he run and hid");
-          logger.Info("But the meanest thing he ever did");
-          logger.Info("Before he left was he went and named me Sue");
+            logger.Info("Now I don't blame him 'cause he run and hid");
+            logger.Info("But the meanest thing he ever did");
+            logger.Info("Before he left was he went and named me Sue");
 
-          LogManager.Shutdown();
-       }
-   }
+            LogManager.Shutdown();
+        }
+    }
 }
 ```
 
