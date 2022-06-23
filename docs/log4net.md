@@ -160,7 +160,7 @@ using log4net.Core;
 using log4net.Repository.Hierarchy;
 using Logzio.DotNet.Log4net;
 
-namespace ConsoleApp9
+namespace dotnet_log4net
 {
     class Program
     {
