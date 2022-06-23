@@ -181,24 +181,24 @@ using Microsoft.Extensions.Logging;
 
 namespace LoggerFactoryAppender
 {
-	class Program
+    class Program
+    {
+        static void Main(string[] args)
         {
-        	static void Main(string[] args)
-            	{
-                	ILoggerFactory loggerFactory = new LoggerFactory();
-	                loggerFactory.AddLog4Net();
+            ILoggerFactory loggerFactory = new LoggerFactory();
+	    loggerFactory.AddLog4Net();
 
-                	var logger = loggerFactory.CreateLogger<Program>();
-	                var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+            var logger = loggerFactory.CreateLogger<Program>();
+	    var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
 
-        	        // Replace "App.config" with the config file that holds your log4net configuration
-                	XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+            // Replace "App.config" with the config file that holds your log4net configuration
+            XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
-	                logger.LogInformation("Hello");
-              		logger.LogInformation("Is it me you looking for?");
+	    logger.LogInformation("Hello");
+            logger.LogInformation("Is it me you looking for?");
                 
-              		LogManager.Shutdown();
-            	}
+            LogManager.Shutdown();
         }
+    }
 }
 ```
