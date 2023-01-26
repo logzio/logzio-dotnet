@@ -8,6 +8,10 @@ using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
 using Newtonsoft.Json.Linq;
 
+#if !NETSTANDARD1_3
+using OpenTelemetry.Trace;
+#endif
+
 namespace Logzio.DotNet.Log4net
 {
     public class LogzioAppender : AppenderSkeleton
@@ -77,6 +81,17 @@ namespace Logzio.DotNet.Log4net
                     {
                     }
                 }
+
+#if !NETSTANDARD1_3
+                if (_shipperOptions.BulkSenderOptions.AddTraceContext)
+                {
+                    var traceId = Tracer.CurrentSpan.Context.TraceId;
+                    var spanId = Tracer.CurrentSpan.Context.SpanId;
+
+                    values.Add("traceId", traceId.ToString());
+                    values.Add("spanId", spanId.ToString());
+                }
+#endif
 
                 foreach (var customField in _customFields)
                 {
@@ -161,6 +176,11 @@ namespace Logzio.DotNet.Log4net
         public void JsonKeysCamelCase(bool value)
         {
             _shipperOptions.BulkSenderOptions.JsonKeysCamelCase = value;
+        }
+
+        public void AddTraceContext(bool value)
+        {
+            _shipperOptions.BulkSenderOptions.AddTraceContext = value;
         }
 
         public void AddBufferTimeout(TimeSpan value)

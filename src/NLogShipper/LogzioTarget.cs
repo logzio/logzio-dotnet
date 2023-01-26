@@ -8,6 +8,10 @@ using NLog.Common;
 using NLog.Config;
 using NLog.Targets;
 
+#if !NETSTANDARD1_3
+using OpenTelemetry.Trace;
+#endif
+
 namespace Logzio.DotNet.NLog
 {
     [Target("Logzio")]
@@ -33,6 +37,7 @@ namespace Logzio.DotNet.NLog
 
         public bool ParseJsonMessage { get { return _shipperOptions.BulkSenderOptions.ParseJsonMessage; } set { _shipperOptions.BulkSenderOptions.ParseJsonMessage = value; } }
         public bool JsonKeysCamelCase { get { return _shipperOptions.BulkSenderOptions.JsonKeysCamelCase; } set { _shipperOptions.BulkSenderOptions.JsonKeysCamelCase = value; } }
+        public bool AddTraceContext { get { return _shipperOptions.BulkSenderOptions.AddTraceContext; } set { _shipperOptions.BulkSenderOptions.AddTraceContext = value; } }
 
         /// <summary>
         /// Configuration of additional properties to include with each LogEvent (Ex. ${logger}, ${machinename}, ${threadid} etc.)
@@ -135,6 +140,17 @@ namespace Logzio.DotNet.NLog
                         }
                     }
                 }
+                
+#if !NETSTANDARD1_3
+                if (AddTraceContext)
+                {
+                    var traceId = Tracer.CurrentSpan.Context.TraceId;
+                    var spanId = Tracer.CurrentSpan.Context.SpanId;
+
+                    values.Add("traceId", traceId.ToString());
+                    values.Add("spanId", spanId.ToString());
+                }
+#endif
 
                 ExtendValues(logEvent, values);
 

@@ -5,6 +5,7 @@
 	- [Code](#code)
 - [Variables](#variables)
 - [Extensibility](#extensibility)
+- [Trace Context](#trace-context)
 
 
 Install the NLog target from the Package Manager Console:
@@ -41,6 +42,7 @@ If you configure your logging in an XML file, you need to register the assembly 
 		useGzip="false"
 		debug="false"
 		jsonKeysCamelCase="false"
+		addTraceContext="false"
 		<!-- parseJsonMessage="true"-->
 	>
 		<contextproperty name="host" layout="${machinename}" />
@@ -71,6 +73,7 @@ var logzioTarget = new LogzioTarget {
     RetriesInterval = TimeSpan.Parse("00:00:02"),
     Debug = false,
     JsonKeysCamelCase = false,
+    AddTraceContext = false,
     // ParseJsonMessage = true, 
     // ProxyAddress = "http://your.proxy.com:port"
 };
@@ -129,3 +132,10 @@ public class MyAppLogzioTarget : LogzioTarget
 ```
 
 You will then have to change your configuration in order to use your own target.
+
+## Trace Context
+
+If you’re sending traces with OpenTelemetry instrumentation (auto or manual), you can correlate your logs with the trace context.
+In this way, your logs will have traces data in it: span id and trace id.
+To enable this feature, set `addTraceContext="true"` in your configuration or `AddTraceContext = true`
+in your code (as shown in the previews sections).
