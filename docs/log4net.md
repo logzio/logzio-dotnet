@@ -5,6 +5,7 @@
 	- [Code](#code)
 - [Custom Fields](#custom-fields)
 - [Extensibility](#extensibility)
+- [Trace Context](#trace-context)
 - [Code Samples](#code-samples)
 
 
@@ -55,6 +56,8 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 	with capital letter in Logz.io, set this field to true. The default is false 
 	(first letter will be small letter). -->
 	<jsonKeysCamelCase>false</jsonKeysCamelCase>
+	<!-- Add trace context (traceId and spanId) to each log. The default is false -->
+	<addTraceContext>false</addTraceContext>
     </appender>
     
     <root>
@@ -79,8 +82,9 @@ logzioAppender.AddListenerUrl("<<LISTENER-HOST>>");
 // <-- Uncomment these lines to enable gzip compression --> 
 // logzioAppender.AddGzip(true);
 // logzioAppender.ActivateOptions();
-// logzioAppender.JsonKeysCamelCase(false)
-logzioAppender.ActiveOptions();
+// logzioAppender.JsonKeysCamelCase(false);
+// logzioAppender.AddTraceContext(false);
+logzioAppender.ActivateOptions();
 hierarchy.Root.AddAppender(logzioAppender);
 hierarchy.Root.Level = Level.All;
 hierarchy.Configured = true;
@@ -119,6 +123,15 @@ public class MyAppLogzioAppender : LogzioAppender
 ```
 
 You will then have to change your configuration in order to use your own appender.
+
+## Trace Context
+
+**WARNING**: Does not support .NET Standard 1.3
+
+If you’re sending traces with OpenTelemetry instrumentation (auto or manual), you can correlate your logs with the trace context.
+In this way, your logs will have traces data in it: span id and trace id.
+To enable this feature, set `<addTraceContext>true</addTraceContext>` in your configuration or `logzioAppender.AddTraceContext(true);`
+in your code (as shown in the previews sections).
 
 ## Code Samples
 

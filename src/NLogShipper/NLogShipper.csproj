@@ -6,7 +6,7 @@
     
     <Description>NLog target that sends logs to the logz.io bulk HTTP service</Description>
     <Company>Logz.io</Company>
-    <Authors>Maor Rosenfeld</Authors>
+    <Authors>Maor Rosenfeld;Shiran Avidov</Authors>
     <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
     <Copyright>Copyright (c) $(CurrentYear) - Logz.io</Copyright>
     <PackageTags>logging;log;logzio;nlog</PackageTags>
@@ -14,7 +14,7 @@
     <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/logzio/logzio-dotnet</RepositoryUrl>
-    <PackageVersion>1.0.13</PackageVersion>
+    <PackageVersion>1.0.14</PackageVersion>
     <PackageReleaseNotes>Option to format message as json</PackageReleaseNotes>
   </PropertyGroup>
  
@@ -26,6 +26,18 @@
  
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" PrivateAssets="all" />
+  </ItemGroup>
+ 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
+    <PackageReference Include="OpenTelemetry" Version="1.3.1" />
+  </ItemGroup>
+ 
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <PackageReference Include="OpenTelemetry" Version="1.3.1" />
+  </ItemGroup>
+ 
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="OpenTelemetry" Version="1.3.1" />
   </ItemGroup>
  
   <PropertyGroup>

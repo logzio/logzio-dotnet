@@ -14,5 +14,6 @@ namespace Logzio.DotNet.Core.Shipping
         public string ProxyAddress { get; set; } = String.Empty;
         public bool ParseJsonMessage { get; set; } = false;
         public bool JsonKeysCamelCase { get; set; } = false;
+        public bool AddTraceContext { get; set; } = false;
     }
 }
