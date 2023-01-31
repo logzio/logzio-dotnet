@@ -83,7 +83,7 @@ logzioAppender.AddListenerUrl("<<LISTENER-HOST>>");
 // logzioAppender.ActivateOptions();
 // logzioAppender.JsonKeysCamelCase(false);
 // logzioAppender.AddTraceContext(false);
-logzioAppender.ActiveOptions();
+logzioAppender.ActivateOptions();
 hierarchy.Root.AddAppender(logzioAppender);
 hierarchy.Root.Level = Level.All;
 hierarchy.Configured = true;
