@@ -193,6 +193,7 @@ namespace dotnet_log4net
             // logzioAppender.AddGzip(true);
             // logzioAppender.ActivateOptions();
             // logzioAppender.JsonKeysCamelCase(false)
+	    // logzioAppender.AddTraceContext(false);
             logzioAppender.ActivateOptions();
             
             hierarchy.Root.AddAppender(logzioAppender);
