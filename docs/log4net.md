@@ -126,6 +126,8 @@ You will then have to change your configuration in order to use your own appende
 
 ## Trace Context
 
+**WARNING**: Does not support .NET Standard 1.3
+
 If you’re sending traces with OpenTelemetry instrumentation (auto or manual), you can correlate your logs with the trace context.
 In this way, your logs will have traces data in it: span id and trace id.
 To enable this feature, set `<addTraceContext>true</addTraceContext>` in your configuration or `logzioAppender.AddTraceContext(true);`
