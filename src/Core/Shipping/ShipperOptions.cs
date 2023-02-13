@@ -14,6 +14,7 @@ namespace Logzio.DotNet.Core.Shipping
         public int BufferSize { get; set; }
         public TimeSpan BufferTimeLimit { get; set; }
         public bool Debug { get; set; }
+        public string DebugLogFile { get; set; }
         public BulkSenderOptions BulkSenderOptions { get; set; }
     }
 }
