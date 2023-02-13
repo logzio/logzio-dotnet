@@ -41,6 +41,7 @@ If you configure your logging in an XML file, you need to register the assembly 
 		includeEventProperties="true"
 		useGzip="false"
 		debug="false"
+		debugLogFile="my_absolute_path\debug.txt"
 		jsonKeysCamelCase="false"
 		addTraceContext="false"
 		<!-- parseJsonMessage="true"-->
@@ -72,6 +73,7 @@ var logzioTarget = new LogzioTarget {
     RetriesMaxAttempts = 3,
     RetriesInterval = TimeSpan.Parse("00:00:02"),
     Debug = false,
+    DebugLogFile = "my_absolute_path_to_file",
     JsonKeysCamelCase = false,
     AddTraceContext = false,
     // ParseJsonMessage = true, 

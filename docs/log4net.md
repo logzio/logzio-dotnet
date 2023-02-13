@@ -52,6 +52,10 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 	<!--<parseJsonMessage>true</parseJsonMessage>-->
 	<!-- Enable the appender's internal debug logger (sent to the console output and trace log) -->
 	<debug>false</debug>
+	<!-- If internal debug logger is enabled, write debug logs to file. Absolute path to file,
+	will be created if not exists. Leave empty if you don't want to write debug log to a file.
+	Default is empty -->		
+	<debugLogFile>my_absolute_path_to_file</debugLogFile>		
 	<!-- If you have custom fields keys that start with capital letter and want to see the fields 
 	with capital letter in Logz.io, set this field to true. The default is false 
 	(first letter will be small letter). -->
@@ -84,6 +88,8 @@ logzioAppender.AddListenerUrl("<<LISTENER-HOST>>");
 // logzioAppender.ActivateOptions();
 // logzioAppender.JsonKeysCamelCase(false);
 // logzioAppender.AddTraceContext(false);
+// logzioAppender.AddDebug(false);
+// logzioAppender.AddDebugLogFile("my_absolute_path_to_file");
 logzioAppender.ActivateOptions();
 hierarchy.Root.AddAppender(logzioAppender);
 hierarchy.Root.Level = Level.All;
@@ -193,7 +199,9 @@ namespace dotnet_log4net
             // logzioAppender.AddGzip(true);
             // logzioAppender.ActivateOptions();
             // logzioAppender.JsonKeysCamelCase(false)
-	    // logzioAppender.AddTraceContext(false);
+            // logzioAppender.AddTraceContext(false);
+            // logzioAppender.AddDebug(false);
+            // logzioAppender.AddDebugLogFile("my_absolute_path_to_file");
             logzioAppender.ActivateOptions();
             
             hierarchy.Root.AddAppender(logzioAppender);

@@ -25,6 +25,6 @@ namespace Logzio.DotNet.NLog
 
             if (_shipperOptions.Debug)
                 _internalLogger?.Log(ex, message, args);
-         }
+        }
     }
 }

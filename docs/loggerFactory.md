@@ -37,25 +37,29 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 	<!-- 
 		Optional fields (with their default values) 
 	-->
-	<!-- The type field will be added to each log message, making it 
-	easier for you to differ between different types of logs. -->
+        <!-- The type field will be added to each log message, making it 
+        easier for you to differ between different types of logs. -->
     	<type>log4net</type>
-	<!-- The URL of the Lgz.io listener -->
+        <!-- The URL of the Lgz.io listener -->
     	<listenerUrl>https://<<LISTENER-HOST>>:8071</listenerUrl>
         <!--Optional proxy server address:
         proxyAddress = "http://your.proxy.com:port" -->
-	<!-- The maximum number of log lines to send in each bulk -->
+        <!-- The maximum number of log lines to send in each bulk -->
     	<bufferSize>100</bufferSize>
-	<!-- The maximum time to wait for more log lines, in a hh:mm:ss.fff format -->
+        <!-- The maximum time to wait for more log lines, in a hh:mm:ss.fff format -->
     	<bufferTimeout>00:00:05</bufferTimeout>
-	<!-- If connection to Logz.io API fails, how many times to retry -->
+        <!-- If connection to Logz.io API fails, how many times to retry -->
     	<retriesMaxAttempts>3</retriesMaxAttempts>
     	<!-- Time to wait between retries, in a hh:mm:ss.fff format -->
-	<retriesInterval>00:00:02</retriesInterval>
-	<!-- Set the appender to compress the message before sending it -->
-	<gzip>true</gzip>
-	<!-- Enable the appender's internal debug logger (sent to the console output and trace log) -->
-	<debug>false</debug>
+        <retriesInterval>00:00:02</retriesInterval>
+        <!-- Set the appender to compress the message before sending it -->
+        <gzip>true</gzip>
+        <!-- Enable the appender's internal debug logger (sent to the console output and trace log) -->
+        <debug>false</debug>
+        <!-- If internal debug logger is enabled, write debug logs to file. Absolute path to file,
+        will be created if not exists. Leave empty if you don't want to write debug log to a file.
+        Default is empty -->
+        <debugLogFile>my_absolute_path_to_file</debugLogFile>
         <!-- Set to true if you want json keys in Logz.io to be in camel case. The default is false. -->
         <jsonKeysCamelCase>false</jsonKeysCamelCase>
         <!-- Add trace context (traceId and spanId) to each log. The default is false -->
@@ -83,6 +87,8 @@ logzioAppender.AddListenerUrl("<<LISTENER-HOST>>");
 // logzioAppender.ActivateOptions();
 // logzioAppender.JsonKeysCamelCase(false);
 // logzioAppender.AddTraceContext(false);
+// logzioAppender.AddDebug(false);
+// logzioAppender.AddDebugLogFile("my_absolute_path_to_file");
 logzioAppender.ActivateOptions();
 hierarchy.Root.AddAppender(logzioAppender);
 hierarchy.Root.Level = Level.All;

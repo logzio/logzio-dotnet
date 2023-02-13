@@ -32,6 +32,7 @@ namespace Logzio.DotNet.NLog
         public int RetriesMaxAttempts { get { return _shipperOptions.BulkSenderOptions.RetriesMaxAttempts; } set { _shipperOptions.BulkSenderOptions.RetriesMaxAttempts = value; } }
         public TimeSpan RetriesInterval { get { return _shipperOptions.BulkSenderOptions.RetriesInterval; } set { _shipperOptions.BulkSenderOptions.RetriesInterval = value; } }
         public bool Debug { get { return _shipperOptions.BulkSenderOptions.Debug; } set { _shipperOptions.BulkSenderOptions.Debug = _shipperOptions.Debug = value; } }
+        public string DebugLogFile { get { return _shipperOptions.BulkSenderOptions.DebugLogFile; } set { _shipperOptions.BulkSenderOptions.DebugLogFile = _shipperOptions.DebugLogFile = value; } }
         public bool UseGzip { get { return _shipperOptions.BulkSenderOptions.UseGzip; } set { _shipperOptions.BulkSenderOptions.UseGzip = value; } }
         public string ProxyAddress { get { return _shipperOptions.BulkSenderOptions.ProxyAddress; } set { _shipperOptions.BulkSenderOptions.ProxyAddress = value; } }
 
@@ -66,7 +67,7 @@ namespace Logzio.DotNet.NLog
             if (_shipper == null)
             {
                 if (_internalLogger == null)
-                    _internalLogger = new InternalLoggerNLog(_shipperOptions, new Core.InternalLogger.InternalLogger());
+                    _internalLogger = new InternalLoggerNLog(_shipperOptions, new Core.InternalLogger.InternalLogger(_shipperOptions.DebugLogFile));
                 _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler(ProxyAddress), _shipperOptions.BulkSenderOptions.JsonKeysCamelCase), _internalLogger);
             }
             _usingDefaultLayout = Layout?.ToString() == DefaultLayout;

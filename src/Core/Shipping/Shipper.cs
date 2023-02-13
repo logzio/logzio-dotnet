@@ -35,18 +35,7 @@ namespace Logzio.DotNet.Core.Shipping
         {
             _queue.Enqueue(logzioLoggingEvent);
             if (options.Debug)
-            {
-                string debugLog = $"Logz.io: Added log message. Queue size - [{_queue.Count}]";
-                _internalLogger.Log(debugLog);
-
-                if (!String.IsNullOrEmpty(options.DebugLogFile))
-                {
-                    using (StreamWriter writer = File.AppendText(options.DebugLogFile))
-                    {
-                        writer.WriteLineAsync(debugLog);   
-                    }
-                }
-            }
+                _internalLogger.Log("Logz.io: Added log message. Queue size - [{0}]", _queue.Count);
 
             SendLogsIfBufferIsFull(options);
             if (_delayTask == null || _delayTask.IsCompleted)
@@ -56,18 +45,7 @@ namespace Logzio.DotNet.Core.Shipping
         public void Flush(ShipperOptions options)
         {
             if (options.Debug)
-            {
-                string debugLog = "Logz.io: Flushing remaining logz.";
-                _internalLogger.Log(debugLog);
-
-                if (!String.IsNullOrEmpty(options.DebugLogFile))
-                {
-                    using (StreamWriter writer = File.AppendText(options.DebugLogFile))
-                    {
-                        writer.WriteLine(debugLog);   
-                    }
-                }
-            }
+                _internalLogger.Log("Logz.io: Flushing remaining logz.");
 
             SendLogs(options, true);
             WaitForSendLogsTask();
@@ -84,18 +62,7 @@ namespace Logzio.DotNet.Core.Shipping
                     return;
 
                 if (options.Debug)
-                {
-                    string debugLog = "Logz.io: Buffer is full. Sending logs.";
-                    _internalLogger.Log(debugLog);
-
-                    if (!String.IsNullOrEmpty(options.DebugLogFile))
-                    {
-                        using (StreamWriter writer = File.AppendText(options.DebugLogFile))
-                        {
-                            writer.WriteLine(debugLog);   
-                        }
-                    }
-                }
+                    _internalLogger.Log("Logz.io: Buffer is full. Sending logs.");
 
                 SendLogs(options);
             }
@@ -112,18 +79,7 @@ namespace Logzio.DotNet.Core.Shipping
                     return;
 
                 if (options.Debug)
-                {
-                    string debugLog = "Logz.io: Buffer is timed out. Sending logs.";
-                    _internalLogger.Log(debugLog);
-                    
-                    if (!String.IsNullOrEmpty(options.DebugLogFile))
-                    {
-                        using (StreamWriter writer = File.AppendText(options.DebugLogFile))
-                        {
-                            writer.WriteLine(debugLog);   
-                        }
-                    }
-                }
+                    _internalLogger.Log("Logz.io: Buffer is timed out. Sending logs.");
 
                 _timeoutReached = true;
                 SendLogs(options);
@@ -153,18 +109,7 @@ namespace Logzio.DotNet.Core.Shipping
                         }
 
                         if (options.Debug)
-                        {
-                            string debugLog = $"Logz.io: Sending [{logz.Count}] logs ([{_queue.Count}] in queue)...";
-                            _internalLogger.Log(debugLog);
-                            
-                            if (!String.IsNullOrEmpty(options.DebugLogFile))
-                            {
-                                using (StreamWriter writer = File.AppendText(options.DebugLogFile))
-                                {
-                                    await writer.WriteLineAsync(debugLog);   
-                                }
-                            }
-                        }
+                            _internalLogger.Log("Logz.io: Sending [{0}] logs ([{1}] in queue)...", logz.Count, _queue.Count);
 
                         if (logz.Count > 0)
                         {
@@ -179,31 +124,12 @@ namespace Logzio.DotNet.Core.Shipping
                                             break;
 
                                         if (options.Debug)
-                                        {
-                                            string debugLog = $"Logz.io: Failed: {response.StatusCode}";
-                                            _internalLogger.Log(debugLog);
-                                            
-                                            if (!String.IsNullOrEmpty(options.DebugLogFile))
-                                            {
-                                                using (StreamWriter writer = File.AppendText(options.DebugLogFile))
-                                                {
-                                                    await writer.WriteLineAsync(debugLog);   
-                                                }
-                                            }
-                                        }
+                                            _internalLogger.Log("Logz.io: Failed: {0}", response.StatusCode);
                                     }
                                 }
                                 catch (Exception ex)
                                 {
                                     _internalLogger.Log(ex, "Logz.io: ERROR");
-                                    
-                                    if (!String.IsNullOrEmpty(options.DebugLogFile))
-                                    {
-                                        using (StreamWriter writer = File.AppendText(options.DebugLogFile))
-                                        {
-                                            await writer.WriteLineAsync($"Logz.io: ERROR - {ex.Message}");   
-                                        }
-                                    }
                                 }
 
                                 await Task.Delay(options.BulkSenderOptions.RetriesInterval).ConfigureAwait(false);
@@ -211,18 +137,7 @@ namespace Logzio.DotNet.Core.Shipping
                         }
 
                         if (options.Debug)
-                        {
-                            string debugLog = $"Logz.io: Sent logs. [{_queue.Count}] in queue.";
-                            _internalLogger.Log(debugLog);
-                            
-                            if (!String.IsNullOrEmpty(options.DebugLogFile))
-                            {
-                                using (StreamWriter writer = File.AppendText(options.DebugLogFile))
-                                {
-                                    await writer.WriteLineAsync(debugLog);   
-                                }
-                            }
-                        }
+                            _internalLogger.Log("Logz.io: Sent logs. [{0}] in queue.", _queue.Count);
 
                     } while (_queue.Count >= options.BufferSize || ((_timeoutReached || flush) && !_queue.IsEmpty));
                 });
