@@ -41,8 +41,10 @@ namespace Logzio.DotNet.Core.Shipping
 
                 if (!String.IsNullOrEmpty(options.DebugLogFile))
                 {
-                    using StreamWriter writer = File.AppendText(options.DebugLogFile);
-                    writer.WriteLineAsync(debugLog);
+                    using (StreamWriter writer = File.AppendText(options.DebugLogFile))
+                    {
+                        writer.WriteLineAsync(debugLog);   
+                    }
                 }
             }
 
@@ -60,8 +62,10 @@ namespace Logzio.DotNet.Core.Shipping
 
                 if (!String.IsNullOrEmpty(options.DebugLogFile))
                 {
-                    using StreamWriter writer = File.AppendText(options.DebugLogFile);
-                    writer.WriteLine(debugLog);
+                    using (StreamWriter writer = File.AppendText(options.DebugLogFile))
+                    {
+                        writer.WriteLine(debugLog);   
+                    }
                 }
             }
 
@@ -86,8 +90,10 @@ namespace Logzio.DotNet.Core.Shipping
 
                     if (!String.IsNullOrEmpty(options.DebugLogFile))
                     {
-                        using StreamWriter writer = File.AppendText(options.DebugLogFile);
-                        writer.WriteLine(debugLog);
+                        using (StreamWriter writer = File.AppendText(options.DebugLogFile))
+                        {
+                            writer.WriteLine(debugLog);   
+                        }
                     }
                 }
 
@@ -112,8 +118,10 @@ namespace Logzio.DotNet.Core.Shipping
                     
                     if (!String.IsNullOrEmpty(options.DebugLogFile))
                     {
-                        using StreamWriter writer = File.AppendText(options.DebugLogFile);
-                        writer.WriteLine(debugLog);
+                        using (StreamWriter writer = File.AppendText(options.DebugLogFile))
+                        {
+                            writer.WriteLine(debugLog);   
+                        }
                     }
                 }
 
@@ -151,8 +159,10 @@ namespace Logzio.DotNet.Core.Shipping
                             
                             if (!String.IsNullOrEmpty(options.DebugLogFile))
                             {
-                                await using StreamWriter writer = File.AppendText(options.DebugLogFile);
-                                await writer.WriteLineAsync(debugLog);
+                                using (StreamWriter writer = File.AppendText(options.DebugLogFile))
+                                {
+                                    await writer.WriteLineAsync(debugLog);   
+                                }
                             }
                         }
 
@@ -175,8 +185,10 @@ namespace Logzio.DotNet.Core.Shipping
                                             
                                             if (!String.IsNullOrEmpty(options.DebugLogFile))
                                             {
-                                                await using StreamWriter writer = File.AppendText(options.DebugLogFile);
-                                                await writer.WriteLineAsync(debugLog);
+                                                using (StreamWriter writer = File.AppendText(options.DebugLogFile))
+                                                {
+                                                    await writer.WriteLineAsync(debugLog);   
+                                                }
                                             }
                                         }
                                     }
@@ -187,8 +199,10 @@ namespace Logzio.DotNet.Core.Shipping
                                     
                                     if (!String.IsNullOrEmpty(options.DebugLogFile))
                                     {
-                                        await using StreamWriter writer = File.AppendText(options.DebugLogFile);
-                                        await writer.WriteLineAsync($"Logz.io: ERROR - {ex.Message}");
+                                        using (StreamWriter writer = File.AppendText(options.DebugLogFile))
+                                        {
+                                            await writer.WriteLineAsync($"Logz.io: ERROR - {ex.Message}");   
+                                        }
                                     }
                                 }
 
@@ -203,8 +217,10 @@ namespace Logzio.DotNet.Core.Shipping
                             
                             if (!String.IsNullOrEmpty(options.DebugLogFile))
                             {
-                                await using StreamWriter writer = File.AppendText(options.DebugLogFile);
-                                await writer.WriteLineAsync(debugLog);
+                                using (StreamWriter writer = File.AppendText(options.DebugLogFile))
+                                {
+                                    await writer.WriteLineAsync(debugLog);   
+                                }
                             }
                         }
 
