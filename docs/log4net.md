@@ -53,7 +53,7 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 	<!-- Enable the appender's internal debug logger (sent to the console output and trace log) -->
 	<debug>false</debug>
 	<!-- If internal debug logger is enabled, write debug logs to file. Absolute path to file,
-	will be created if not exists. Leave empty if you don't want to write debug log to a file.
+	will be created if not exists. Leave empty if you don't want to write debug logs to a file.
 	Default is empty -->		
 	<debugLogFile>my_absolute_path_to_file</debugLogFile>		
 	<!-- If you have custom fields keys that start with capital letter and want to see the fields 
