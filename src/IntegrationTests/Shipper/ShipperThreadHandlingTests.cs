@@ -19,7 +19,7 @@ namespace Logzio.DotNet.IntegrationTests.Shipper
             _dummy = new LogzioListenerDummy();
             _dummy.Start();
 
-            var internalLogger = new Core.InternalLogger.InternalLogger($"{System.Environment.CurrentDirectory}/debug.txt");
+            var internalLogger = new Core.InternalLogger.InternalLogger($"{Environment.CurrentDirectory}/debug.txt");
             _shipper = new Core.Shipping.Shipper(new BulkSender(new Core.WebClient.HttpClientHandler(), false), internalLogger);
         }
 
