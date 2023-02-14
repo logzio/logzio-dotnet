@@ -11,6 +11,8 @@
     <Description>Core BulkSender that sends logs to the logz.io bulk HTTP service</Description>
 
     <IsPackable>false</IsPackable>
+
+    <PackageVersion>1.0.15</PackageVersion>
   </PropertyGroup>
  
   <ItemGroup>
