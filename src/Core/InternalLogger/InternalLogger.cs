@@ -38,8 +38,7 @@ namespace Logzio.DotNet.Core.InternalLogger
 #endif
                 Console.WriteLine(formattedMessage);
             }
-
-            if (String.IsNullOrEmpty(_logFile)) return;
+            
             using (StreamWriter writer = File.AppendText(_logFile))
             {
                 writer.WriteLine(formattedMessage);   
