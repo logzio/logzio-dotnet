@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 namespace Logzio.DotNet.Core.Shipping
 {
@@ -10,6 +11,7 @@ namespace Logzio.DotNet.Core.Shipping
         public int RetriesMaxAttempts { get; set; } = 3;
         public string Type { get; set; } = "dotnet";
         public bool Debug { get; set; }
+        public string DebugLogFile { get; set; } = String.Empty;
         public bool UseGzip { get; set; } = false;
         public string ProxyAddress { get; set; } = String.Empty;
         public bool ParseJsonMessage { get; set; } = false;

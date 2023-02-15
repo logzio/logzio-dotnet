@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace Logzio.DotNet.Core.InternalLogger
 {
@@ -10,6 +11,13 @@ namespace Logzio.DotNet.Core.InternalLogger
 
     public class InternalLogger : IInternalLogger
     {
+        private readonly string _logFile;
+
+        public InternalLogger(string logFile)
+        {
+            _logFile = String.IsNullOrEmpty(logFile) ? Path.Combine(Directory.GetCurrentDirectory(), "debug.txt") : logFile;
+        }
+        
         public void Log(Exception ex, string message, params object[] args)
         {
             var formattedMessage = string.Concat(DateTime.Now.ToString("HH:mm:ss.fff"), " - ", args?.Length > 0 ? string.Format(message, args) : message);
@@ -29,6 +37,11 @@ namespace Logzio.DotNet.Core.InternalLogger
                 Trace.WriteLine(formattedMessage);
 #endif
                 Console.WriteLine(formattedMessage);
+            }
+            
+            using (StreamWriter writer = File.AppendText(_logFile))
+            {
+                writer.WriteLine(formattedMessage);   
             }
         }
     }

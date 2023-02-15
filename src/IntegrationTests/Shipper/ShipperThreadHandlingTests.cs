@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.IntegrationTests.Listener;
 using NUnit.Framework;
@@ -18,7 +19,7 @@ namespace Logzio.DotNet.IntegrationTests.Shipper
             _dummy = new LogzioListenerDummy();
             _dummy.Start();
 
-            var internalLogger = new Core.InternalLogger.InternalLogger();
+            var internalLogger = new Core.InternalLogger.InternalLogger($"{Environment.CurrentDirectory}/debug.txt");
             _shipper = new Core.Shipping.Shipper(new BulkSender(new Core.WebClient.HttpClientHandler(), false), internalLogger);
         }
 

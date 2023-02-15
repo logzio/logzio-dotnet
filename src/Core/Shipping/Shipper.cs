@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Logzio.DotNet.Core.InternalLogger;
 
@@ -106,6 +107,7 @@ namespace Logzio.DotNet.Core.Shipping
 
                             logz.Add(log);
                         }
+
                         if (options.Debug)
                             _internalLogger.Log("Logz.io: Sending [{0}] logs ([{1}] in queue)...", logz.Count, _queue.Count);
 
@@ -122,7 +124,7 @@ namespace Logzio.DotNet.Core.Shipping
                                             break;
 
                                         if (options.Debug)
-                                            _internalLogger.Log("Logz.io: Failed: " + response.StatusCode);
+                                            _internalLogger.Log("Logz.io: Failed: {0}", response.StatusCode);
                                     }
                                 }
                                 catch (Exception ex)
