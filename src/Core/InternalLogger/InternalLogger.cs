@@ -11,6 +11,7 @@ namespace Logzio.DotNet.Core.InternalLogger
 
     public class InternalLogger : IInternalLogger
     {
+        private readonly object _writerLocker = new object();
         private readonly string _logFile;
 
         public InternalLogger(string logFile)
@@ -38,10 +39,13 @@ namespace Logzio.DotNet.Core.InternalLogger
 #endif
                 Console.WriteLine(formattedMessage);
             }
-            
-            using (StreamWriter writer = File.AppendText(_logFile))
+
+            lock (_writerLocker)
             {
-                writer.WriteLine(formattedMessage);   
+                using (StreamWriter writer = File.AppendText(_logFile))
+                {
+                    writer.WriteLine(formattedMessage);   
+                }
             }
         }
     }
