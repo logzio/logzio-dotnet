@@ -57,7 +57,8 @@ If you configure your logging in an XML file, simply add a reference to the Logz
         <!-- Enable the appender's internal debug logger (sent to the console output and trace log) -->
         <debug>false</debug>
         <!-- If internal debug logger is enabled, write debug logs to file. Absolute path to file,
-        will be created if not exists. If no file was given, creates debug.txt file in current directory of running the application. -->
+        a GUID will be added to the file name. If no file was given or file path does not exist,
+        creates debug.txt file in the directory where the application is running from. -->
         <debugLogFile>my_absolute_path_to_file</debugLogFile>
         <!-- Set to true if you want json keys in Logz.io to be in camel case. The default is false. -->
         <jsonKeysCamelCase>false</jsonKeysCamelCase>
