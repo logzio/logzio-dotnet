@@ -16,7 +16,24 @@ namespace Logzio.DotNet.Core.InternalLogger
 
         public InternalLogger(string logFile)
         {
-            _logFile = String.IsNullOrEmpty(logFile) ? Path.Combine(Directory.GetCurrentDirectory(), "debug.txt") : logFile;
+            if (String.IsNullOrEmpty(logFile))
+            {
+                _logFile = Path.Combine(Directory.GetCurrentDirectory(), $@"debug-{Guid.NewGuid()}.txt");
+                return;
+            }
+
+            var filePath = Path.GetDirectoryName(logFile);
+
+            if (!Directory.Exists(filePath))
+            {
+                _logFile = Path.Combine(Directory.GetCurrentDirectory(), $@"debug-{Guid.NewGuid()}.txt");
+                return;
+            }
+            
+            var fileName = Path.GetFileNameWithoutExtension(logFile);
+            var fileExtension = Path.GetExtension(logFile);
+            
+            _logFile = Path.Combine(filePath, $@"{fileName}-{Guid.NewGuid()}{fileExtension}");
         }
         
         public void Log(Exception ex, string message, params object[] args)
@@ -44,7 +61,7 @@ namespace Logzio.DotNet.Core.InternalLogger
             {
                 using (StreamWriter writer = File.AppendText(_logFile))
                 {
-                    writer.WriteLine(formattedMessage);   
+                    writer.WriteLine(formattedMessage);
                 }
             }
         }
