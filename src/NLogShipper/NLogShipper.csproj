@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net5.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net5.0;netcoreapp3.1;netstandard1.3;netstandard2.0;net6.0</TargetFrameworks>
 
     <AssemblyName>Logzio.DotNet.NLog</AssemblyName>
     
@@ -14,7 +14,7 @@
     <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/logzio/logzio-dotnet</RepositoryUrl>
-    <PackageVersion>1.0.16</PackageVersion>
+    <PackageVersion>1.0.17</PackageVersion>
     <PackageReleaseNotes>Option to format message as json</PackageReleaseNotes>
   </PropertyGroup>
  
@@ -39,7 +39,9 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="OpenTelemetry" Version="1.3.1" />
   </ItemGroup>
- 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="OpenTelemetry" Version="1.3.1" />
+  </ItemGroup>
   <PropertyGroup>
     <TargetsForTfmSpecificBuildOutput>
       $(TargetsForTfmSpecificBuildOutput);PackReferencedProjectOutputs

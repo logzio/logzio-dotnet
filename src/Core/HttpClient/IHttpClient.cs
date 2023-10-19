@@ -2,8 +2,13 @@
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection.Emit;
 using System.Threading.Tasks;
 using Core.HttpClient;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
+using MicrosoftLogger = Microsoft.Extensions.Logging.ILogger;
+using Microsoft.Extensions.Logging;
 
 namespace Logzio.DotNet.Core.WebClient
 {
@@ -15,16 +20,18 @@ namespace Logzio.DotNet.Core.WebClient
 
     public class HttpClientHandler : IHttpClient
     {
-        private readonly HttpClient _client;
-
+        private static HttpClient _client;
+        private static readonly ILogger msLogger = new Logger<HttpClientHandler>(new LoggerFactory());
         public HttpClientHandler()
         {
             _client = new HttpClient();
+            msLogger.LogInformation("HttpClient created.");
+
         }
 
-        public HttpClientHandler(String proxyAddress)
+        public HttpClientHandler(string proxyAddress)
         {
-            if (proxyAddress != String.Empty)
+            if (proxyAddress != string.Empty)
             {
                 var handler = new System.Net.Http.HttpClientHandler
                 {
@@ -32,12 +39,13 @@ namespace Logzio.DotNet.Core.WebClient
                     Proxy = new Proxy(new Uri(proxyAddress))
                 };
                 _client = new HttpClient(handler: handler);
+                msLogger.LogInformation("HttpClient created with proxy address: {proxyAddress}", proxyAddress);
+
             }
             else
             {
                 _client = new HttpClient();
             }
-            
         }
         public async Task<HttpResponseMessage> GetAsync(string url)
         {
@@ -58,5 +66,4 @@ namespace Logzio.DotNet.Core.WebClient
             return await _client.PostAsync(url, content).ConfigureAwait(false);
         }
     }
-
 }
