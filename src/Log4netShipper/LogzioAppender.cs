@@ -41,7 +41,7 @@ namespace Logzio.DotNet.Log4net
             {
                 if (_internalLogger == null)
                     _internalLogger = new InternalLoggerLog4net(_shipperOptions, new Core.InternalLogger.InternalLogger(_shipperOptions.DebugLogFile));
-                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler(_shipperOptions.BulkSenderOptions.ProxyAddress), _shipperOptions.BulkSenderOptions.JsonKeysCamelCase), _internalLogger);
+                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler(_shipperOptions.BulkSenderOptions), _shipperOptions.BulkSenderOptions.JsonKeysCamelCase), _internalLogger);
             }
 
             base.ActivateOptions();
@@ -223,6 +223,10 @@ namespace Logzio.DotNet.Log4net
         public void AddGzip(bool value)
         {
             _shipperOptions.BulkSenderOptions.UseGzip = value;
+        }
+        public void UseStaticHttpClient(bool value)
+        {
+            _shipperOptions.BulkSenderOptions.UseStaticHttpClient = value;
         }
     }
 }

@@ -45,6 +45,7 @@ If you configure your logging in an XML file, you need to register the assembly 
 		jsonKeysCamelCase="false"
 		addTraceContext="false"
 		<!-- parseJsonMessage="true"-->
+        <!-- useStaticHttpClient="false"-->        
 	>
 		<contextproperty name="host" layout="${machinename}" />
 		<contextproperty name="threadid" layout="${threadid}" />
@@ -77,7 +78,8 @@ var logzioTarget = new LogzioTarget {
     JsonKeysCamelCase = false,
     AddTraceContext = false,
     // ParseJsonMessage = true, 
-    // ProxyAddress = "http://your.proxy.com:port"
+    // ProxyAddress = "http://your.proxy.com:port",
+    // UseStaticHttpClient = true,
 };
 
 config.AddRule(LogLevel.Debug, LogLevel.Fatal, logzioTarget);
@@ -144,10 +146,9 @@ To enable this feature, set `addTraceContext="true"` in your configuration or `A
 in your code (as shown in the previews sections).
 
 ## Serverless platforms
-If you’re using a serverless function, you’ll need to call the appender's flush methods at the end of the function run to make sure the logs are sent before the function finishes its execution. You’ll also need to create a static appender in the Startup.cs file so each invocation will use the same appender. 
-Make sure 'debug' is set to false if the function is deployed as it might cause permission issues with debug files. 
+If you’re using a serverless function, you’ll need to call the appender's flush method at the end of the function run to make sure the logs are sent before the function finishes its execution. You’ll also need to create a static appender in the Startup.cs file so each invocation will use the same appender. The appender should have the `UseStaticHttpClient` flag set to `true`.
 
-###### Code sample
+###### Azure serverless function code sample
 
 *Startup.cs*
 
@@ -182,6 +183,7 @@ namespace LogzioNLogSampleApplication
                 Debug = false,
                 JsonKeysCamelCase = false,
                 AddTraceContext = false,
+                UseStaticHttpClient = true, 
                 // ParseJsonMessage = true,
                 // ProxyAddress = "http://your.proxy.com:port"
             };

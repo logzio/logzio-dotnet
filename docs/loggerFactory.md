@@ -64,6 +64,8 @@ If you configure your logging in an XML file, simply add a reference to the Logz
         <jsonKeysCamelCase>false</jsonKeysCamelCase>
         <!-- Add trace context (traceId and spanId) to each log. The default is false -->
         <addTraceContext>false</addTraceContext>
+        <!-- Use the same static HTTP/s client for sending logs. The default is false -->
+        <useStaticHttpClient>false</useStaticHttpClient>        
     </appender>
     
     <root>
@@ -89,6 +91,7 @@ logzioAppender.AddListenerUrl("<<LISTENER-HOST>>");
 // logzioAppender.AddTraceContext(false);
 // logzioAppender.AddDebug(false);
 // logzioAppender.AddDebugLogFile("my_absolute_path_to_file");
+// logzioAppender.UseStaticHttpClient(false);
 logzioAppender.ActivateOptions();
 hierarchy.Root.AddAppender(logzioAppender);
 hierarchy.Root.Level = Level.All;
@@ -205,15 +208,15 @@ namespace LoggerFactoryAppender
         static void Main(string[] args)
         {
             ILoggerFactory loggerFactory = new LoggerFactory();
-	    loggerFactory.AddLog4Net();
+	        loggerFactory.AddLog4Net();
 
             var logger = loggerFactory.CreateLogger<Program>();
-	    var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+	        var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
 
             // Replace "App.config" with the config file that holds your log4net configuration
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
-	    logger.LogInformation("Hello");
+	        logger.LogInformation("Hello");
             logger.LogInformation("Is it me you looking for?");
                 
             LogManager.Shutdown();
@@ -223,10 +226,10 @@ namespace LoggerFactoryAppender
 ```
 
 ### Serverless platforms
-If you’re using a serverless function, you’ll need to call the appender's flush methods at the end of the function run to make sure the logs are sent before the function finishes its execution. You’ll also need to create a static appender in the Startup.cs file so each invocation will use the same appender. 
-Make sure 'debug' is set to false if the function is deployed as it might cause permission issues with debug files. 
+If you’re using a serverless function, you’ll need to call the appender's flush method at the end of the function run to make sure the logs are sent before the function finishes its execution. You’ll also need to create a static appender in the Startup.cs file so each invocation will use the same appender. The appender should have the `UseStaticHttpClient` flag set to `true`.
 
-###### Code sample
+
+###### Azure serverless function code sample
 
 *Startup.cs*
 
@@ -261,6 +264,7 @@ namespace LogzioNLogSampleApplication
                 Debug = false,
                 JsonKeysCamelCase = false,
                 AddTraceContext = false,
+                UseStaticHttpClient = true,
                 // ParseJsonMessage = true,
                 // ProxyAddress = "http://your.proxy.com:port"
             };

@@ -62,6 +62,9 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 	<jsonKeysCamelCase>false</jsonKeysCamelCase>
 	<!-- Add trace context (traceId and spanId) to each log. The default is false -->
 	<addTraceContext>false</addTraceContext>
+    <!-- Use the same static HTTP/s client for sending logs. The default is false -->
+	<UseStaticHttpClient>false</addTraceContext>
+
     </appender>
     
     <root>
@@ -90,6 +93,7 @@ logzioAppender.AddListenerUrl("<<LISTENER-HOST>>");
 // logzioAppender.AddTraceContext(false);
 // logzioAppender.AddDebug(false);
 // logzioAppender.AddDebugLogFile("my_absolute_path_to_file");
+// logzioAppender.UseStaticHttpClient(false);
 logzioAppender.ActivateOptions();
 hierarchy.Root.AddAppender(logzioAppender);
 hierarchy.Root.Level = Level.All;
@@ -202,6 +206,7 @@ namespace dotnet_log4net
             // logzioAppender.AddTraceContext(false);
             // logzioAppender.AddDebug(false);
             // logzioAppender.AddDebugLogFile("my_absolute_path_to_file");
+            // logzioAppender.UseStaticHttpClient(false);
             logzioAppender.ActivateOptions();
             
             hierarchy.Root.AddAppender(logzioAppender);
@@ -220,10 +225,9 @@ namespace dotnet_log4net
 
 
 ## Serverless platforms
-If you’re using a serverless function, you’ll need to call the appender's flush methods at the end of the function run to make sure the logs are sent before the function finishes its execution. You’ll also need to create a static appender in the Startup.cs file so each invocation will use the same appender. 
-Make sure 'debug' is set to false if the function is deployed as it might cause permission issues with debug files. 
+If you’re using a serverless function, you’ll need to call the appender's flush method at the end of the function run to make sure the logs are sent before the function finishes its execution. You’ll also need to create a static appender in the Startup.cs file so each invocation will use the same appender. The appender should have the `UseStaticHttpClient` flag set to `true`.
 
-###### Code sample
+###### Azure serverless function code sample
 *Startup.cs*
 ```csharp
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
@@ -244,6 +248,7 @@ namespace LogzioLog4NetSampleApplication
             logzioAppender.AddToken("<<LOG-SHIPPING-TOKEN>>");
             logzioAppender.AddListenerUrl("https://<<LISTENER-HOST>>:8071");
             logzioAppender.ActivateOptions();
+            logzioAppender.UseStaticHttpClient(true);
             hierarchy.Root.AddAppender(logzioAppender);
             hierarchy.Configured = true;
         }
