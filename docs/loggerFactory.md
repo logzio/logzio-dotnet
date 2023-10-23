@@ -64,6 +64,8 @@ If you configure your logging in an XML file, simply add a reference to the Logz
         <jsonKeysCamelCase>false</jsonKeysCamelCase>
         <!-- Add trace context (traceId and spanId) to each log. The default is false -->
         <addTraceContext>false</addTraceContext>
+        <!-- Use the same static HTTP/s client for sending logs. The default is false -->
+        <useStaticHttpClient>false</useStaticHttpClient>        
     </appender>
     
     <root>
@@ -89,6 +91,7 @@ logzioAppender.AddListenerUrl("<<LISTENER-HOST>>");
 // logzioAppender.AddTraceContext(false);
 // logzioAppender.AddDebug(false);
 // logzioAppender.AddDebugLogFile("my_absolute_path_to_file");
+// logzioAppender.UseStaticHttpClient(false);
 logzioAppender.ActivateOptions();
 hierarchy.Root.AddAppender(logzioAppender);
 hierarchy.Root.Level = Level.All;
@@ -205,18 +208,100 @@ namespace LoggerFactoryAppender
         static void Main(string[] args)
         {
             ILoggerFactory loggerFactory = new LoggerFactory();
-	    loggerFactory.AddLog4Net();
+	        loggerFactory.AddLog4Net();
 
             var logger = loggerFactory.CreateLogger<Program>();
-	    var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+	        var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
 
             // Replace "App.config" with the config file that holds your log4net configuration
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
-	    logger.LogInformation("Hello");
+	        logger.LogInformation("Hello");
             logger.LogInformation("Is it me you looking for?");
                 
             LogManager.Shutdown();
+        }
+    }
+}
+```
+
+### Serverless platforms
+If you’re using a serverless function, you’ll need to call the appender's flush method at the end of the function run to make sure the logs are sent before the function finishes its execution. You’ll also need to create a static appender in the Startup.cs file so each invocation will use the same appender. The appender should have the `UseStaticHttpClient` flag set to `true`.
+
+
+###### Azure serverless function code sample
+
+*Startup.cs*
+
+```csharp
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Logzio.DotNet.NLog;
+using NLog;
+using NLog.Config;
+using System;
+
+[assembly: FunctionsStartup(typeof(LogzioNLogSampleApplication.Startup))]
+
+namespace LogzioNLogSampleApplication
+{
+    public class Startup : FunctionsStartup
+    {
+        public override void Configure(IFunctionsHostBuilder builder)
+        {
+            var config = new LoggingConfiguration();
+
+            // Replace these parameters with your configuration
+            var logzioTarget = new LogzioTarget
+            {
+                Name = "Logzio",
+                Token = "<<LOG-SHIPPING-TOKEN>>",
+                LogzioType = "nlog",
+                ListenerUrl = "https://<<LISTENER-HOST>>:8071",
+                BufferSize = 100,
+                BufferTimeout = TimeSpan.Parse("00:00:05"),
+                RetriesMaxAttempts = 3,
+                RetriesInterval = TimeSpan.Parse("00:00:02"),
+                Debug = false,
+                JsonKeysCamelCase = false,
+                AddTraceContext = false,
+                UseStaticHttpClient = true,
+                // ParseJsonMessage = true,
+                // ProxyAddress = "http://your.proxy.com:port"
+            };
+
+            config.AddRule(NLog.LogLevel.Debug, NLog.LogLevel.Fatal, logzioTarget);
+            LogManager.Configuration = config;
+        }
+    }
+}
+```
+
+*FunctionApp.cs*
+
+```csharp
+using System;
+using Microsoft.Azure.WebJobs;
+using NLog;
+using Microsoft.Extensions.Logging;
+using MicrosoftLogger = Microsoft.Extensions.Logging.ILogger;
+
+namespace LogzioNLogSampleApplication
+{
+    public class TimerTriggerCSharpNLog
+    {
+        private static readonly Logger nLog = LogManager.GetCurrentClassLogger();
+
+        [FunctionName("TimerTriggerCSharpNLog")]
+        public void Run([TimerTrigger("*/30 * * * * *")]TimerInfo myTimer, MicrosoftLogger msLog)
+        {
+            msLog.LogInformation($"NLogzio C# Timer trigger function executed at: {DateTime.Now}");
+
+            nLog.WithProperty("iCanBe", "your long lost pal")
+                .WithProperty("iCanCallYou", "Betty, and Betty when you call me")
+                .WithProperty("youCanCallMe", "Al")
+                .Info("If you'll be my bodyguard");
+            // Call Flush method before function trigger finishes
+            LogManager.Flush(5000);
         }
     }
 }

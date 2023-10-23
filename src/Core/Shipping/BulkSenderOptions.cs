@@ -17,5 +17,7 @@ namespace Logzio.DotNet.Core.Shipping
         public bool ParseJsonMessage { get; set; } = false;
         public bool JsonKeysCamelCase { get; set; } = false;
         public bool AddTraceContext { get; set; } = false;
+        public bool UseStaticHttpClient { get; set; } = false;
+        
     }
 }

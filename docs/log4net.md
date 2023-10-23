@@ -62,6 +62,9 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 	<jsonKeysCamelCase>false</jsonKeysCamelCase>
 	<!-- Add trace context (traceId and spanId) to each log. The default is false -->
 	<addTraceContext>false</addTraceContext>
+    <!-- Use the same static HTTP/s client for sending logs. The default is false -->
+	<UseStaticHttpClient>false</addTraceContext>
+
     </appender>
     
     <root>
@@ -90,6 +93,7 @@ logzioAppender.AddListenerUrl("<<LISTENER-HOST>>");
 // logzioAppender.AddTraceContext(false);
 // logzioAppender.AddDebug(false);
 // logzioAppender.AddDebugLogFile("my_absolute_path_to_file");
+// logzioAppender.UseStaticHttpClient(false);
 logzioAppender.ActivateOptions();
 hierarchy.Root.AddAppender(logzioAppender);
 hierarchy.Root.Level = Level.All;
@@ -202,6 +206,7 @@ namespace dotnet_log4net
             // logzioAppender.AddTraceContext(false);
             // logzioAppender.AddDebug(false);
             // logzioAppender.AddDebugLogFile("my_absolute_path_to_file");
+            // logzioAppender.UseStaticHttpClient(false);
             logzioAppender.ActivateOptions();
             
             hierarchy.Root.AddAppender(logzioAppender);
@@ -213,6 +218,71 @@ namespace dotnet_log4net
             logger.Info("Before he left was he went and named me Sue");
 
             LogManager.Shutdown();
+        }
+    }
+}
+```
+
+
+## Serverless platforms
+If you’re using a serverless function, you’ll need to call the appender's flush method at the end of the function run to make sure the logs are sent before the function finishes its execution. You’ll also need to create a static appender in the Startup.cs file so each invocation will use the same appender. The appender should have the `UseStaticHttpClient` flag set to `true`.
+
+###### Azure serverless function code sample
+*Startup.cs*
+```csharp
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using log4net;
+using log4net.Repository.Hierarchy;
+using Logzio.DotNet.Log4net;
+
+[assembly: FunctionsStartup(typeof(LogzioLog4NetSampleApplication.Startup))]
+
+namespace LogzioLog4NetSampleApplication
+{
+    public class Startup : FunctionsStartup
+    {
+        public override void Configure(IFunctionsHostBuilder builder)
+        {
+            var hierarchy = (Hierarchy)LogManager.GetRepository();
+            var logzioAppender = new LogzioAppender();
+            logzioAppender.AddToken("<<LOG-SHIPPING-TOKEN>>");
+            logzioAppender.AddListenerUrl("https://<<LISTENER-HOST>>:8071");
+            logzioAppender.ActivateOptions();
+            logzioAppender.UseStaticHttpClient(true);
+            hierarchy.Root.AddAppender(logzioAppender);
+            hierarchy.Configured = true;
+        }
+    }
+}
+
+```
+
+*FunctionApp.cs*
+```csharp
+using System;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
+using log4net;
+using MicrosoftLogger = Microsoft.Extensions.Logging.ILogger;
+
+namespace LogzioLog4NetSampleApplication
+{
+    public class TimerTriggerCSharpLog4Net
+    {
+        
+        private static readonly ILog logger = LogManager.GetLogger(typeof(TimerTriggerCSharpLog4Net));
+
+        [FunctionName("TimerTriggerCSharpLog4Net")]
+        public void Run([TimerTrigger("*/30 * * * * *")]TimerInfo myTimer, MicrosoftLogger msLog)
+        {
+            msLog.LogInformation($"Log4Net C# Timer trigger function executed at: {DateTime.Now}");
+
+            logger.Info("Now I don't blame him 'cause he run and hid");
+            logger.Info("But the meanest thing he ever did");
+            logger.Info("Before he left was he went and named me Sue");
+            LogManager.Flush(5000);
+
+            msLog.LogInformation($"Log4Net C# Timer trigger function finished at: {DateTime.Now}");
         }
     }
 }

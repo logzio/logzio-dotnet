@@ -39,6 +39,7 @@ namespace Logzio.DotNet.NLog
         public bool ParseJsonMessage { get { return _shipperOptions.BulkSenderOptions.ParseJsonMessage; } set { _shipperOptions.BulkSenderOptions.ParseJsonMessage = value; } }
         public bool JsonKeysCamelCase { get { return _shipperOptions.BulkSenderOptions.JsonKeysCamelCase; } set { _shipperOptions.BulkSenderOptions.JsonKeysCamelCase = value; } }
         public bool AddTraceContext { get { return _shipperOptions.BulkSenderOptions.AddTraceContext; } set { _shipperOptions.BulkSenderOptions.AddTraceContext = value; } }
+        public bool UseStaticHttpClient { get { return _shipperOptions.BulkSenderOptions.UseStaticHttpClient; } set { _shipperOptions.BulkSenderOptions.UseStaticHttpClient = value; } }
 
         /// <summary>
         /// Configuration of additional properties to include with each LogEvent (Ex. ${logger}, ${machinename}, ${threadid} etc.)
@@ -68,7 +69,7 @@ namespace Logzio.DotNet.NLog
             {
                 if (_internalLogger == null)
                     _internalLogger = new InternalLoggerNLog(_shipperOptions, new Core.InternalLogger.InternalLogger(_shipperOptions.DebugLogFile));
-                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler(ProxyAddress), _shipperOptions.BulkSenderOptions.JsonKeysCamelCase), _internalLogger);
+                _shipper = new Shipper(new BulkSender(new Core.WebClient.HttpClientHandler(_shipperOptions.BulkSenderOptions), _shipperOptions.BulkSenderOptions.JsonKeysCamelCase), _internalLogger);
             }
             _usingDefaultLayout = Layout?.ToString() == DefaultLayout;
             base.InitializeTarget();

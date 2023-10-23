@@ -4,6 +4,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Core.HttpClient;
+using Logzio.DotNet.Core.Shipping;
+using Logzio.DotNet.Core.InternalLogger;
 
 namespace Logzio.DotNet.Core.WebClient
 {
@@ -12,33 +14,59 @@ namespace Logzio.DotNet.Core.WebClient
         Task<HttpResponseMessage> GetAsync(string url);
         Task<HttpResponseMessage> PostAsync(string url, MemoryStream body, System.Text.Encoding encoding, bool useGzip = false);
     }
-
-    public class HttpClientHandler : IHttpClient
-    {
-        private readonly HttpClient _client;
-
-        public HttpClientHandler()
+        public class HttpClientHandler : IHttpClient
         {
-            _client = new HttpClient();
-        }
+            private static HttpClient _staticClient;
+            private readonly HttpClient _client;
+            public bool IsStaticClient { get; private set; }
+            private readonly IInternalLogger _internalLogger;
 
-        public HttpClientHandler(String proxyAddress)
-        {
-            if (proxyAddress != String.Empty)
+            public HttpClientHandler(BulkSenderOptions options)
             {
-                var handler = new System.Net.Http.HttpClientHandler
+                _internalLogger = new InternalLogger.InternalLogger(options.DebugLogFile);
+                if (options.UseStaticHttpClient)
                 {
-                    UseProxy = true,
-                    Proxy = new Proxy(new Uri(proxyAddress))
-                };
-                _client = new HttpClient(handler: handler);
+                    if (_staticClient == null)
+                    {
+                        _staticClient = CreateHttpClient(options.ProxyAddress);
+
+                    }
+                    _client = _staticClient;
+                    IsStaticClient = true;
+                    if (options.Debug)
+                    {
+                        _internalLogger.Log("Logz.io: Created static HTTP/s client.");        
+                    }
+                
+                }
+                else
+                {
+                    _client = CreateHttpClient(options.ProxyAddress);
+                    IsStaticClient = false;
+                    if (options.Debug)
+                    {
+                        _internalLogger.Log("Logz.io: Created HTTP/s client.");
+
+                    }
+                }
             }
-            else
+
+            private HttpClient CreateHttpClient(string proxyAddress)
             {
-                _client = new HttpClient();
+                if (!string.IsNullOrEmpty(proxyAddress))
+                {
+                    var handler = new System.Net.Http.HttpClientHandler
+                    {
+                        UseProxy = true,
+                        Proxy = new Proxy(new Uri(proxyAddress))
+                    };
+                    return new HttpClient(handler: handler);
+                }
+                else
+                {
+                    return new HttpClient();
+                }
             }
-            
-        }
         public async Task<HttpResponseMessage> GetAsync(string url)
         {
             return await _client.GetAsync(url).ConfigureAwait(false);
@@ -58,5 +86,4 @@ namespace Logzio.DotNet.Core.WebClient
             return await _client.PostAsync(url, content).ConfigureAwait(false);
         }
     }
-
 }

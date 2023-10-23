@@ -10,7 +10,9 @@ namespace Logzio.DotNet.Core.Shipping
 {
     public interface IBulkSender
     {
+        bool IsUsingStaticHttpClient { get; }
         Task<HttpResponseMessage> SendAsync(ICollection<LogzioLoggingEvent> logz, BulkSenderOptions options);
+        
     }
 
     public class BulkSender : IBulkSender
@@ -20,6 +22,7 @@ namespace Logzio.DotNet.Core.Shipping
         private readonly JsonSerializer _jsonSerializer;
         private static readonly System.Text.Encoding _encodingUtf8 = new System.Text.UTF8Encoding(false);
         private readonly IHttpClient _httpClient;
+        public bool IsUsingStaticHttpClient { get; }
 
         public BulkSender(IHttpClient httpClient, bool jsonKeysCamelCase)
         {
@@ -40,6 +43,7 @@ namespace Logzio.DotNet.Core.Shipping
             };
             _jsonSerializer = JsonSerializer.CreateDefault(jsonSettings);
             _httpClient = httpClient;
+            IsUsingStaticHttpClient = _httpClient is Logzio.DotNet.Core.WebClient.HttpClientHandler handler && handler.IsStaticClient;
         }
 
         public Task<HttpResponseMessage> SendAsync(ICollection<LogzioLoggingEvent> logz, BulkSenderOptions options)

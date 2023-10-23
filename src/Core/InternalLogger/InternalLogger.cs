@@ -57,13 +57,21 @@ namespace Logzio.DotNet.Core.InternalLogger
                 Console.WriteLine(formattedMessage);
             }
 
-            lock (_writerLocker)
+            try
             {
-                using (StreamWriter writer = File.AppendText(_logFile))
+                lock (_writerLocker)
                 {
-                    writer.WriteLine(formattedMessage);
+                    using (StreamWriter writer = File.AppendText(_logFile))
+                    {
+                        writer.WriteLine(formattedMessage);
+                    }
                 }
             }
+            catch
+            {
+                Console.WriteLine("Couldn't write debug log to file: " + formattedMessage);
+            }
+
         }
     }
 

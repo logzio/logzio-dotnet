@@ -14,12 +14,14 @@ namespace Logzio.DotNet.UnitTests.Shipping
     {
         private BulkSender _target;
         private IHttpClient _httpClient;
-
+        private BulkSender _targetWithStaticHttpClient;
+        
         [SetUp]
         public void SetUp()
         {
             _httpClient = Substitute.For<IHttpClient>();
             _target = new BulkSender(_httpClient, false);
+            _targetWithStaticHttpClient = new BulkSender(new HttpClientHandler(new BulkSenderOptions { UseStaticHttpClient = true }), false);
         }
 
         [Test]
@@ -88,6 +90,18 @@ namespace Logzio.DotNet.UnitTests.Shipping
             _target.SendAsync(new List<LogzioLoggingEvent>(), new BulkSenderOptions()).Wait();
 
             _httpClient.ReceivedCalls().ShouldBeEmpty();
+        }
+
+        [Test]
+        public void IsUsingStaticHttpClient_StaticHttpClient_True()
+        {
+            _targetWithStaticHttpClient.IsUsingStaticHttpClient.ShouldBeTrue();
+        }
+
+        [Test]
+        public void IsUsingStaticHttpClient_NonStaticHttpClient_False()
+        {
+            _target.IsUsingStaticHttpClient.ShouldBeFalse();
         }
 
         [Test]
