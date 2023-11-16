@@ -63,7 +63,7 @@ If you configure your logging in an XML file, simply add a reference to the Logz
 	<!-- Add trace context (traceId and spanId) to each log. The default is false -->
 	<addTraceContext>false</addTraceContext>
     <!-- Use the same static HTTP/s client for sending logs. The default is false -->
-	<UseStaticHttpClient>false</addTraceContext>
+	<UseStaticHttpClient>false</UseStaticHttpClient>
 
     </appender>
     
