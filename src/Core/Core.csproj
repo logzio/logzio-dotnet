@@ -13,7 +13,7 @@
 
     <IsPackable>false</IsPackable>
 
-    <PackageVersion>1.1.0</PackageVersion>
+    <PackageVersion>1.1.1</PackageVersion>
   </PropertyGroup>
  
   <ItemGroup>
