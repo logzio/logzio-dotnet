@@ -1,5 +1,5 @@
 name: unit and integration testing for dotnet package
-on: [push, pull_request]
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,7 +23,7 @@ jobs:
           cd src
           dotnet restore logzio-dotnet.sln
       - name: Build package
-        run: dotnet build logzio-dotnet.sln /p:Configuration=Release
+        run: dotnet build ./logzio-dotnet.sln /p:Configuration=Release
       - name: Run tests
         run: |
           dotnet test ./UnitTests/UnitTests.csproj
