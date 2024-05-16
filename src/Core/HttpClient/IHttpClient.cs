@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Threading.Tasks;
 using Core.HttpClient;
 using Logzio.DotNet.Core.Shipping;
@@ -76,6 +77,7 @@ namespace Logzio.DotNet.Core.WebClient
         {
             var content = new StreamContent(body);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json") { CharSet = encoding.WebName };
+            content.Headers.Add("user-agent", "dotnet/<<LOGZIO_VERSION>>/logs");
 
             if (useGzip)
             {

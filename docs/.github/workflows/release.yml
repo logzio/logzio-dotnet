@@ -1,0 +1,31 @@
+name: build and release a new package version
+on: 
+  release:
+    published
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: ['2.0' ,'2.1', '2.2', '3.0', '3.1', '5.0', '6.0', '7.0', '8.0']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup dotnet ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Replace Logzio Version in Header
+        run: grep -rli '<<LOGZIO_VERSION>>' ./src/Core/HttpClient/IHttpClient.cs | xargs -i@ sed -i 's/<<LOGZIO_VERSION>>/${{ github.event.release.tag_name }}/g' @
+      - name: Setup .NET 6.x
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.x'
+      - name: Install dependencies
+        run: |
+          cd src
+          dotnet restore logzio-dotnet.sln
+      - name: Build and release package
+        run: |
+          cd ../package
+          build-nlog.bat ${{ github.event.release.tag_name }}
+          build-log4net.bat ${{ github.event.release.tag_name }}
