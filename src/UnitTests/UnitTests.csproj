@@ -13,4 +13,7 @@
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Log4netShipper\Log4netShipper.csproj" />
   </ItemGroup>
+  <PropertyGroup>
+    <RollForward>Major</RollForward>
+  </PropertyGroup>
 </Project>
