@@ -1,5 +1,5 @@
 name: unit and integration testing for dotnet package
-on: [push]
+on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
