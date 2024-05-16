@@ -19,12 +19,13 @@ jobs:
         with:
           dotnet-version: '6.x'
       - name: Install dependencies
-        run: |
-          cd src
-          dotnet restore logzio-dotnet.sln
+        working-directory: ./src
+        run: dotnet restore logzio-dotnet.sln
       - name: Build package
-        run: dotnet build ./logzio-dotnet.sln /p:Configuration=Release
+        working-directory: ./src
+        run: dotnet build logzio-dotnet.sln /p:Configuration=Release
       - name: Run tests
+        working-directory: ./src
         run: |
           dotnet test ./UnitTests/UnitTests.csproj
           dotnet test ./IntegrationTests/IntegrationTests.csproj

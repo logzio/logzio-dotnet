@@ -21,11 +21,10 @@ jobs:
         with:
           dotnet-version: '6.x'
       - name: Install dependencies
-        run: |
-          cd src
-          dotnet restore logzio-dotnet.sln
+        working-directory: ./src
+        run: dotnet restore logzio-dotnet.sln
       - name: Build and release package
+        working-directory: ./package
         run: |
-          cd ../package
           build-nlog.bat ${{ github.event.release.tag_name }}
           build-log4net.bat ${{ github.event.release.tag_name }}
