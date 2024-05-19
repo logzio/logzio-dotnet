@@ -53,6 +53,7 @@ namespace Logzio.DotNet.Core.WebClient
 
             private HttpClient CreateHttpClient(string proxyAddress)
             {
+                HttpClient client;
                 if (!string.IsNullOrEmpty(proxyAddress))
                 {
                     var handler = new System.Net.Http.HttpClientHandler
@@ -60,12 +61,14 @@ namespace Logzio.DotNet.Core.WebClient
                         UseProxy = true,
                         Proxy = new Proxy(new Uri(proxyAddress))
                     };
-                    return new HttpClient(handler: handler);
+                    client = new HttpClient(handler: handler);
                 }
                 else
                 {
-                    return new HttpClient();
+                    client = new HttpClient();
                 }
+                client.DefaultRequestHeaders.Add("User-Agent", "dotnet/<<LOGZIO_VERSION>> logs");
+                return client;
             }
         public async Task<HttpResponseMessage> GetAsync(string url)
         {
@@ -76,7 +79,6 @@ namespace Logzio.DotNet.Core.WebClient
         {
             var content = new StreamContent(body);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json") { CharSet = encoding.WebName };
-            content.Headers.Add("user-agent", "dotnet/<<LOGZIO_VERSION>>/logs");
 
             if (useGzip)
             {
