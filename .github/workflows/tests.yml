@@ -14,8 +14,6 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Display dotnet version
         run: dotnet --version
-      - name: Replace Logzio Version in Header
-        run: grep -rli '<<LOGZIO_VERSION>>' ./src/Core/HttpClient/IHttpClient.cs | xargs -i@ sed -i 's/<<LOGZIO_VERSION>>/7357.0/g' @
       - name: Install dependencies
         working-directory: ./src
         run: dotnet restore logzio-dotnet.sln
