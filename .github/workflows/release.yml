@@ -16,6 +16,7 @@ jobs:
         run: dotnet restore logzio-dotnet.sln
       - name: Build and release package
         working-directory: .\package
+        shell: cmd
         run: |
           build-nlog.bat ${{ github.event.release.tag_name }}
           build-log4net.bat ${{ github.event.release.tag_name }}
