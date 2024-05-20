@@ -1,7 +1,8 @@
 name: unit and integration testing for dotnet package
 on:
-  pull_request:
-    types: [opened, edited]
+  push:
+    branches:
+      - '**'
 jobs:
   tests:
     runs-on: ubuntu-latest
