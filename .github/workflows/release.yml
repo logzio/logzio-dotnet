@@ -4,21 +4,20 @@ on:
     types: [published]
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
       - name: Setup .NET 8.x
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
       - name: Install dependencies
-        working-directory: .\src
+        working-directory: ./src
         run: dotnet restore logzio-dotnet.sln
       - name: Build and release package
-        working-directory: .\package
-        shell: cmd
+        working-directory: ./src
         run: |
-          build-nlog.bat ${{ github.event.release.tag_name }}
-          build-log4net.bat ${{ github.event.release.tag_name }}
+          dotnet publish -c Release -f net6.0
+          dotnet pack --configuration Release
+          dotnet nuget push ".Log4netShipper/bin/Release/Logzio.DotNet.Log4net.${{ github.event.release.tag_name }}.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+          dotnet nuget push ".NLogShipper/bin/Release/Logzio.DotNet.NLog.${{ github.event.release.tag_name }}.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json

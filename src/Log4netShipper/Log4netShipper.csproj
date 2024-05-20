@@ -16,6 +16,7 @@
     <RepositoryUrl>git://github.com/logzio/logzio-dotnet</RepositoryUrl>
     <PackageVersion>1.1.1</PackageVersion>
     <PackageReleaseNotes>Option to format message as json</PackageReleaseNotes>
+    <PackageReadmeFile>log4net.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -40,6 +41,10 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="OpenTelemetry" Version="1.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\log4net.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <PropertyGroup>
