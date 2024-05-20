@@ -53,6 +53,8 @@ namespace Logzio.DotNet.Core.WebClient
 
             private HttpClient CreateHttpClient(string proxyAddress)
             {
+                HttpClient client;
+                string logzioVersion = Environment.GetEnvironmentVariable("LOGZIO_VERSION");
                 if (!string.IsNullOrEmpty(proxyAddress))
                 {
                     var handler = new System.Net.Http.HttpClientHandler
@@ -60,12 +62,14 @@ namespace Logzio.DotNet.Core.WebClient
                         UseProxy = true,
                         Proxy = new Proxy(new Uri(proxyAddress))
                     };
-                    return new HttpClient(handler: handler);
+                    client = new HttpClient(handler: handler);
                 }
                 else
                 {
-                    return new HttpClient();
+                    client = new HttpClient();
                 }
+                client.DefaultRequestHeaders.Add("User-Agent", $"dotnet/{logzioVersion} logs");
+                return client;
             }
         public async Task<HttpResponseMessage> GetAsync(string url)
         {

@@ -13,7 +13,7 @@
 
     <IsPackable>false</IsPackable>
 
-    <PackageVersion>1.1.0</PackageVersion>
+    <PackageVersion>1.1.1</PackageVersion>
   </PropertyGroup>
  
   <ItemGroup>
@@ -24,4 +24,8 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
 
+  <Target Name="SetLogzioVersionEnvVar" BeforeTargets="Build">
+    <Exec Command="export LOGZIO_VERSION=$(PackageVersion)" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' or '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'" />
+    <Exec Command="set LOGZIO_VERSION=$(PackageVersion)" Condition="$(OS.StartsWith('win'))" />
+  </Target>
 </Project>

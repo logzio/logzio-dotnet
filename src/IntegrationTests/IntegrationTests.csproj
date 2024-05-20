@@ -22,4 +22,7 @@
 <!--      <CopyToOutputDirectory>Always</CopyToOutputDirectory>-->
 <!--    </Content>-->
   </ItemGroup>
+  <PropertyGroup>
+    <RollForward>Major</RollForward>
+  </PropertyGroup>
 </Project>
