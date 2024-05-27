@@ -17,6 +17,7 @@ jobs:
       - name: Build and release package
         working-directory: ./src
         run: |
+          dotnet publish -c Release -f net8.0
           dotnet publish -c Release -f net6.0
           dotnet pack --configuration Release
           dotnet nuget push "./Log4netShipper/bin/Release/Logzio.DotNet.Log4net.${{ github.event.release.tag_name }}.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
