@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net5.0;netcoreapp3.1;netstandard1.3;netstandard2.0;net6.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net5.0;netcoreapp3.1;netstandard1.3;netstandard2.0;net6.0;net8.0</TargetFrameworks>
 
     <AssemblyName>Logzio.DotNet.NLog</AssemblyName>
     
@@ -14,7 +14,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/logzio/logzio-dotnet</RepositoryUrl>
-    <PackageVersion>1.1.1</PackageVersion>
+    <PackageVersion>1.2.0</PackageVersion>
     <PackageReleaseNotes>Option to format message as json</PackageReleaseNotes>
     <PackageReadmeFile>nlog.md</PackageReadmeFile>
   </PropertyGroup>
@@ -28,7 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" PrivateAssets="all" />
   </ItemGroup>
- 
+
   <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
     <PackageReference Include="OpenTelemetry" Version="1.3.1" />
   </ItemGroup>
@@ -42,6 +42,10 @@
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
     <PackageReference Include="OpenTelemetry" Version="1.3.1" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="OpenTelemetry" Version="1.8.1" />
   </ItemGroup>
 
   <ItemGroup>
