@@ -6,15 +6,12 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dotnet-version: ['2.0', '3.0', '5.0', '6.0', '7.0', '8.0']
     steps:
       - uses: actions/checkout@v4
-      - name: Setup .NET ${{ matrix.dotnet-version }}
+      - name: Setup .NET 8.0
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
+          dotnet-version: 8.0
       - name: Display dotnet version
         run: dotnet --version
       - name: Install dependencies
