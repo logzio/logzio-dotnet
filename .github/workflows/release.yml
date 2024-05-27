@@ -19,36 +19,30 @@ jobs:
         working-directory: ./src
         run: dotnet restore logzio-dotnet.sln
       
-      - name: Build projects for net8.0
-        working-directory: ./src
-        run: |
-          dotnet build logzio-dotnet.sln -c Release -f net8.0
-      
-      - name: Build projects for net6.0
-        working-directory: ./src
-        run: |
-          dotnet build logzio-dotnet.sln -c Release -f net6.0
-      
-      - name: Pack and release Log4netShipper for net8.0
+      - name: Build and pack Log4netShipper for net8.0
         working-directory: ./src/Log4netShipper
         run: |
-          dotnet pack --configuration Release -p:TargetFramework=net8.0
+          dotnet build --configuration Release --framework net8.0
+          dotnet pack --configuration Release --framework net8.0
           dotnet nuget push "./bin/Release/Logzio.DotNet.Log4net.${{ github.event.release.tag_name }}.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       
-      - name: Pack and release Log4netShipper for net6.0
+      - name: Build and pack Log4netShipper for net6.0
         working-directory: ./src/Log4netShipper
         run: |
-          dotnet pack --configuration Release -p:TargetFramework=net6.0
+          dotnet build --configuration Release --framework net6.0
+          dotnet pack --configuration Release --framework net6.0
           dotnet nuget push "./bin/Release/Logzio.DotNet.Log4net.${{ github.event.release.tag_name }}.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       
-      - name: Pack and release NLogShipper for net8.0
+      - name: Build and pack NLogShipper for net8.0
         working-directory: ./src/NLogShipper
         run: |
-          dotnet pack --configuration Release -p:TargetFramework=net8.0
+          dotnet build --configuration Release --framework net8.0
+          dotnet pack --configuration Release --framework net8.0
           dotnet nuget push "./bin/Release/Logzio.DotNet.NLog.${{ github.event.release.tag_name }}.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       
-      - name: Pack and release NLogShipper for net6.0
+      - name: Build and pack NLogShipper for net6.0
         working-directory: ./src/NLogShipper
         run: |
-          dotnet pack --configuration Release -p:TargetFramework=net6.0
+          dotnet build --configuration Release --framework net6.0
+          dotnet pack --configuration Release --framework net6.0
           dotnet nuget push "./bin/Release/Logzio.DotNet.NLog.${{ github.event.release.tag_name }}.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
