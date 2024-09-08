@@ -17,3 +17,28 @@ Prerequisites:
 - On console applications, logs are flushed before the app exits
 - Enable debug mode to see debug messages and errors in the console output and trace log
 - Provided with sample applications and configuration examples
+
+## Build and Test Locally
+
+This project uses .NET 8.0 and can be built and tested locally. Follow the steps below to do so:
+
+1. Clone the repository
+
+   ```bash
+   git clone https://github.com/logzio/logzio-dotnet.git
+   ```
+
+2. Go to `./src` directory
+
+  ```bash
+  cd logzio-dotnet/src
+  ```
+
+3. Build and run tests
+
+  ```bash
+  dotnet restore logzio-dotnet.sln
+  dotnet build logzio-dotnet.sln /p:Configuration=Release
+  dotnet test ./UnitTests/UnitTests.csproj
+  dotnet test ./IntegrationTests/IntegrationTests.csproj
+  ```
