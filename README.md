@@ -28,13 +28,13 @@ This project uses .NET 8.0 and can be built and tested locally. Follow the steps
    git clone https://github.com/logzio/logzio-dotnet.git
    ```
 
-2. go to `./src` directory
+2. Go to `./src` directory
 
   ```bash
   cd logzio-dotnet/src
   ```
 
-3. build and run tests
+3. Build and run tests
 
   ```bash
   dotnet restore logzio-dotnet.sln
