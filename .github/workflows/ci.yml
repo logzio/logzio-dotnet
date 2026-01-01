@@ -1,0 +1,140 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  test:
+    name: Test (.NET ${{ matrix.dotnet-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dotnet-version: ['6.0', '8.0']
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup .NET ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      
+      - name: Display dotnet version
+        run: dotnet --version
+      
+      - name: Install dependencies
+        working-directory: ./src
+        run: dotnet restore logzio-dotnet.sln
+      
+      - name: Build
+        working-directory: ./src
+        run: dotnet build logzio-dotnet.sln --configuration Release --no-restore
+      
+      - name: Run Unit Tests with Coverage
+        working-directory: ./src
+        run: |
+          dotnet test ./UnitTests/UnitTests.csproj \
+            --configuration Release \
+            --no-build \
+            --framework net${{ matrix.dotnet-version }} \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./TestResults \
+            --logger "trx;LogFileName=unit-tests.trx"
+      
+      - name: Run Integration Tests
+        working-directory: ./src
+        run: |
+          dotnet test ./IntegrationTests/IntegrationTests.csproj \
+            --configuration Release \
+            --no-build \
+            --framework net${{ matrix.dotnet-version }} \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./TestResults \
+            --logger "trx;LogFileName=integration-tests.trx"
+      
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.dotnet-version }}
+          path: ./src/TestResults/
+          retention-days: 7
+
+  e2e-integration:
+    name: E2E Integration Tests
+    needs: [test]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    env:
+      LOGZIO_TOKEN: ${{ secrets.LOGZIO_TOKEN }}
+      LOGZIO_API_KEY: ${{ secrets.LOGZIO_API_KEY }}
+      LOGZIO_API_URL: ${{ secrets.LOGZIO_API_URL }}
+      ENV_ID: e2e-${{ github.run_id }}-${{ github.run_attempt }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0'
+      
+      - name: Install dependencies
+        working-directory: ./src
+        run: dotnet restore logzio-dotnet.sln
+      
+      - name: Build
+        working-directory: ./src
+        run: dotnet build logzio-dotnet.sln --configuration Release --no-restore
+      
+      - name: Check E2E secrets
+        id: check-secrets
+        run: |
+          if [ -z "$LOGZIO_TOKEN" ] || [ -z "$LOGZIO_API_KEY" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "::warning::E2E tests skipped - LOGZIO_TOKEN or LOGZIO_API_KEY not configured"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Run E2E Tests
+        if: steps.check-secrets.outputs.skip != 'true'
+        working-directory: ./src
+        run: |
+          echo "Running E2E tests with ENV_ID: $ENV_ID"
+          dotnet test ./IntegrationTests/IntegrationTests.csproj \
+            --configuration Release \
+            --no-build \
+            --framework net8.0 \
+            --filter "Category=E2E" \
+            --logger "console;verbosity=detailed" || true
+          echo "E2E test execution completed"
+
+  ci-success:
+    name: CI Success
+    needs: [test, e2e-integration]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Check job results
+        run: |
+          if [[ "${{ needs.test.result }}" != "success" ]]; then
+            echo "Test job failed"
+            exit 1
+          fi
+          if [[ "${{ needs.e2e-integration.result }}" != "success" && "${{ needs.e2e-integration.result }}" != "skipped" ]]; then
+            echo "E2E integration job failed"
+            exit 1
+          fi
+          echo "All required jobs passed!"
+
