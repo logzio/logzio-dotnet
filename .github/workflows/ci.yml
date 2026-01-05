@@ -10,6 +10,9 @@ on:
       - main
       - master
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Test (.NET ${{ matrix.dotnet-version }})
@@ -17,27 +20,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dotnet-version: ['6.0', '8.0']
-    
+        dotnet-version: ['6.0', '8.0', '9.0']
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup .NET ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
-      
+
       - name: Display dotnet version
         run: dotnet --version
-      
+
       - name: Install dependencies
         working-directory: ./src
         run: dotnet restore logzio-dotnet.sln
-      
+
       - name: Build
         working-directory: ./src
         run: dotnet build logzio-dotnet.sln --configuration Release --no-restore
-      
+
       - name: Run Unit Tests with Coverage
         working-directory: ./src
         run: |
@@ -48,7 +51,7 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --results-directory ./TestResults \
             --logger "trx;LogFileName=unit-tests.trx"
-      
+
       - name: Run Integration Tests
         working-directory: ./src
         run: |
@@ -59,7 +62,7 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --results-directory ./TestResults \
             --logger "trx;LogFileName=integration-tests.trx"
-      
+
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
@@ -73,29 +76,29 @@ jobs:
     needs: [test]
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
-    
+
     env:
       LOGZIO_TOKEN: ${{ secrets.LOGZIO_TOKEN }}
       LOGZIO_API_KEY: ${{ secrets.LOGZIO_API_KEY }}
       LOGZIO_API_URL: ${{ secrets.LOGZIO_API_URL }}
       ENV_ID: e2e-${{ github.run_id }}-${{ github.run_attempt }}
-    
+
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Setup .NET 8.0
+
+      - name: Setup .NET 9.0
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0'
-      
+          dotnet-version: '9.0'
+
       - name: Install dependencies
         working-directory: ./src
         run: dotnet restore logzio-dotnet.sln
-      
+
       - name: Build
         working-directory: ./src
         run: dotnet build logzio-dotnet.sln --configuration Release --no-restore
-      
+
       - name: Check E2E secrets
         id: check-secrets
         run: |
@@ -105,7 +108,7 @@ jobs:
           else
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Run E2E Tests
         if: steps.check-secrets.outputs.skip != 'true'
         working-directory: ./src
@@ -114,7 +117,7 @@ jobs:
           dotnet test ./IntegrationTests/IntegrationTests.csproj \
             --configuration Release \
             --no-build \
-            --framework net8.0 \
+            --framework net9.0 \
             --filter "Category=E2E" \
             --logger "console;verbosity=detailed" || true
           echo "E2E test execution completed"
@@ -124,7 +127,7 @@ jobs:
     needs: [test, e2e-integration]
     runs-on: ubuntu-latest
     if: always()
-    
+
     steps:
       - name: Check job results
         run: |
@@ -137,4 +140,3 @@ jobs:
             exit 1
           fi
           echo "All required jobs passed!"
-
