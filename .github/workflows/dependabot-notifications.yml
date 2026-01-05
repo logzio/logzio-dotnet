@@ -6,6 +6,10 @@ on:
     types:
       - completed
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   notify-success:
     name: Notify Success
@@ -19,20 +23,26 @@ jobs:
       - name: Check Slack webhook
         id: check-webhook
         run: |
-          if [ -z "${{ secrets.SLACK_WEBHOOK }}" ]; then
+          if [ -z "${SLACK_WEBHOOK}" ]; then
             echo "skip=true" >> $GITHUB_OUTPUT
           else
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
       - name: Get PR info
         if: steps.check-webhook.outputs.skip != 'true'
         id: pr
         run: |
-          PR_URL="https://github.com/${{ github.repository }}/pull/$(gh pr list --head "${{ github.event.workflow_run.head_branch }}" --json number --jq '.[0].number')"
+          PR_NUMBER=$(gh pr list --head "${HEAD_BRANCH}" --json number --jq '.[0].number')
+          PR_URL="https://github.com/${GITHUB_REPOSITORY}/pull/${PR_NUMBER}"
           echo "url=$PR_URL" >> $GITHUB_OUTPUT
+          echo "branch=${HEAD_BRANCH}" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
 
       - name: Send Slack notification
         if: steps.check-webhook.outputs.skip != 'true'
@@ -45,7 +55,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "✅ *Dependabot PR Ready for Merge*\n\n*Repository:* ${{ github.repository }}\n*Branch:* `${{ github.event.workflow_run.head_branch }}`\n*Status:* All CI checks passed"
+                    "text": "✅ *Dependabot PR Ready for Merge*\n\n*Repository:* ${{ github.repository }}\n*Branch:* `${{ steps.pr.outputs.branch }}`\n*Status:* All CI checks passed"
                   }
                 },
                 {
@@ -79,20 +89,26 @@ jobs:
       - name: Check Slack webhook
         id: check-webhook
         run: |
-          if [ -z "${{ secrets.SLACK_WEBHOOK }}" ]; then
+          if [ -z "${SLACK_WEBHOOK}" ]; then
             echo "skip=true" >> $GITHUB_OUTPUT
           else
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
       - name: Get PR info
         if: steps.check-webhook.outputs.skip != 'true'
         id: pr
         run: |
-          PR_URL="https://github.com/${{ github.repository }}/pull/$(gh pr list --head "${{ github.event.workflow_run.head_branch }}" --json number --jq '.[0].number')"
+          PR_NUMBER=$(gh pr list --head "${HEAD_BRANCH}" --json number --jq '.[0].number')
+          PR_URL="https://github.com/${GITHUB_REPOSITORY}/pull/${PR_NUMBER}"
           echo "url=$PR_URL" >> $GITHUB_OUTPUT
+          echo "branch=${HEAD_BRANCH}" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
 
       - name: Send Slack notification
         if: steps.check-webhook.outputs.skip != 'true'
@@ -105,7 +121,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "🚨 *Dependabot PR Failed CI*\n\n*Repository:* ${{ github.repository }}\n*Branch:* `${{ github.event.workflow_run.head_branch }}`\n*Status:* CI checks failed - manual review required"
+                    "text": "🚨 *Dependabot PR Failed CI*\n\n*Repository:* ${{ github.repository }}\n*Branch:* `${{ steps.pr.outputs.branch }}`\n*Status:* CI checks failed - manual review required"
                   }
                 },
                 {
@@ -134,4 +150,3 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-
