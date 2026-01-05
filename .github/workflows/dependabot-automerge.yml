@@ -25,10 +25,11 @@ jobs:
       - name: Get PR number
         id: pr
         run: |
-          PR_NUMBER=$(gh pr list --head "${{ github.event.workflow_run.head_branch }}" --json number --jq '.[0].number')
+          PR_NUMBER=$(gh pr list --head "${HEAD_BRANCH}" --json number --jq '.[0].number')
           echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
 
       - name: Fetch Dependabot metadata
         id: metadata
@@ -40,23 +41,26 @@ jobs:
         if: steps.metadata.outputs.update-type == 'version-update:semver-patch'
         run: |
           echo "Enabling auto-merge for patch update"
-          gh pr merge --auto --merge "${{ github.event.workflow_run.head_branch }}"
+          gh pr merge --auto --merge "${HEAD_BRANCH}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
 
       - name: Auto-merge minor updates
         if: steps.metadata.outputs.update-type == 'version-update:semver-minor'
         run: |
           echo "Enabling auto-merge for minor update"
-          gh pr merge --auto --merge "${{ github.event.workflow_run.head_branch }}"
+          gh pr merge --auto --merge "${HEAD_BRANCH}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
 
       - name: Skip major updates
         if: steps.metadata.outputs.update-type == 'version-update:semver-major'
         run: |
           echo "::warning::Major version update detected - requires manual review"
-          echo "PR: ${{ github.event.workflow_run.head_branch }}"
+          echo "PR: ${HEAD_BRANCH}"
           echo "Dependency: ${{ steps.metadata.outputs.dependency-names }}"
           echo "Update type: ${{ steps.metadata.outputs.update-type }}"
-
+        env:
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
