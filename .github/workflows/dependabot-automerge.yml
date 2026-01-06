@@ -52,7 +52,6 @@ jobs:
               core.setOutput('found', 'false');
             }
 
-      # CI FAILED
       - name: Notify Slack - CI Failed
         if: |
           github.event.workflow_run.conclusion == 'failure' &&
@@ -74,7 +73,6 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
-      # CI PASSED - MAJOR UPDATE
       - name: Notify Slack - Major Update
         if: |
           github.event.workflow_run.conclusion == 'success' &&
@@ -97,7 +95,6 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
-      # CI PASSED - PATCH/MINOR UPDATE
       - name: Squash merge PR
         id: merge
         if: |
@@ -159,7 +156,6 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
-  # Notify when actually merged
   notify-merged:
     name: Notify Merged
     runs-on: ubuntu-latest
