@@ -12,15 +12,15 @@ permissions:
 
 jobs:
   unit-tests:
-    name: Unit Tests (.NET 8.0)
+    name: Unit Tests (.NET 9.0)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET 8.0
+      - name: Setup .NET 9.0
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0'
+          dotnet-version: '9.0'
 
       - name: Display dotnet version
         run: dotnet --version
@@ -39,5 +39,5 @@ jobs:
           dotnet test ./UnitTests/UnitTests.csproj \
             --configuration Release \
             --no-build \
-            --framework net8.0 \
+            --framework net9.0 \
             --logger "console;verbosity=normal"
