@@ -11,56 +11,176 @@ permissions:
   pull-requests: write
 
 jobs:
-  auto-merge:
-    name: Auto-merge Dependabot PRs
+  process-dependabot:
+    name: Process Dependabot PR
     runs-on: ubuntu-latest
     if: |
-      github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.actor.login == 'dependabot[bot]' &&
       github.event.workflow_run.event == 'pull_request'
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Get PR number
+      - name: Get PR information
         id: pr
-        run: |
-          PR_NUMBER=$(gh pr list --head "${HEAD_BRANCH}" --json number --jq '.[0].number')
-          echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
-
-      - name: Fetch Dependabot metadata
-        id: metadata
-        uses: dependabot/fetch-metadata@v2
+        uses: actions/github-script@v7
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          script: |
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              head: `${context.repo.owner}:${context.payload.workflow_run.head_branch}`
+            });
+            
+            if (pullRequests.length > 0) {
+              const pr = pullRequests[0];
+              core.setOutput('number', pr.number);
+              core.setOutput('title', pr.title);
+              core.setOutput('url', pr.html_url);
+              core.setOutput('found', 'true');
+              
+              // Check if major update from PR title
+              const majorPattern = /from \d+\.\d+\.\d+ to (\d+)\./;
+              const match = pr.title.match(majorPattern);
+              if (match) {
+                const fromMajor = pr.title.match(/from (\d+)\./);
+                const toMajor = match[1];
+                core.setOutput('is_major', fromMajor && fromMajor[1] !== toMajor ? 'true' : 'false');
+              } else {
+                core.setOutput('is_major', 'false');
+              }
+            } else {
+              core.setOutput('found', 'false');
+            }
 
-      - name: Auto-merge patch updates
-        if: steps.metadata.outputs.update-type == 'version-update:semver-patch'
+      # CI FAILED
+      - name: Notify Slack - CI Failed
+        if: |
+          github.event.workflow_run.conclusion == 'failure' &&
+          steps.pr.outputs.found == 'true'
         run: |
-          echo "Enabling auto-merge for patch update"
-          gh pr merge --auto --merge "${HEAD_BRANCH}"
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "attachments": [{
+              "color": "#ff0000",
+              "blocks": [
+                {"type": "header", "text": {"type": "plain_text", "text": "🚨 Dependabot Update - CI Failed"}},
+                {"type": "section", "fields": [
+                  {"type": "mrkdwn", "text": "*Repository:*\n${{ github.repository }}"},
+                  {"type": "mrkdwn", "text": "*PR:*\n<${{ steps.pr.outputs.url }}|#${{ steps.pr.outputs.number }}>"}
+                ]},
+                {"type": "section", "text": {"type": "mrkdwn", "text": "${{ steps.pr.outputs.title }}\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}|View CI Run>"}}
+              ]
+            }]
+          }' "$SLACK_WEBHOOK"
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+      # CI PASSED - MAJOR UPDATE
+      - name: Notify Slack - Major Update
+        if: |
+          github.event.workflow_run.conclusion == 'success' &&
+          steps.pr.outputs.found == 'true' &&
+          steps.pr.outputs.is_major == 'true'
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "attachments": [{
+              "color": "#ffa500",
+              "blocks": [
+                {"type": "header", "text": {"type": "plain_text", "text": "⚠️ Major Update - Manual Review Required"}},
+                {"type": "section", "fields": [
+                  {"type": "mrkdwn", "text": "*Repository:*\n${{ github.repository }}"},
+                  {"type": "mrkdwn", "text": "*PR:*\n<${{ steps.pr.outputs.url }}|#${{ steps.pr.outputs.number }}>"}
+                ]},
+                {"type": "section", "text": {"type": "mrkdwn", "text": "${{ steps.pr.outputs.title }}\n\nReview changelog for breaking changes."}}
+              ]
+            }]
+          }' "$SLACK_WEBHOOK"
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+      # CI PASSED - PATCH/MINOR UPDATE
+      - name: Squash merge PR
+        id: merge
+        if: |
+          github.event.workflow_run.conclusion == 'success' &&
+          steps.pr.outputs.found == 'true' &&
+          steps.pr.outputs.is_major != 'true'
+        run: |
+          if gh pr merge ${{ steps.pr.outputs.number }} --squash --repo ${{ github.repository }}; then
+            echo "result=success" >> $GITHUB_OUTPUT
+          else
+            echo "result=failed" >> $GITHUB_OUTPUT
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
 
-      - name: Auto-merge minor updates
-        if: steps.metadata.outputs.update-type == 'version-update:semver-minor'
+      - name: Notify Slack - Squash Merged
+        if: |
+          github.event.workflow_run.conclusion == 'success' &&
+          steps.pr.outputs.found == 'true' &&
+          steps.pr.outputs.is_major != 'true' &&
+          steps.merge.outputs.result == 'success'
         run: |
-          echo "Enabling auto-merge for minor update"
-          gh pr merge --auto --merge "${HEAD_BRANCH}"
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "attachments": [{
+              "color": "#36a64f",
+              "blocks": [
+                {"type": "header", "text": {"type": "plain_text", "text": "✅ Dependabot Update - Squash Merged"}},
+                {"type": "section", "fields": [
+                  {"type": "mrkdwn", "text": "*Repository:*\n${{ github.repository }}"},
+                  {"type": "mrkdwn", "text": "*PR:*\n<${{ steps.pr.outputs.url }}|#${{ steps.pr.outputs.number }}>"}
+                ]},
+                {"type": "section", "text": {"type": "mrkdwn", "text": "${{ steps.pr.outputs.title }}"}}
+              ]
+            }]
+          }' "$SLACK_WEBHOOK"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
-      - name: Skip major updates
-        if: steps.metadata.outputs.update-type == 'version-update:semver-major'
+      - name: Notify Slack - Merge Failed
+        if: |
+          github.event.workflow_run.conclusion == 'success' &&
+          steps.pr.outputs.found == 'true' &&
+          steps.pr.outputs.is_major != 'true' &&
+          steps.merge.outputs.result == 'failed'
         run: |
-          echo "::warning::Major version update detected - requires manual review"
-          echo "PR: ${HEAD_BRANCH}"
-          echo "Dependency: ${{ steps.metadata.outputs.dependency-names }}"
-          echo "Update type: ${{ steps.metadata.outputs.update-type }}"
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "attachments": [{
+              "color": "#ff0000",
+              "blocks": [
+                {"type": "header", "text": {"type": "plain_text", "text": "🚨 Merge Failed"}},
+                {"type": "section", "fields": [
+                  {"type": "mrkdwn", "text": "*Repository:*\n${{ github.repository }}"},
+                  {"type": "mrkdwn", "text": "*PR:*\n<${{ steps.pr.outputs.url }}|#${{ steps.pr.outputs.number }}>"}
+                ]},
+                {"type": "section", "text": {"type": "mrkdwn", "text": "${{ steps.pr.outputs.title }}\n\nCould not merge PR. Manual intervention required."}}
+              ]
+            }]
+          }' "$SLACK_WEBHOOK"
         env:
-          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+  # Notify when actually merged
+  notify-merged:
+    name: Notify Merged
+    runs-on: ubuntu-latest
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      contains(github.event.workflow_run.head_commit.message, 'dependabot')
+    steps:
+      - name: Send Slack notification
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "attachments": [{
+              "color": "#2eb886",
+              "blocks": [
+                {"type": "header", "text": {"type": "plain_text", "text": "🎉 Dependencies Updated Successfully"}},
+                {"type": "section", "fields": [
+                  {"type": "mrkdwn", "text": "*Repository:*\n${{ github.repository }}"},
+                  {"type": "mrkdwn", "text": "*Commit:*\n<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.event.workflow_run.head_sha }}|View>"}
+                ]}
+              ]
+            }]
+          }' "$SLACK_WEBHOOK"
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
