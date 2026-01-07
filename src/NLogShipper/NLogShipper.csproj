@@ -20,9 +20,9 @@
   </PropertyGroup>
  
   <ItemGroup>
-    <PackageReference Include="NLog" Version="4.7.11" />
+    <PackageReference Include="NLog" Version="5.5.1" />
     <!-- Newtonsoft.Json MUST be here for correct nuget-package generation -->
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
  
   <ItemGroup>
