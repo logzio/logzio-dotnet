@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
 
-    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net5.0;netcoreapp3.1;netstandard1.3;netstandard2.0;net6.0;net8.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net5.0;netcoreapp3.1;netstandard1.3;netstandard2.0;net6.0;net8.0;net9.0</TargetFrameworks>
     <LangVersion>9.0</LangVersion>
 
     <AssemblyName>Logzio.DotNet.Core</AssemblyName>
