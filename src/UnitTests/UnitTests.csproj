@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net6.0;net8.0;net9.0</TargetFrameworks>
   </PropertyGroup>
@@ -8,6 +8,13 @@
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
     <PackageReference Include="Shouldly" Version="4.0.3" />
+  </ItemGroup>
+    <!-- Pin transitive dependencies to version 8.0.x only for net6.0 (which doesn't support 10.0.0) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
+    <PackageReference Include="System.IO.Pipelines" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
