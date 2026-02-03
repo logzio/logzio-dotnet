@@ -1,4 +1,4 @@
-name: Dependabot Auto-Merge
+name: Dependency Auto-Merge
 
 on:
   workflow_run:
@@ -11,11 +11,12 @@ permissions:
   pull-requests: write
 
 jobs:
-  process-dependabot:
-    name: Process Dependabot PR
+  process-dependency-update:
+    name: Process Dependency Update PR
     runs-on: ubuntu-latest
     if: |
-      github.event.workflow_run.actor.login == 'dependabot[bot]' &&
+      (github.event.workflow_run.actor.login == 'dependabot[bot]' ||
+       github.event.workflow_run.actor.login == 'cycode-security[bot]') &&
       github.event.workflow_run.event == 'pull_request'
 
     steps:
@@ -37,6 +38,7 @@ jobs:
               core.setOutput('title', pr.title);
               core.setOutput('url', pr.html_url);
               core.setOutput('found', 'true');
+              core.setOutput('author', pr.user.login);
               
               // Check if major update from PR title
               const majorPattern = /from \d+\.\d+\.\d+ to (\d+)\./;
@@ -61,12 +63,12 @@ jobs:
             "attachments": [{
               "color": "#ff0000",
               "blocks": [
-                {"type": "header", "text": {"type": "plain_text", "text": "🚨 Dependabot Update - CI Failed"}},
+                {"type": "header", "text": {"type": "plain_text", "text": "🚨 Dependency Update - CI Failed"}},
                 {"type": "section", "fields": [
                   {"type": "mrkdwn", "text": "*Repository:*\n${{ github.repository }}"},
                   {"type": "mrkdwn", "text": "*PR:*\n<${{ steps.pr.outputs.url }}|#${{ steps.pr.outputs.number }}>"}
                 ]},
-                {"type": "section", "text": {"type": "mrkdwn", "text": "${{ steps.pr.outputs.title }}\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}|View CI Run>"}}
+                {"type": "section", "text": {"type": "mrkdwn", "text": "*Author:* ${{ steps.pr.outputs.author }}\n${{ steps.pr.outputs.title }}\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}|View CI Run>"}}
               ]
             }]
           }' "$SLACK_WEBHOOK"
@@ -88,7 +90,7 @@ jobs:
                   {"type": "mrkdwn", "text": "*Repository:*\n${{ github.repository }}"},
                   {"type": "mrkdwn", "text": "*PR:*\n<${{ steps.pr.outputs.url }}|#${{ steps.pr.outputs.number }}>"}
                 ]},
-                {"type": "section", "text": {"type": "mrkdwn", "text": "${{ steps.pr.outputs.title }}\n\nReview changelog for breaking changes."}}
+                {"type": "section", "text": {"type": "mrkdwn", "text": "*Author:* ${{ steps.pr.outputs.author }}\n${{ steps.pr.outputs.title }}\n\nReview changelog for breaking changes."}}
               ]
             }]
           }' "$SLACK_WEBHOOK"
@@ -121,12 +123,12 @@ jobs:
             "attachments": [{
               "color": "#36a64f",
               "blocks": [
-                {"type": "header", "text": {"type": "plain_text", "text": "✅ Dependabot Update - Squash Merged"}},
+                {"type": "header", "text": {"type": "plain_text", "text": "✅ Dependency Update - Squash Merged"}},
                 {"type": "section", "fields": [
                   {"type": "mrkdwn", "text": "*Repository:*\n${{ github.repository }}"},
                   {"type": "mrkdwn", "text": "*PR:*\n<${{ steps.pr.outputs.url }}|#${{ steps.pr.outputs.number }}>"}
                 ]},
-                {"type": "section", "text": {"type": "mrkdwn", "text": "${{ steps.pr.outputs.title }}"}}
+                {"type": "section", "text": {"type": "mrkdwn", "text": "*Author:* ${{ steps.pr.outputs.author }}\n${{ steps.pr.outputs.title }}"}}
               ]
             }]
           }' "$SLACK_WEBHOOK"
@@ -149,7 +151,7 @@ jobs:
                   {"type": "mrkdwn", "text": "*Repository:*\n${{ github.repository }}"},
                   {"type": "mrkdwn", "text": "*PR:*\n<${{ steps.pr.outputs.url }}|#${{ steps.pr.outputs.number }}>"}
                 ]},
-                {"type": "section", "text": {"type": "mrkdwn", "text": "${{ steps.pr.outputs.title }}\n\nCould not merge PR. Manual intervention required."}}
+                {"type": "section", "text": {"type": "mrkdwn", "text": "*Author:* ${{ steps.pr.outputs.author }}\n${{ steps.pr.outputs.title }}\n\nCould not merge PR. Manual intervention required."}}
               ]
             }]
           }' "$SLACK_WEBHOOK"
@@ -162,7 +164,8 @@ jobs:
     if: |
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'push' &&
-      contains(github.event.workflow_run.head_commit.message, 'dependabot')
+      (contains(github.event.workflow_run.head_commit.message, 'dependabot') ||
+       contains(github.event.workflow_run.head_commit.message, 'cycode'))
     steps:
       - name: Send Slack notification
         run: |
