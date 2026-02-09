@@ -6,7 +6,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
     <PackageReference Include="NSubstitute" Version="5.3.0" />
     <PackageReference Include="NUnit" Version="4.4.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="6.0.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="6.1.0" />
     <PackageReference Include="Shouldly" Version="4.3.0" />
   </ItemGroup>
     <!-- Pin transitive dependencies to version 8.0.x only for net6.0 (which doesn't support 10.0.0) -->
