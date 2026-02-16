@@ -12,9 +12,9 @@
   
   <!-- Pin transitive dependencies to version 8.0.x only for net6.0 (which doesn't support 10.0.0) -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="System.Text.Json" Version="10.0.2" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="10.0.2" />
-    <PackageReference Include="System.IO.Pipelines" Version="10.0.2" />
+    <PackageReference Include="System.Text.Json" Version="10.0.3" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="10.0.3" />
+    <PackageReference Include="System.IO.Pipelines" Version="10.0.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="10.0.2" />
   </ItemGroup>
   <ItemGroup>
