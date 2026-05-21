@@ -1,4 +1,5 @@
 ﻿using log4net.Core;
+using log4net.Util;
 using Logzio.DotNet.Core.InternalLogger;
 using Logzio.DotNet.Core.Shipping;
 using Logzio.DotNet.Log4net;
@@ -36,6 +37,31 @@ namespace Logzio.DotNet.UnitTests.Log4net
             _target.DoAppend(GetLoggingEventWithSomeData());
             _target.Close();
             _shipper.Received().Ship(Arg.Is<LogzioLoggingEvent>(x => (string)x.LogData["DatKey"] == "DatVal"), Arg.Any<ShipperOptions>());
+        }
+
+        [Test]
+        public void Append_WithEventProperties_ShipsPropertyValuesWithSanitizedKeys()
+        {
+            var properties = new PropertiesDictionary();
+            properties["log4net:HostName"] = "host-1";
+            properties["request.id"] = "abc-123";
+
+            var evt = new LoggingEvent(new LoggingEventData
+            {
+                Domain = "Such domain",
+                Level = Level.Info,
+                Message = "msg",
+                Properties = properties
+            });
+
+            _target.DoAppend(evt);
+            _target.Close();
+
+            _shipper.Received().Ship(
+                Arg.Is<LogzioLoggingEvent>(x =>
+                    (string)x.LogData["HostName"] == "host-1" &&
+                    (string)x.LogData["requestid"] == "abc-123"),
+                Arg.Any<ShipperOptions>());
         }
 
         private LoggingEvent GetLoggingEventWithSomeData()

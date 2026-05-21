@@ -99,14 +99,13 @@ namespace Logzio.DotNet.Log4net
                 }
 
                 var properties = loggingEvent.GetProperties();
-                foreach (DictionaryEntry property in properties)
+                foreach (var propertyKey in properties.GetKeys())
                 {
-                    var value = property.Value;
+                    var value = properties[propertyKey];
                     if (value == null || ReferenceEquals(value, ""))
                         continue;
 
-                    var key = property.Key?.ToString() ?? string.Empty;
-                    key = key.Replace(":", "").Replace(".", "").Replace("log4net", "");
+                    var key = (propertyKey ?? string.Empty).Replace(":", "").Replace(".", "").Replace("log4net", "");
                     if (!string.IsNullOrEmpty(key))
                         values[key] = value;
                 }
