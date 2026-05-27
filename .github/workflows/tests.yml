@@ -12,8 +12,12 @@ permissions:
 
 jobs:
   unit-tests:
-    name: Unit Tests (.NET 9.0)
+    name: Unit Tests (.NET 9.0, log4net ${{ matrix.log4net }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        log4net: ['2.0.17', '3.3.0']
     steps:
       - uses: actions/checkout@v6
 
@@ -27,11 +31,11 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./src
-        run: dotnet restore logzio-dotnet.sln
+        run: dotnet restore logzio-dotnet.sln -p:Log4netVersion=${{ matrix.log4net }}
 
       - name: Build package
         working-directory: ./src
-        run: dotnet build logzio-dotnet.sln --configuration Release --no-restore
+        run: dotnet build logzio-dotnet.sln --configuration Release --no-restore -p:Log4netVersion=${{ matrix.log4net }}
 
       - name: Run Unit Tests
         working-directory: ./src
@@ -40,4 +44,5 @@ jobs:
             --configuration Release \
             --no-build \
             --framework net9.0 \
+            -p:Log4netVersion=${{ matrix.log4net }} \
             --logger "console;verbosity=normal"

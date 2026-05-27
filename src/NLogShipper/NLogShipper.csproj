@@ -14,8 +14,8 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/logzio/logzio-dotnet</RepositoryUrl>
-    <PackageVersion>1.2.0</PackageVersion>
-    <PackageReleaseNotes>Option to format message as json</PackageReleaseNotes>
+    <PackageVersion>1.2.1</PackageVersion>
+    <PackageReleaseNotes>No functional changes — released alongside Logzio.DotNet.Log4net 1.2.1.</PackageReleaseNotes>
     <PackageReadmeFile>nlog.md</PackageReadmeFile>
   </PropertyGroup>
  
